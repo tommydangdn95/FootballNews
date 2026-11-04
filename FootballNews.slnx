@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FootballNews.App/FootballNews.App.csproj" />
+    <Project Path="src/FootballNews.Core/FootballNews.Core.csproj" />
+    <Project Path="src/FootballNews.Rendering/FootballNews.Rendering.csproj" />
+    <Project Path="src/FootballNews.Sources.Espn/FootballNews.Sources.Espn.csproj" />
+    <Project Path="src/FootballNews.Telegram/FootballNews.Telegram.csproj" />
+    <Project Path="src/FootballNews.Tests/FootballNews.Tests.csproj" />
+  </Folder>
+</Solution>

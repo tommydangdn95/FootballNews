@@ -1,0 +1,60 @@
+name: football-news
+
+on:
+  schedule:
+    # 07:50 giờ Việt Nam. Chạy sớm 10 phút vì cron của GitHub hay trễ.
+    - cron: '50 0 * * *'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Nội dung cần chạy
+        type: choice
+        options: [daily, results, upcoming]
+        default: daily
+      date:
+        description: Ngày báo cáo yyyy-MM-dd (để trống là hôm nay)
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: football-news
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NOTIFY_WHEN_EMPTY: ${{ vars.NOTIFY_WHEN_EMPTY }}
+          JOB_INPUT: ${{ inputs.job }}
+          DATE_INPUT: ${{ inputs.date }}
+        run: |
+          args=("${JOB_INPUT:-daily}")
+          if [ -n "$DATE_INPUT" ]; then args+=(--date "$DATE_INPUT"); fi
+          dotnet run -c Release --project src/FootballNews.App -- "${args[@]}"
+
+      # Luôn commit, kể cả khi bước trên lỗi: phần đã gửi xong không được báo lại.
+      - name: Commit state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/announced.json
+          if git diff --cached --quiet; then
+            echo "Không có thay đổi."
+          else
+            git commit -m "chore: update announced.json"
+            git pull --rebase
+            git push
+          fi

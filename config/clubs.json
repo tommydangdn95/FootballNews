@@ -1,0 +1,33 @@
+{
+  "clubs": [
+    { "espnId": "359",   "name": "Arsenal",         "priority": 1, "hashtag": "Arsenal" },
+    { "espnId": "382",   "name": "Man City",        "priority": 1, "hashtag": "ManCity" },
+    { "espnId": "364",   "name": "Liverpool",       "priority": 1, "hashtag": "Liverpool" },
+    { "espnId": "360",   "name": "Man Utd",         "priority": 1, "hashtag": "MU" },
+    { "espnId": "363",   "name": "Chelsea",         "priority": 1, "hashtag": "Chelsea" },
+    { "espnId": "367",   "name": "Tottenham",       "priority": 2, "hashtag": "Tottenham" },
+    { "espnId": "361",   "name": "Newcastle",       "priority": 2, "hashtag": "Newcastle" },
+    { "espnId": "362",   "name": "Aston Villa",     "priority": 2, "hashtag": "AstonVilla" },
+
+    { "espnId": "132",   "name": "Bayern",          "priority": 1, "hashtag": "Bayern" },
+    { "espnId": "124",   "name": "Dortmund",        "priority": 2, "hashtag": "Dortmund" },
+    { "espnId": "11420", "name": "Leipzig",         "priority": 2, "hashtag": "Leipzig" },
+    { "espnId": "131",   "name": "Leverkusen",      "priority": 2, "hashtag": "Leverkusen" },
+
+    { "espnId": "160",   "name": "PSG",             "priority": 1, "hashtag": "PSG" },
+    { "espnId": "176",   "name": "Marseille",       "priority": 2, "hashtag": "Marseille" },
+    { "espnId": "167",   "name": "Lyon",            "priority": 2, "hashtag": "Lyon" },
+    { "espnId": "174",   "name": "Monaco",          "priority": 2, "hashtag": "Monaco" },
+
+    { "espnId": "86",    "name": "Real Madrid",     "priority": 1, "hashtag": "RealMadrid" },
+    { "espnId": "83",    "name": "Barcelona",       "priority": 1, "hashtag": "Barcelona" },
+    { "espnId": "1068",  "name": "Atlético Madrid", "priority": 2, "hashtag": "AtleticoMadrid" },
+    { "espnId": "110",   "name": "Inter",           "priority": 2, "hashtag": "Inter" },
+    { "espnId": "103",   "name": "Milan",           "priority": 2, "hashtag": "ACMilan" },
+    { "espnId": "111",   "name": "Juventus",        "priority": 2, "hashtag": "Juventus" },
+    { "espnId": "114",   "name": "Napoli",          "priority": 2, "hashtag": "Napoli" },
+    { "espnId": "1929",  "name": "Benfica",         "priority": 2, "hashtag": "Benfica" },
+    { "espnId": "437",   "name": "Porto",           "priority": 2, "hashtag": "Porto" },
+    { "espnId": "139",   "name": "Ajax",            "priority": 2, "hashtag": "Ajax" }
+  ]
+}
