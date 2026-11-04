@@ -1,1 +1,57 @@
-{ "upcoming": {}, "results": {} }
+{
+  "upcoming": {
+    "401915383": {
+      "kickoffUtc": "2026-11-04T17:45:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.champions",
+      "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    },
+    "401915382": {
+      "kickoffUtc": "2026-11-04T17:45:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.champions",
+      "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    },
+    "401915304": {
+      "kickoffUtc": "2026-11-04T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.champions",
+      "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    },
+    "401915301": {
+      "kickoffUtc": "2026-11-04T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.champions",
+      "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    },
+    "401915306": {
+      "kickoffUtc": "2026-11-04T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.champions",
+      "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    },
+    "401915381": {
+      "kickoffUtc": "2026-11-04T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.champions",
+      "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    }
+  },
+  "results": {
+    "401915386": {
+      "announcedAt": "2026-11-04T13:55:23.8509938+00:00"
+    },
+    "401915387": {
+      "announcedAt": "2026-11-04T13:55:23.8509938+00:00"
+    },
+    "401915307": {
+      "announcedAt": "2026-11-04T13:55:23.8509938+00:00"
+    },
+    "401915308": {
+      "announcedAt": "2026-11-04T13:55:23.8509938+00:00"
+    },
+    "401915309": {
+      "announcedAt": "2026-11-04T13:55:23.8509938+00:00"
+    }
+  }
+}
