@@ -11,7 +11,7 @@ using FootballNews.Telegram;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-const string usage = "Cách dùng: <daily|results|upcoming> [--date yyyy-MM-dd] [--dry-run]";
+const string usage = "Cách dùng: <daily|results|upcoming> [--date yyyy-MM-dd] [--dry-run] [--force]";
 
 DigestKind[]? kinds = args.FirstOrDefault() switch
 {
@@ -28,11 +28,16 @@ if (kinds is null)
 
 var date = ReportWindow.VietnamToday(DateTimeOffset.UtcNow);
 var dryRun = false;
+var force = false;
 for (var i = 1; i < args.Length; i++)
 {
     if (args[i] == "--dry-run")
     {
         dryRun = true;
+    }
+    else if (args[i] == "--force")
+    {
+        force = true;
     }
     else if (args[i] == "--date" && i + 1 < args.Length
         && DateOnly.TryParseExact(args[++i], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
@@ -77,8 +82,13 @@ try
         new AnnouncedStore(Path.Combine(root, "data", "announced.json")),
         renderer,
         publisher,
-        saveState: !dryRun,
-        notifyWhenEmpty: Environment.GetEnvironmentVariable("NOTIFY_WHEN_EMPTY") == "true");
+        ignoreAnnounced: force,
+        // Chạy force để test: không lưu trạng thái để lần chạy thật vẫn báo đủ, và luôn có tin phản hồi.
+        saveState: !dryRun && !force,
+        notifyWhenEmpty: force || Environment.GetEnvironmentVariable("NOTIFY_WHEN_EMPTY") == "true");
+
+    if (force)
+        await publisher.NotifyAsync($"🧪 Chạy test ({args[0]}, {date:yyyy-MM-dd}): gửi lại cả trận đã báo, không lưu trạng thái.", cts.Token);
 
     await runner.RunAsync(kinds, date, cts.Token);
     return 0;

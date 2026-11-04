@@ -133,7 +133,7 @@ Liverpool 0–1 Arsenal
 ## 8. Hạ tầng
 - **Runtime:** .NET (console app), chạy trên **GitHub Actions**.
 - **Cron (UTC):** `daily` 07:50 VN → `50 0 * * *` (chạy sớm 10 phút vì cron GitHub hay trễ, tránh giờ tròn).
-- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming` và `date` (để test lại ngày cũ).
+- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (test thông báo: gửi lại cả trận đã báo, không lưu trạng thái, không có trận thì vẫn gửi 1 dòng).
 - Chạy thử ở máy, không gửi và không ghi trạng thái: `dotnet run --project src/FootballNews.App -- daily --date yyyy-MM-dd --dry-run` (kết quả nằm trong `output/`).
 - **Secrets:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, (tuỳ chọn) `FOOTBALL_DATA_TOKEN`.
 - **Biến tuỳ chọn:** `NOTIFY_WHEN_EMPTY=true` để gửi 1 dòng khi không có trận.

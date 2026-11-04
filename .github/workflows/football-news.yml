@@ -14,6 +14,10 @@ on:
       date:
         description: Ngày báo cáo yyyy-MM-dd (để trống là hôm nay)
         required: false
+      force:
+        description: Test thông báo - gửi lại cả trận đã báo, không lưu trạng thái
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -39,9 +43,11 @@ jobs:
           NOTIFY_WHEN_EMPTY: ${{ vars.NOTIFY_WHEN_EMPTY }}
           JOB_INPUT: ${{ inputs.job }}
           DATE_INPUT: ${{ inputs.date }}
+          FORCE_INPUT: ${{ inputs.force }}
         run: |
           args=("${JOB_INPUT:-daily}")
           if [ -n "$DATE_INPUT" ]; then args+=(--date "$DATE_INPUT"); fi
+          if [ "$FORCE_INPUT" = "true" ]; then args+=(--force); fi
           dotnet run -c Release --project src/FootballNews.App -- "${args[@]}"
 
       # Luôn commit, kể cả khi bước trên lỗi: phần đã gửi xong không được báo lại.

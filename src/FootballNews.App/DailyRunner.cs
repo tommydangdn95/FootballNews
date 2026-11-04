@@ -15,6 +15,7 @@ internal sealed class DailyRunner(
     AnnouncedStore store,
     CardRenderer renderer,
     IPublisher publisher,
+    bool ignoreAnnounced,
     bool saveState,
     bool notifyWhenEmpty)
 {
@@ -23,7 +24,7 @@ internal sealed class DailyRunner(
     public async Task RunAsync(IReadOnlyList<DigestKind> kinds, DateOnly vietnamDate, CancellationToken ct)
     {
         var reference = ReportWindow.ReferenceFor(vietnamDate);
-        var state = store.Load();
+        var state = ignoreAnnounced ? new AnnouncedState() : store.Load();
         var sentAny = false;
 
         foreach (var kind in kinds)
