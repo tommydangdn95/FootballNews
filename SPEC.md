@@ -97,7 +97,7 @@ GET https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/scoreboard?dates
 ## 7. Đầu ra: bản nháp gửi Telegram
 Mỗi phần (`results`, `upcoming`) gửi **ảnh bảng tỉ số** trước, rồi **3 tin nhắn**, mỗi tin 1 nền tảng (bấm vào khối chữ để copy nhanh).
 
-**Ảnh:** dựng từ HTML/CSS (`CardHtml`) rồi chụp thành PNG bằng Chrome/Edge có sẵn qua Playwright. Có logo đội, tối đa 6 trận/ảnh, màu và tên trang sửa trong `config/card.json`. Không vẽ được ảnh thì vẫn gửi bài chữ và báo cảnh báo.
+**Ảnh:** dựng từ HTML/CSS (`CardHtml`) rồi chụp thành PNG bằng Chrome/Edge có sẵn qua Playwright. Mỗi ảnh vẽ **2 bản tiếng Việt và tiếng Anh** (bài chữ vẫn chỉ tiếng Việt). Bản tiếng Việt dùng giờ VN, bản tiếng Anh dùng giờ Anh (`Europe/London`, tự đổi GMT/BST); cả giờ và ngày đều tính theo múi giờ của từng bản. Đầu ảnh ghi ngày thi đấu; nếu các trận thuộc nhiều ngày thì ghi khoảng ngày và thêm ngày dưới từng trận. Có logo đội, tối đa 6 trận/ảnh, màu và tên trang sửa trong `config/card.json`. Không vẽ được ảnh thì vẫn gửi bài chữ và báo cảnh báo.
 
 | Nền tảng | Giới hạn | Định dạng |
 |---|---|---|

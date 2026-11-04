@@ -119,7 +119,7 @@ internal sealed class DailyRunner(
     }
 
     // Không vẽ được ảnh thì vẫn gửi bài chữ và báo cho chủ trang biết.
-    private async Task<IReadOnlyList<byte[]>> RenderCardsAsync(Digest digest, CancellationToken ct)
+    private async Task<IReadOnlyList<CardImage>> RenderCardsAsync(Digest digest, CancellationToken ct)
     {
         try
         {

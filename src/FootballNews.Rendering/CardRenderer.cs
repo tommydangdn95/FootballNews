@@ -3,12 +3,14 @@ using Microsoft.Playwright;
 
 namespace FootballNews.Rendering;
 
+public sealed record CardImage(string Language, int Page, byte[] Png);
+
 /// <summary>Chụp HTML thành PNG bằng Chrome hoặc Edge có sẵn trên máy.</summary>
 public sealed class CardRenderer(CardHtml html)
 {
     private static readonly string[] BrowserChannels = ["chrome", "msedge"];
 
-    public async Task<IReadOnlyList<byte[]>> RenderAsync(Digest digest)
+    public async Task<IReadOnlyList<CardImage>> RenderAsync(Digest digest)
     {
         using var playwright = await Playwright.CreateAsync();
         await using var browser = await LaunchAsync(playwright);
@@ -17,12 +19,17 @@ public sealed class CardRenderer(CardHtml html)
             ViewportSize = new ViewportSize { Width = 1080, Height = 1350 },
         });
 
-        var images = new List<byte[]>();
-        foreach (var content in html.BuildPages(digest))
+        var images = new List<CardImage>();
+        foreach (var locale in CardLocale.All)
         {
-            await page.SetContentAsync(content, new PageSetContentOptions { WaitUntil = WaitUntilState.NetworkIdle });
-            await page.EvaluateAsync("() => document.fonts.ready.then(() => true)");
-            images.Add(await page.Locator(".card").ScreenshotAsync(new LocatorScreenshotOptions { Type = ScreenshotType.Png }));
+            var contents = html.BuildPages(digest, locale);
+            for (var i = 0; i < contents.Count; i++)
+            {
+                await page.SetContentAsync(contents[i], new PageSetContentOptions { WaitUntil = WaitUntilState.NetworkIdle });
+                await page.EvaluateAsync("() => document.fonts.ready.then(() => true)");
+                var png = await page.Locator(".card").ScreenshotAsync(new LocatorScreenshotOptions { Type = ScreenshotType.Png });
+                images.Add(new CardImage(locale.Code, i + 1, png));
+            }
         }
         return images;
     }

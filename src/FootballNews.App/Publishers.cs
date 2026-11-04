@@ -1,21 +1,28 @@
 using FootballNews.Core.Formatting;
 using FootballNews.Core.Models;
+using FootballNews.Rendering;
 using FootballNews.Telegram;
 
 namespace FootballNews.App;
 
 internal interface IPublisher
 {
-    Task PublishAsync(DigestKind kind, IReadOnlyList<byte[]> cards, IReadOnlyList<Draft> drafts, CancellationToken ct);
+    Task PublishAsync(DigestKind kind, IReadOnlyList<CardImage> cards, IReadOnlyList<Draft> drafts, CancellationToken ct);
     Task NotifyAsync(string message, CancellationToken ct);
+}
+
+internal static class CardFileName
+{
+    public static string For(DigestKind kind, CardImage card) =>
+        $"{kind.ToString().ToLowerInvariant()}-{card.Language}-{card.Page}.png";
 }
 
 internal sealed class TelegramPublisher(TelegramClient telegram) : IPublisher
 {
-    public async Task PublishAsync(DigestKind kind, IReadOnlyList<byte[]> cards, IReadOnlyList<Draft> drafts, CancellationToken ct)
+    public async Task PublishAsync(DigestKind kind, IReadOnlyList<CardImage> cards, IReadOnlyList<Draft> drafts, CancellationToken ct)
     {
-        for (var i = 0; i < cards.Count; i++)
-            await telegram.SendPhotoAsync(cards[i], $"{kind.ToString().ToLowerInvariant()}-{i + 1}.png", ct);
+        foreach (var card in cards)
+            await telegram.SendPhotoAsync(card.Png, CardFileName.For(kind, card), ct);
 
         foreach (var message in drafts.SelectMany(TelegramMessages.Build))
             await telegram.SendHtmlAsync(message, ct);
@@ -27,13 +34,13 @@ internal sealed class TelegramPublisher(TelegramClient telegram) : IPublisher
 /// <summary>Chạy thử: ghi ảnh và bài nháp ra thư mục, không gửi đi đâu.</summary>
 internal sealed class FilePublisher(string directory) : IPublisher
 {
-    public async Task PublishAsync(DigestKind kind, IReadOnlyList<byte[]> cards, IReadOnlyList<Draft> drafts, CancellationToken ct)
+    public async Task PublishAsync(DigestKind kind, IReadOnlyList<CardImage> cards, IReadOnlyList<Draft> drafts, CancellationToken ct)
     {
         Directory.CreateDirectory(directory);
-        var prefix = kind.ToString().ToLowerInvariant();
-        for (var i = 0; i < cards.Count; i++)
-            await File.WriteAllBytesAsync(Path.Combine(directory, $"{prefix}-card-{i + 1}.png"), cards[i], ct);
+        foreach (var card in cards)
+            await File.WriteAllBytesAsync(Path.Combine(directory, CardFileName.For(kind, card)), card.Png, ct);
 
+        var prefix = kind.ToString().ToLowerInvariant();
         foreach (var draft in drafts)
         {
             var text = string.Join("\n\n--- tweet tiếp theo ---\n\n", draft.Parts);
