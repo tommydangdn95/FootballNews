@@ -35,6 +35,48 @@
       "status": "scheduled",
       "competition": "uefa.champions",
       "announcedAt": "2026-11-04T13:55:28.9240784+00:00"
+    },
+    "401915534": {
+      "kickoffUtc": "2026-11-05T17:45:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401915537": {
+      "kickoffUtc": "2026-11-05T17:45:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401915529": {
+      "kickoffUtc": "2026-11-05T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401915533": {
+      "kickoffUtc": "2026-11-05T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401915525": {
+      "kickoffUtc": "2026-11-05T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401915829": {
+      "kickoffUtc": "2026-11-05T17:45:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa.conf",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401915824": {
+      "kickoffUtc": "2026-11-05T20:00:00+00:00",
+      "status": "scheduled",
+      "competition": "uefa.europa.conf",
+      "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
     }
   },
   "results": {
@@ -52,6 +94,24 @@
     },
     "401915309": {
       "announcedAt": "2026-11-04T13:55:23.8509938+00:00"
+    },
+    "401915383": {
+      "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
+    },
+    "401915382": {
+      "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
+    },
+    "401915304": {
+      "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
+    },
+    "401915301": {
+      "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
+    },
+    "401915306": {
+      "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
+    },
+    "401915381": {
+      "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
     }
   }
 }
