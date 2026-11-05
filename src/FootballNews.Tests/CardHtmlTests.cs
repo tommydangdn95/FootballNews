@@ -180,11 +180,12 @@ public class CardHtmlTests
     }
 
     [Fact]
-    public void Results_over_many_days_show_the_date_range_instead_of_last_night()
+    public void Results_over_many_days_have_no_date_range_and_do_not_say_last_night()
     {
         var page = SinglePage(Results(Night.AddDays(-6), Night.AddDays(-3), Night), CardLocale.Vietnamese);
 
-        Assert.Contains("30/10 – 05/11/2026", page);
+        Assert.DoesNotContain("<div class=\"date\">", page);
+        Assert.DoesNotContain("30/10 –", page);
         Assert.Contains(WebUtility.HtmlEncode("Các trận gần đây"), page);
         Assert.DoesNotContain("Đêm qua", page);
     }

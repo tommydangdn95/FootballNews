@@ -52,7 +52,8 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         var sb = new StringBuilder();
         sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css()).Append("</style></head><body><div class=\"card\">");
         sb.Append($"<header><div class=\"heading\"><h1>{E(isResults ? locale.ResultsTitle : locale.UpcomingTitle)}</h1>");
-        if (!isDailyResults)
+        // Ảnh kết quả đã ghi ngày giờ dưới từng trận; khoảng ngày nằm trong tin Telegram.
+        if (!isResults)
             sb.Append($"<div class=\"date\">{E(DateLine(locale, dates))}</div>");
         var subtitle = !isResults ? locale.UpcomingSubtitle : isDailyResults ? locale.ResultsSubtitle : locale.RecentResultsSubtitle;
         sb.Append($"<p>{E(subtitle)}</p></div>");
