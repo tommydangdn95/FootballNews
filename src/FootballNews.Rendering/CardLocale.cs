@@ -1,6 +1,5 @@
 using System.Globalization;
 using FootballNews.Core.Filtering;
-using FootballNews.Core.Formatting;
 using FootballNews.Core.Models;
 
 namespace FootballNews.Rendering;
@@ -20,9 +19,7 @@ public sealed record CardLocale(
     string NewTime,
     string OwnGoal,
     Func<Competition, string> CompetitionName,
-    Func<DateOnly, string> ShortDate,
-    Func<DateOnly, string> YearDate,
-    Func<DateOnly, string> Weekday)
+    Func<DateOnly, string> ShortDate)
 {
     // Giờ Anh đổi theo mùa (GMT/BST) nên phải dùng múi giờ thật, không dùng độ lệch cố định.
     private static readonly TimeZoneInfo UkTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
@@ -41,9 +38,7 @@ public sealed record CardLocale(
         NewTime: "giờ mới",
         OwnGoal: "phản lưới",
         CompetitionName: c => c.Name,
-        ShortDate: d => d.ToString("dd/MM", CultureInfo.InvariantCulture),
-        YearDate: d => d.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
-        Weekday: VietnameseCalendar.Weekday);
+        ShortDate: d => d.ToString("dd/MM", CultureInfo.InvariantCulture));
 
     public static readonly CardLocale English = new(
         Code: "en",
@@ -59,9 +54,7 @@ public sealed record CardLocale(
         NewTime: "new time",
         OwnGoal: "o.g.",
         CompetitionName: c => c.EnglishName,
-        ShortDate: d => d.ToString("d MMM", CultureInfo.InvariantCulture),
-        YearDate: d => d.ToString("d MMM yyyy", CultureInfo.InvariantCulture),
-        Weekday: d => d.ToString("dddd", CultureInfo.InvariantCulture));
+        ShortDate: d => d.ToString("d MMM", CultureInfo.InvariantCulture));
 
     /// <summary>Các ngôn ngữ cần vẽ, theo thứ tự gửi đi.</summary>
     public static readonly IReadOnlyList<CardLocale> All = [Vietnamese, English];

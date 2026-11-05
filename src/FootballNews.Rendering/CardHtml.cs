@@ -52,9 +52,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         var sb = new StringBuilder();
         sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css()).Append("</style></head><body><div class=\"card\">");
         sb.Append($"<header><div class=\"heading\"><h1>{E(isResults ? locale.ResultsTitle : locale.UpcomingTitle)}</h1>");
-        // Ảnh kết quả đã ghi ngày giờ dưới từng trận; khoảng ngày nằm trong tin Telegram.
-        if (!isResults)
-            sb.Append($"<div class=\"date\">{E(DateLine(locale, dates))}</div>");
+        // Ảnh ghi ngày dưới từng trận; khoảng ngày nằm trong tin Telegram.
         var subtitle = !isResults ? locale.UpcomingSubtitle : isDailyResults ? locale.ResultsSubtitle : locale.RecentResultsSubtitle;
         sb.Append($"<p>{E(subtitle)}</p></div>");
         if (pageLogoBase64.Length > 0)
@@ -65,7 +63,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         {
             sb.Append($"<section><h2>{E(group.Key)}</h2>");
             foreach (var (match, isUpdate) in group)
-                sb.Append(MatchRow(kind, locale, match, isUpdate, showDate: dates.Count > 1));
+                sb.Append(MatchRow(kind, locale, match, isUpdate));
             sb.Append("</section>");
         }
 
@@ -74,19 +72,10 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         return sb.ToString();
     }
 
-    private static string DateLine(CardLocale locale, List<DateOnly> dates)
-    {
-        if (dates.Count == 0)
-            return "";
-        return dates.Count == 1
-            ? $"{locale.Weekday(dates[0])}, {locale.YearDate(dates[0])}"
-            : $"{locale.ShortDate(dates[0])} – {locale.YearDate(dates[^1])}";
-    }
-
-    private string MatchRow(DigestKind kind, CardLocale locale, Match m, bool isUpdate, bool showDate)
+    private string MatchRow(DigestKind kind, CardLocale locale, Match m, bool isUpdate)
     {
         var center = isUpdate ? UpdateCenter(locale, m)
-            : kind == DigestKind.Upcoming ? TimeCenter(locale, m, showDate)
+            : kind == DigestKind.Upcoming ? TimeCenter(locale, m)
             : ScoreCenter(locale, m);
 
         var below = isUpdate || kind == DigestKind.Upcoming
@@ -105,8 +94,8 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
             """;
     }
 
-    private static string TimeCenter(CardLocale locale, Match m, bool showDate) =>
-        $"<div class=\"center\"><div class=\"time\">{Clock(locale, m)}</div>{MatchDate(locale, m, showDate)}</div>";
+    private static string TimeCenter(CardLocale locale, Match m) =>
+        $"<div class=\"center\"><div class=\"time\">{Clock(locale, m)}</div><div class=\"pen\">{E(locale.ShortDate(LocalDate(locale, m)))}</div></div>";
 
     private static string ScoreCenter(CardLocale locale, Match m)
     {
@@ -115,10 +104,6 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
             : "";
         return $"<div class=\"center\"><div class=\"score\">{m.Home.Score}–{m.Away.Score}</div>{shootout}<div class=\"pen\">{E(locale.ShortDate(LocalDate(locale, m)))} · {Clock(locale, m)}</div></div>";
     }
-
-    private static string MatchDate(CardLocale locale, Match m, bool showDate) => showDate
-        ? $"<div class=\"pen\">{E(locale.ShortDate(LocalDate(locale, m)))}</div>"
-        : "";
 
     private static string UpdateCenter(CardLocale locale, Match m) => m.Status switch
     {
@@ -177,23 +162,22 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         .heading { border-left: 12px solid {{theme.Accent}}; padding-left: 24px; }
         .page-logo { height: 170px; }
         h1 { font-size: 64px; font-weight: 700; line-height: 1.15; }
-        .date { font-size: 34px; font-weight: 700; color: {{theme.Accent}}; margin-top: 4px; }
         header p { font-size: 28px; color: {{theme.Muted}}; margin-top: 2px; }
         section { margin-bottom: 28px; }
         h2 { font-size: 26px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-bottom: 14px; }
-        article { background: {{theme.Surface}}; border-radius: 20px; padding: 22px 24px; margin-bottom: 14px; }
+        article { background: linear-gradient(90deg, {{theme.Surface}}, {{theme.SurfaceEnd}}); color: {{theme.SurfaceText}}; border-radius: 56px; padding: 22px 36px; margin-bottom: 14px; }
         .line { display: grid; grid-template-columns: 1fr 170px 1fr; align-items: center; column-gap: 14px; }
         .team { display: flex; align-items: center; gap: 16px; min-width: 0; }
         .home { justify-content: flex-end; text-align: right; }
         .name { font-size: 32px; font-weight: 700; line-height: 1.2; }
-        .logo { flex: none; width: 72px; height: 72px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; }
-        .logo img { width: 56px; height: 56px; object-fit: contain; }
+        .logo { flex: none; width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; }
+        .logo img { width: 72px; height: 72px; object-fit: contain; }
         .center { text-align: center; }
-        .score { font-size: 54px; font-weight: 700; color: {{theme.Accent}}; text-align: center; line-height: 1.1; }
-        .time { font-size: 44px; font-weight: 700; color: {{theme.Accent}}; text-align: center; line-height: 1.15; }
-        .pen { font-size: 20px; color: {{theme.Muted}}; text-align: center; }
+        .score { font-size: 54px; font-weight: 700; color: {{theme.SurfaceText}}; text-align: center; line-height: 1.1; }
+        .time { font-size: 44px; font-weight: 700; color: {{theme.SurfaceText}}; text-align: center; line-height: 1.15; }
+        .pen { font-size: 20px; color: {{theme.SurfaceMuted}}; text-align: center; }
         .tag { font-size: 24px; font-weight: 700; color: #1A1206; background: #FFB020; border-radius: 12px; padding: 10px 0; text-align: center; }
-        .below { display: grid; grid-template-columns: 1fr 1fr; column-gap: 198px; margin-top: 10px; font-size: 23px; line-height: 1.4; color: {{theme.Muted}}; }
+        .below { display: grid; grid-template-columns: 1fr 1fr; column-gap: 198px; margin-top: 10px; font-size: 23px; line-height: 1.4; color: {{theme.SurfaceMuted}}; }
         .below:not(:has(div > *)) { display: none; }
         .left { text-align: right; }
         .form { display: inline-flex; gap: 6px; }

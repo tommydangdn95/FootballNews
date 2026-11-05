@@ -1,7 +1,10 @@
 {
   "pageName": "Matchday Challenge",
   "background": "#00122E",
-  "surface": "#0C2A52",
+  "surface": "#C8F02A",
+  "surfaceEnd": "#2CE3E0",
+  "surfaceText": "#00122E",
+  "surfaceMuted": "#1D3A5F",
   "accent": "#A4F81C",
   "text": "#F8F8F8",
   "muted": "#AFC0D6"

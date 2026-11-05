@@ -8,7 +8,7 @@ namespace FootballNews.Tests;
 
 public class CardHtmlTests
 {
-    private static readonly CardTheme Theme = new("Trang <test>", "#000", "#111", "#fff", "#eee", "#ccc");
+    private static readonly CardTheme Theme = new("Trang <test>", "#000", "#111", "#222", "#333", "#444", "#fff", "#eee", "#ccc");
     private static readonly CardHtml Html = new(TestData.Clubs, Theme, "", "");
 
     // 03:00 ngày 05/11/2026 và 19:30 ngày 05/11/2026 giờ Việt Nam.
@@ -55,10 +55,16 @@ public class CardHtmlTests
     }
 
     [Fact]
-    public void Single_day_shows_weekday_and_full_date_in_both_languages()
+    public void Upcoming_page_has_no_date_heading()
     {
-        Assert.Contains("Thứ Năm, 05/11/2026", SinglePage(Upcoming(Night, SameDayEvening), CardLocale.Vietnamese));
-        Assert.Contains("Thursday, 5 Nov 2026", SinglePage(Upcoming(SameDayEvening, SameDayEvening), CardLocale.English));
+        var digest = Upcoming(DayBeforeEvening, SameDayEvening);
+
+        Assert.All(CardLocale.All, locale =>
+        {
+            var page = SinglePage(digest, locale);
+            Assert.DoesNotContain("<div class=\"date\">", page);
+            Assert.DoesNotContain("–", page);
+        });
     }
 
     [Fact]
@@ -68,11 +74,11 @@ public class CardHtmlTests
 
         var vietnamese = SinglePage(digest, CardLocale.Vietnamese);
         Assert.Contains(">03:00<", vietnamese);
-        Assert.Contains("Thứ Năm, 05/11/2026", vietnamese);
+        Assert.Contains("<div class=\"pen\">05/11</div>", vietnamese);
 
         var english = SinglePage(digest, CardLocale.English);
         Assert.Contains(">20:00<", english);
-        Assert.Contains("Wednesday, 4 Nov 2026", english);
+        Assert.Contains("<div class=\"pen\">4 Nov</div>", english);
     }
 
     [Fact]
@@ -85,23 +91,23 @@ public class CardHtmlTests
     }
 
     [Fact]
-    public void Single_day_has_no_per_match_date()
+    public void Single_day_still_shows_the_date_under_every_match()
     {
-        Assert.DoesNotContain("<div class=\"pen\">", SinglePage(Upcoming(Night, SameDayEvening), CardLocale.Vietnamese));
+        var page = SinglePage(Upcoming(Night, SameDayEvening), CardLocale.Vietnamese);
+
+        Assert.Equal(2, page.Split("<div class=\"pen\">05/11</div>").Length - 1);
     }
 
     [Fact]
-    public void Several_days_show_range_and_per_match_date()
+    public void Several_days_show_per_match_date()
     {
         var digest = Upcoming(DayBeforeEvening, SameDayEvening);
 
         var vietnamese = SinglePage(digest, CardLocale.Vietnamese);
-        Assert.Contains("04/11 – 05/11/2026", vietnamese);
         Assert.Contains("<div class=\"pen\">04/11</div>", vietnamese);
         Assert.Contains("<div class=\"pen\">05/11</div>", vietnamese);
 
         var english = SinglePage(digest, CardLocale.English);
-        Assert.Contains("4 Nov – 5 Nov 2026", english);
         Assert.Contains("<div class=\"pen\">5 Nov</div>", english);
     }
 
@@ -109,7 +115,10 @@ public class CardHtmlTests
     public void Date_uses_vietnam_time_not_utc()
     {
         // 20:00 ngày 04/11 theo UTC đã là ngày 05/11 ở Việt Nam.
-        Assert.DoesNotContain("04/11/2026", SinglePage(Upcoming(Night, Night), CardLocale.Vietnamese));
+        var page = SinglePage(Upcoming(Night, Night), CardLocale.Vietnamese);
+
+        Assert.Contains("<div class=\"pen\">05/11</div>", page);
+        Assert.DoesNotContain("04/11", page);
     }
 
     [Fact]
@@ -221,6 +230,31 @@ public class CardHtmlTests
 
         Assert.DoesNotContain("page-logo\" src", SinglePage(digest, CardLocale.Vietnamese));
         Assert.Contains("data:image/png;base64,QUJD", new CardHtml(TestData.Clubs, Theme, "", "", "QUJD").BuildPages(digest, CardLocale.Vietnamese).Single());
+    }
+
+    [Fact]
+    public void Match_rows_use_the_theme_gradient()
+    {
+        Assert.Contains("linear-gradient(90deg, #111, #222)", SinglePage(Upcoming(Night, Night), CardLocale.Vietnamese));
+    }
+
+    [Fact]
+    public void Real_theme_config_can_be_loaded()
+    {
+        var theme = CardTheme.Load(Path.Combine(FindConfigDirectory(), "card.json"));
+
+        Assert.All(new[] { theme.Surface, theme.SurfaceEnd, theme.SurfaceText, theme.SurfaceMuted }, Assert.NotEmpty);
+    }
+
+    private static string FindConfigDirectory()
+    {
+        for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
+        {
+            var config = Path.Combine(dir.FullName, "config");
+            if (File.Exists(Path.Combine(config, "card.json")))
+                return config;
+        }
+        throw new DirectoryNotFoundException("Không tìm thấy config/card.json");
     }
 
     [Fact]
