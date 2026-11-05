@@ -233,6 +233,32 @@ public class CardHtmlTests
     }
 
     [Fact]
+    public void Upcoming_page_shows_the_encoded_venue_in_both_languages()
+    {
+        var match = TestData.Match("1", Night) with { Venue = "St <James'> Park" };
+        var digest = new Digest(DigestKind.Upcoming, [match], []);
+
+        Assert.All(CardLocale.All, locale =>
+            Assert.Contains($"<div class=\"venue\">{WebUtility.HtmlEncode(match.Venue)}</div>", SinglePage(digest, locale)));
+    }
+
+    [Fact]
+    public void Upcoming_page_without_venue_has_no_venue_line()
+    {
+        Assert.DoesNotContain("<div class=\"venue\">", SinglePage(Upcoming(Night), CardLocale.Vietnamese));
+    }
+
+    [Fact]
+    public void Results_and_updates_do_not_show_the_venue()
+    {
+        var finished = TestData.Match("1", Night, MatchStatus.Finished, homeScore: 1, awayScore: 0) with { Venue = "Anfield" };
+        var moved = TestData.Match("2", Night) with { Venue = "Anfield" };
+
+        Assert.DoesNotContain("Anfield", SinglePage(new Digest(DigestKind.Results, [finished], []), CardLocale.Vietnamese));
+        Assert.DoesNotContain("Anfield", SinglePage(new Digest(DigestKind.Upcoming, [], [moved]), CardLocale.Vietnamese));
+    }
+
+    [Fact]
     public void Match_rows_use_the_theme_gradient()
     {
         Assert.Contains("linear-gradient(90deg, #111, #222)", SinglePage(Upcoming(Night, Night), CardLocale.Vietnamese));

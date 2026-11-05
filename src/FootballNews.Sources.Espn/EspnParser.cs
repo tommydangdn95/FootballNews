@@ -48,8 +48,18 @@ public static partial class EspnParser
             ? details.EnumerateArray().Select(ParseEvent).OfType<MatchEvent>().ToList()
             : [];
 
-        return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events);
+        return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events, ParseVenue(c));
     }
+
+    // Không bắt buộc: thiếu tên sân thì ảnh chỉ không ghi sân.
+    private static string? ParseVenue(JsonElement c) =>
+        c.TryGetProperty("venue", out var venue)
+            && venue.ValueKind == JsonValueKind.Object
+            && venue.TryGetProperty("fullName", out var name)
+            && name.ValueKind == JsonValueKind.String
+            && !string.IsNullOrWhiteSpace(name.GetString())
+            ? name.GetString()
+            : null;
 
     private static MatchStatus ParseStatus(JsonElement type)
     {

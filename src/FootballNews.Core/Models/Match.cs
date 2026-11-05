@@ -11,4 +11,5 @@ public sealed record Match(
     MatchStatus Status,
     MatchSide Home,
     MatchSide Away,
-    IReadOnlyList<MatchEvent> Events);
+    IReadOnlyList<MatchEvent> Events,
+    string? Venue = null);

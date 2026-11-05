@@ -6,6 +6,16 @@ namespace FootballNews.Tests;
 public class EspnParserTests
 {
     [Fact]
+    public void Reads_venue_when_present_and_tolerates_it_missing()
+    {
+        var match = EspnParser.ParseScoreboard(TestData.Fixture("eng1-20261101.json"), TestData.Competition("eng.1")).Single(m => m.Id == "401879246");
+        Assert.Equal("Anfield", match.Venue);
+
+        var summary = EspnParser.ParseSummary(TestData.Fixture("summary-401879246.json"), "401879246", TestData.Competition("eng.1"));
+        Assert.Null(summary.Venue);
+    }
+
+    [Fact]
     public void Parses_finished_match_from_scoreboard()
     {
         var matches = EspnParser.ParseScoreboard(TestData.Fixture("eng1-20261101.json"), TestData.Competition("eng.1"));

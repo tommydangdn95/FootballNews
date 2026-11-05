@@ -95,7 +95,11 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
     }
 
     private static string TimeCenter(CardLocale locale, Match m) =>
-        $"<div class=\"center\"><div class=\"time\">{Clock(locale, m)}</div><div class=\"pen\">{E(locale.ShortDate(LocalDate(locale, m)))}</div></div>";
+        $"<div class=\"center\"><div class=\"time\">{Clock(locale, m)}</div><div class=\"pen\">{E(locale.ShortDate(LocalDate(locale, m)))}</div>{Venue(m)}</div>";
+
+    private static string Venue(Match m) => string.IsNullOrWhiteSpace(m.Venue)
+        ? ""
+        : $"<div class=\"venue\">{E(m.Venue)}</div>";
 
     private static string ScoreCenter(CardLocale locale, Match m)
     {
@@ -176,6 +180,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         .score { font-size: 54px; font-weight: 700; color: {{theme.SurfaceText}}; text-align: center; line-height: 1.1; }
         .time { font-size: 44px; font-weight: 700; color: {{theme.SurfaceText}}; text-align: center; line-height: 1.15; }
         .pen { font-size: 20px; color: {{theme.SurfaceMuted}}; text-align: center; }
+        .venue { font-size: 18px; line-height: 1.2; color: {{theme.SurfaceMuted}}; text-align: center; margin-top: 2px; }
         .tag { font-size: 24px; font-weight: 700; color: #1A1206; background: #FFB020; border-radius: 12px; padding: 10px 0; text-align: center; }
         .below { display: grid; grid-template-columns: 1fr 1fr; column-gap: 198px; margin-top: 10px; font-size: 23px; line-height: 1.4; color: {{theme.SurfaceMuted}}; }
         .below:not(:has(div > *)) { display: none; }
