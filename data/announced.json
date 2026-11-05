@@ -77,6 +77,174 @@
       "status": "scheduled",
       "competition": "uefa.europa.conf",
       "announcedAt": "2026-11-05T02:43:57.4862137+00:00"
+    },
+    "401884739": {
+      "kickoffUtc": "2026-11-06T19:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884745": {
+      "kickoffUtc": "2026-11-07T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884740": {
+      "kickoffUtc": "2026-11-07T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884744": {
+      "kickoffUtc": "2026-11-07T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884737": {
+      "kickoffUtc": "2026-11-07T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884743": {
+      "kickoffUtc": "2026-11-07T17:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884738": {
+      "kickoffUtc": "2026-11-08T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884741": {
+      "kickoffUtc": "2026-11-08T16:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401884742": {
+      "kickoffUtc": "2026-11-08T18:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874815": {
+      "kickoffUtc": "2026-11-06T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874791": {
+      "kickoffUtc": "2026-11-07T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874811": {
+      "kickoffUtc": "2026-11-07T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874974": {
+      "kickoffUtc": "2026-11-07T17:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874803": {
+      "kickoffUtc": "2026-11-07T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874810": {
+      "kickoffUtc": "2026-11-08T11:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401875018": {
+      "kickoffUtc": "2026-11-08T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874800": {
+      "kickoffUtc": "2026-11-08T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401874808": {
+      "kickoffUtc": "2026-11-08T17:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401875003": {
+      "kickoffUtc": "2026-11-08T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876405": {
+      "kickoffUtc": "2026-11-06T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876411": {
+      "kickoffUtc": "2026-11-07T18:00:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876407": {
+      "kickoffUtc": "2026-11-07T20:05:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876406": {
+      "kickoffUtc": "2026-11-08T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876412": {
+      "kickoffUtc": "2026-11-08T16:15:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876410": {
+      "kickoffUtc": "2026-11-08T16:15:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876409": {
+      "kickoffUtc": "2026-11-08T16:15:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876408": {
+      "kickoffUtc": "2026-11-08T16:15:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
+    },
+    "401876404": {
+      "kickoffUtc": "2026-11-08T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-05T04:23:12.1498938+00:00"
     }
   },
   "results": {
@@ -112,6 +280,18 @@
     },
     "401915381": {
       "announcedAt": "2026-11-05T02:43:47.3876329+00:00"
+    },
+    "401915305": {
+      "announcedAt": "2026-11-05T04:22:46.658537+00:00"
+    },
+    "401915303": {
+      "announcedAt": "2026-11-05T04:22:46.658537+00:00"
+    },
+    "401915302": {
+      "announcedAt": "2026-11-05T04:22:46.658537+00:00"
+    },
+    "401915551": {
+      "announcedAt": "2026-11-05T04:22:46.658537+00:00"
     }
   }
 }
