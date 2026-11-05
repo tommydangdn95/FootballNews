@@ -7,20 +7,21 @@ namespace FootballNews.Core.Formatting;
 public sealed class XFormatter(ClubCatalog clubs)
 {
     public const int MaxWeightedLength = 280;
-    private const int MaxMatches = 4;
     private const int MaxHashtags = 2;
     private readonly MatchText _text = new(clubs);
 
     public Draft Format(Digest digest)
     {
-        var top = clubs.ByHighlight(digest.Matches).Take(MaxMatches).ToList();
+        var ordered = _text.Ordered(digest).ToList();
         var lines = new List<string> { _text.Title(digest.Kind), "" };
         lines.AddRange(digest.Updates.Select(m => "⚠️ " + _text.UpdateLine(m)));
-        lines.AddRange(top.Select(m => digest.Kind == DigestKind.Results ? _text.ScoreLine(m) : _text.KickoffLine(m)));
-        lines.Add("");
-        lines.Add(_text.Hashtags(top.Concat(digest.Updates), MaxHashtags));
+        lines.AddRange(ordered.Select(m => digest.Kind == DigestKind.Results ? _text.ScoreLine(m) : _text.KickoffLine(m)));
 
-        return new Draft("X", SplitIntoTweets(lines));
+        // Mỗi tweet đều chừa chỗ cho hashtag để tweet cuối không phải tách riêng hashtag.
+        var suffix = "\n\n" + _text.Hashtags(ordered.Concat(digest.Updates), MaxHashtags);
+        var tweets = SplitIntoTweets(lines, MaxWeightedLength - WeightedLength(suffix));
+        tweets[^1] += suffix;
+        return new Draft("X", tweets);
     }
 
     /// <summary>
@@ -39,13 +40,13 @@ public sealed class XFormatter(ClubCatalog clubs)
         return total;
     }
 
-    private static List<string> SplitIntoTweets(IEnumerable<string> lines)
+    private static List<string> SplitIntoTweets(IEnumerable<string> lines, int maxLength)
     {
         var tweets = new List<string>();
         var current = new StringBuilder();
         foreach (var line in lines)
         {
-            if (current.Length > 0 && WeightedLength(current + "\n" + line) > MaxWeightedLength)
+            if (current.Length > 0 && WeightedLength(current + "\n" + line) > maxLength)
             {
                 tweets.Add(current.ToString().Trim());
                 current.Clear();

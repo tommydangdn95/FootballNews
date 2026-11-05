@@ -11,13 +11,14 @@ namespace FootballNews.App;
 internal sealed class DailyRunner(
     IMatchSource source,
     IReadOnlyList<Competition> competitions,
+    IReadOnlyList<Competition> upcomingCompetitions,
+    bool remindWeekend,
     ClubCatalog clubs,
     AnnouncedStore store,
     CardRenderer renderer,
     IPublisher publisher,
     bool ignoreAnnounced,
-    bool saveState,
-    bool notifyWhenEmpty)
+    bool saveState)
 {
     private readonly Dictionary<(string Slug, DateOnly Date), IReadOnlyList<Match>> _cache = [];
 
@@ -25,7 +26,6 @@ internal sealed class DailyRunner(
     {
         var reference = ReportWindow.ReferenceFor(vietnamDate);
         var state = ignoreAnnounced ? new AnnouncedState() : store.Load();
-        var sentAny = false;
 
         foreach (var kind in kinds)
         {
@@ -35,7 +35,10 @@ internal sealed class DailyRunner(
 
             Console.WriteLine($"{kind}: {digest.Matches.Count} trận mới, {digest.Updates.Count} cập nhật");
             if (digest.IsEmpty)
+            {
+                await publisher.NotifyAsync(EmptyMessage(kind), ct);
                 continue;
+            }
 
             var cards = await RenderCardsAsync(digest, ct);
             var drafts = new[]
@@ -45,16 +48,12 @@ internal sealed class DailyRunner(
                 new XFormatter(clubs).Format(digest),
             };
             await publisher.PublishAsync(kind, cards, drafts, ct);
-            sentAny = true;
 
             // Gửi xong mới lưu: nếu gửi lỗi, lần chạy sau vẫn báo lại các trận này.
             state.MarkAnnounced(digest, DateTimeOffset.UtcNow);
             if (saveState)
                 store.Save(state);
         }
-
-        if (!sentAny && notifyWhenEmpty)
-            await publisher.NotifyAsync("Hôm nay không có trận ông lớn", ct);
 
         if (saveState)
         {
@@ -63,24 +62,32 @@ internal sealed class DailyRunner(
         }
     }
 
+    // Trận đã báo được bỏ qua nên "mới": có thể vẫn còn trận, chỉ là đã báo ở lần trước.
+    private static string EmptyMessage(DigestKind kind) => kind == DigestKind.Results
+        ? "⚽ Không có kết quả trận đấu mới."
+        : $"📅 Không có trận mới trong lịch {ReportWindow.UpcomingDays} ngày tới.";
+
     private async Task<Digest> BuildResultsAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
     {
         var window = ReportWindow.Results(reference);
-        return state.BuildResults(await FetchAsync(window, ct), window);
+        return state.BuildResults(await FetchAsync(competitions, window, ct), window);
     }
 
     private async Task<Digest> BuildUpcomingAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
     {
         var window = ReportWindow.Upcoming(reference);
-        var matches = await FetchAsync(window, ct);
-        var rechecked = await RecheckAsync(state, matches, ct);
-        return state.BuildUpcoming(matches, rechecked, window);
+        var matches = await FetchAsync(upcomingCompetitions, window, ct);
+        IReadOnlyList<Match> weekend = remindWeekend
+            ? (await FetchAsync(competitions, window, ct)).Where(m => ReportWindow.IsWeekend(m.KickoffUtc)).ToList()
+            : [];
+        var rechecked = await RecheckAsync(state, [.. matches, .. weekend], ct);
+        return state.BuildUpcoming(matches, rechecked, window, weekend);
     }
 
-    private async Task<IReadOnlyList<Match>> FetchAsync(ReportWindow window, CancellationToken ct)
+    private async Task<IReadOnlyList<Match>> FetchAsync(IReadOnlyList<Competition> from, ReportWindow window, CancellationToken ct)
     {
         var all = new Dictionary<string, Match>();
-        foreach (var competition in competitions)
+        foreach (var competition in from)
         {
             foreach (var date in window.FetchDates())
             {
@@ -89,7 +96,7 @@ internal sealed class DailyRunner(
                     matches = await source.GetMatchesAsync(competition, date, ct);
                     _cache[(competition.Slug, date)] = matches;
                 }
-                foreach (var match in BigClubFilter.Apply(matches, clubs))
+                foreach (var match in matches)
                     all[match.Id] = match;
             }
         }

@@ -8,7 +8,12 @@ internal sealed class MatchText(ClubCatalog clubs)
 {
     public string Title(DigestKind kind) => kind == DigestKind.Results
         ? "⚽ KẾT QUẢ ĐÊM QUA & RẠNG SÁNG NAY"
-        : "📅 LỊCH THI ĐẤU TỐI NAY & RẠNG SÁNG MAI";
+        : "📅 LỊCH THI ĐẤU SẮP TỚI";
+
+    /// <summary>Kết quả: trận nổi bật trước. Lịch đấu trải nhiều ngày nên xếp theo giờ đá cho dễ đọc.</summary>
+    public IEnumerable<Match> Ordered(Digest digest) => digest.Kind == DigestKind.Results
+        ? clubs.ByHighlight(digest.Matches)
+        : digest.Matches.OrderBy(m => m.KickoffUtc).ThenBy(m => m.Id, StringComparer.Ordinal);
 
     public string Name(MatchSide side) => clubs.DisplayName(side.Team);
 
@@ -22,7 +27,7 @@ internal sealed class MatchText(ClubCatalog clubs)
 
     public string Fixture(Match m) => $"{Name(m.Home)} vs {Name(m.Away)}";
 
-    public string KickoffLine(Match m) => $"🕒 {m.KickoffUtc.ToOffset(ReportWindow.VietnamOffset):HH:mm} | {Fixture(m)}";
+    public string KickoffLine(Match m) => $"🕒 {m.KickoffUtc.ToOffset(ReportWindow.VietnamOffset):HH:mm dd/MM} | {Fixture(m)}";
 
     public string UpdateLine(Match m) => m.Status switch
     {

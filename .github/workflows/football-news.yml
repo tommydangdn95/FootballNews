@@ -1,10 +1,7 @@
 name: football-news
 
 on:
-  schedule:
-    # 09:25 giờ Việt Nam.
-    - cron: '25 9 * * *'
-      timezone: 'Asia/Ho_Chi_Minh'
+  # Lịch chạy đặt ở cron-job.org, gọi vào workflow_dispatch.
   workflow_dispatch:
     inputs:
       job:
@@ -16,7 +13,7 @@ on:
         description: Ngày báo cáo yyyy-MM-dd (để trống là hôm nay)
         required: false
       force:
-        description: Test thông báo - gửi lại cả trận đã báo, không lưu trạng thái
+        description: Gửi hết cả kết quả và lịch đấu (kể cả trận đã báo, bất kể thứ), không lưu trạng thái
         type: boolean
         default: false
 
@@ -35,13 +32,12 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 8.0.x
 
       - name: Run bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          NOTIFY_WHEN_EMPTY: ${{ vars.NOTIFY_WHEN_EMPTY }}
           JOB_INPUT: ${{ inputs.job }}
           DATE_INPUT: ${{ inputs.date }}
           FORCE_INPUT: ${{ inputs.force }}

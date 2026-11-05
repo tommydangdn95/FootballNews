@@ -16,13 +16,13 @@ public class FormatterTests
     private static Digest UclPost()
     {
         var matches = EspnParser.ParseScoreboard(TestData.Fixture("ucl-post-20261103.json"), TestData.Competition("uefa.champions"));
-        return new Digest(DigestKind.Results, BigClubFilter.Apply(matches, TestData.Clubs).ToList(), []);
+        return new Digest(DigestKind.Results, matches, []);
     }
 
     private static Digest UclPre()
     {
         var matches = EspnParser.ParseScoreboard(TestData.Fixture("ucl-pre-20261104.json"), TestData.Competition("uefa.champions"));
-        return new Digest(DigestKind.Upcoming, BigClubFilter.Apply(matches, TestData.Clubs).ToList(), []);
+        return new Digest(DigestKind.Upcoming, matches, []);
     }
 
     [Fact]
@@ -50,9 +50,17 @@ public class FormatterTests
         var text = new FacebookFormatter(TestData.Clubs).Format(UclPre()).Parts.Single();
 
         Assert.Contains("⭐ CHAMPIONS LEAGUE", text);
-        Assert.Contains("🕒 00:45 | AEK Athens vs Real Madrid", text);
-        Assert.Contains("🕒 03:00 | Leipzig vs Man City", text);
+        Assert.Contains("🕒 00:45 05/11 | AEK Athens vs Real Madrid", text);
+        Assert.Contains("🕒 03:00 05/11 | Leipzig vs Man City", text);
         Assert.Contains("Phong độ: DWLLW | WWWWW", text);
+    }
+
+    [Fact]
+    public void Facebook_includes_matches_without_a_big_club()
+    {
+        var text = new FacebookFormatter(TestData.Clubs).Format(UclPre()).Parts.Single();
+
+        Assert.Contains("Viking FK", text);
     }
 
     [Fact]
@@ -71,24 +79,25 @@ public class FormatterTests
     }
 
     [Fact]
-    public void Threads_stays_within_limit_and_says_what_was_left_out()
+    public void Threads_splits_into_posts_within_limit_and_keeps_every_match()
     {
         var many = Enumerable.Range(0, 40).Select(i => TestData.Match(i.ToString(), DateTimeOffset.UnixEpoch, MatchStatus.Finished, homeScore: 1, awayScore: 0)).ToList();
 
-        var text = new ThreadsFormatter(TestData.Clubs).Format(new Digest(DigestKind.Results, many, [])).Parts.Single();
+        var parts = new ThreadsFormatter(TestData.Clubs).Format(new Digest(DigestKind.Results, many, [])).Parts;
 
-        Assert.True(text.Length <= ThreadsFormatter.MaxLength, $"Dài {text.Length} ký tự");
-        Assert.Contains("trận khác", text);
-        Assert.Contains("#NgoaiHangAnh", text);
+        Assert.True(parts.Count > 1);
+        Assert.All(parts, p => Assert.True(p.Length <= ThreadsFormatter.MaxLength, $"Dài {p.Length} ký tự"));
+        Assert.Equal(many.Count, parts.Sum(p => p.Split('\n').Count(line => line.Contains('–'))));
+        Assert.Contains("#NgoaiHangAnh", parts[^1]);
     }
 
     [Fact]
     public void Threads_real_data_stays_within_limit_and_starts_with_top_matches()
     {
-        var text = new ThreadsFormatter(TestData.Clubs).Format(UclPost()).Parts.Single();
+        var parts = new ThreadsFormatter(TestData.Clubs).Format(UclPost()).Parts;
 
-        Assert.True(text.Length <= ThreadsFormatter.MaxLength, $"Dài {text.Length} ký tự");
-        Assert.Contains("Atlético Madrid 0–2 Bayern", text);
+        Assert.All(parts, p => Assert.True(p.Length <= ThreadsFormatter.MaxLength, $"Dài {p.Length} ký tự"));
+        Assert.Contains("Atlético Madrid 0–2 Bayern", parts[0]);
     }
 
     [Fact]
@@ -103,12 +112,37 @@ public class FormatterTests
     }
 
     [Fact]
-    public void X_keeps_at_most_four_matches()
+    public void X_shows_every_match()
     {
-        var draft = new XFormatter(TestData.Clubs).Format(UclPost());
+        var digest = UclPost();
 
-        Assert.Single(draft.Parts);
-        Assert.Equal(4, draft.Parts[0].Split('\n').Count(line => line.Contains('–')));
+        var draft = new XFormatter(TestData.Clubs).Format(digest);
+
+        Assert.Equal(digest.Matches.Count, draft.Parts.Sum(p => p.Split('\n').Count(line => line.Contains('–'))));
+    }
+
+    [Fact]
+    public void Upcoming_on_x_and_threads_is_chronological()
+    {
+        var late = TestData.Match("1", new DateTimeOffset(2026, 11, 8, 20, 0, 0, TimeSpan.Zero));
+        var early = TestData.Match("2", new DateTimeOffset(2026, 11, 5, 20, 0, 0, TimeSpan.Zero));
+        var digest = new Digest(DigestKind.Upcoming, [late, early], []);
+
+        foreach (var text in new[] { new XFormatter(TestData.Clubs).Format(digest).Parts[0], new ThreadsFormatter(TestData.Clubs).Format(digest).Parts[0] })
+            Assert.True(text.IndexOf("06/11", StringComparison.Ordinal) < text.IndexOf("09/11", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void X_hashtags_stay_with_the_last_matches()
+    {
+        var many = Enumerable.Range(0, 40).Select(i => TestData.Match(i.ToString(), DateTimeOffset.UnixEpoch, MatchStatus.Finished, homeScore: 1, awayScore: 0)).ToList();
+
+        var draft = new XFormatter(TestData.Clubs).Format(new Digest(DigestKind.Results, many, []));
+
+        Assert.True(draft.Parts.Count > 1);
+        Assert.All(draft.Parts, tweet => Assert.True(XFormatter.WeightedLength(tweet) <= XFormatter.MaxWeightedLength));
+        Assert.Contains("–", draft.Parts[^1]);
+        Assert.Contains("#NgoaiHangAnh", draft.Parts[^1]);
     }
 
     [Theory]

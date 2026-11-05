@@ -43,7 +43,7 @@ internal sealed class FilePublisher(string directory) : IPublisher
         var prefix = kind.ToString().ToLowerInvariant();
         foreach (var draft in drafts)
         {
-            var text = string.Join("\n\n--- tweet tiếp theo ---\n\n", draft.Parts);
+            var text = string.Join("\n\n--- bài tiếp theo ---\n\n", draft.Parts);
             await File.WriteAllTextAsync(Path.Combine(directory, $"{prefix}-{draft.Platform.ToLowerInvariant()}.txt"), text, ct);
         }
         Console.WriteLine($"Đã ghi {prefix} vào {directory}");

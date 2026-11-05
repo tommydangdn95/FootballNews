@@ -13,24 +13,27 @@ public sealed class ThreadsFormatter(ClubCatalog clubs)
     {
         var hashtags = _text.Hashtags(digest.Matches.Concat(digest.Updates), MaxHashtags);
         var blocks = digest.Updates.Select(m => "⚠️ " + _text.UpdateLine(m))
-            .Concat(clubs.ByHighlight(digest.Matches).Select(m => MatchBlock(digest.Kind, m)))
+            .Concat(_text.Ordered(digest).Select(m => MatchBlock(digest.Kind, m)))
             .ToList();
 
+        // Mỗi bài đều chừa chỗ cho hashtag, vì bài cuối mới biết sau khi xếp xong.
+        var limit = MaxLength - Compose("", hashtags).Length;
+        var parts = new List<string>();
         var body = _text.Title(digest.Kind);
-        var used = 0;
         foreach (var block in blocks)
         {
-            var remaining = blocks.Count - used - 1;
-            var suffix = remaining > 0 ? $"\n\n…và {remaining} trận khác" : "";
-            if (Compose(body + "\n\n" + block + suffix, hashtags).Length > MaxLength)
-                break;
-            body += "\n\n" + block;
-            used++;
+            if (body.Length + 2 + block.Length > limit)
+            {
+                parts.Add(body);
+                body = block;
+            }
+            else
+            {
+                body += "\n\n" + block;
+            }
         }
-
-        if (used < blocks.Count)
-            body += $"\n\n…và {blocks.Count - used} trận khác";
-        return new Draft("Threads", [Compose(body, hashtags)]);
+        parts.Add(Compose(body, hashtags));
+        return new Draft("Threads", parts);
     }
 
     private string MatchBlock(DigestKind kind, Match match)

@@ -20,7 +20,7 @@ public class CardHtmlTests
     private static Digest BuildDigest(string fixture, string slug, DigestKind kind)
     {
         var matches = EspnParser.ParseScoreboard(TestData.Fixture(fixture), TestData.Competition(slug));
-        return new Digest(kind, BigClubFilter.Apply(matches, TestData.Clubs).ToList(), []);
+        return new Digest(kind, matches, []);
     }
 
     private static Digest Upcoming(params DateTimeOffset[] kickoffs) => new(
@@ -33,7 +33,10 @@ public class CardHtmlTests
     [Fact]
     public void Results_page_has_logo_score_and_scorer()
     {
-        var page = Html.BuildPages(BuildDigest("eng1-20261101.json", "eng.1", DigestKind.Results), CardLocale.Vietnamese)
+        var digest = BuildDigest("eng1-20261101.json", "eng.1", DigestKind.Results);
+        var other = TestData.Match("2", Night, MatchStatus.Finished, homeScore: 1, awayScore: 1);
+
+        var page = Html.BuildPages(digest with { Matches = [.. digest.Matches, other] }, CardLocale.Vietnamese)
             .Single(p => p.Contains("Havertz"));
 
         Assert.Contains("364.png", page);
@@ -54,13 +57,13 @@ public class CardHtmlTests
     public void Single_day_shows_weekday_and_full_date_in_both_languages()
     {
         Assert.Contains("Thứ Năm, 05/11/2026", SinglePage(Upcoming(Night, SameDayEvening), CardLocale.Vietnamese));
-        Assert.Contains("Thursday, 5 Nov 2026", SinglePage(Upcoming(SameDayEvening), CardLocale.English));
+        Assert.Contains("Thursday, 5 Nov 2026", SinglePage(Upcoming(SameDayEvening, SameDayEvening), CardLocale.English));
     }
 
     [Fact]
     public void Each_language_uses_its_own_time_zone_for_time_and_date()
     {
-        var digest = Upcoming(Night);
+        var digest = Upcoming(Night, Night);
 
         var vietnamese = SinglePage(digest, CardLocale.Vietnamese);
         Assert.Contains(">03:00<", vietnamese);
@@ -74,7 +77,8 @@ public class CardHtmlTests
     [Fact]
     public void English_time_follows_british_summer_time()
     {
-        var page = SinglePage(Upcoming(new DateTimeOffset(2026, 7, 1, 18, 0, 0, TimeSpan.Zero)), CardLocale.English);
+        var summer = new DateTimeOffset(2026, 7, 1, 18, 0, 0, TimeSpan.Zero);
+        var page = SinglePage(Upcoming(summer, summer), CardLocale.English);
 
         Assert.Contains(">19:00<", page);
     }
@@ -104,13 +108,13 @@ public class CardHtmlTests
     public void Date_uses_vietnam_time_not_utc()
     {
         // 20:00 ngày 04/11 theo UTC đã là ngày 05/11 ở Việt Nam.
-        Assert.DoesNotContain("04/11/2026", SinglePage(Upcoming(Night), CardLocale.Vietnamese));
+        Assert.DoesNotContain("04/11/2026", SinglePage(Upcoming(Night, Night), CardLocale.Vietnamese));
     }
 
     [Fact]
     public void English_page_uses_english_labels_and_states_the_time_zone()
     {
-        var page = SinglePage(Upcoming(Night), CardLocale.English);
+        var page = SinglePage(Upcoming(Night, Night), CardLocale.English);
 
         Assert.Contains("FIXTURES", page);
         Assert.Contains("PREMIER LEAGUE", page);
@@ -123,7 +127,7 @@ public class CardHtmlTests
     [Fact]
     public void English_page_translates_update_status()
     {
-        var digest = new Digest(DigestKind.Upcoming, [], [TestData.Match("1", Night, MatchStatus.Postponed)]);
+        var digest = new Digest(DigestKind.Upcoming, [], [TestData.Match("1", Night, MatchStatus.Postponed), TestData.Match("2", Night, MatchStatus.Postponed)]);
 
         var page = SinglePage(digest, CardLocale.English);
 
@@ -143,7 +147,7 @@ public class CardHtmlTests
     [Fact]
     public void Pages_are_split_and_numbered()
     {
-        var kickoffs = Enumerable.Repeat(Night, CardHtml.MaxMatchesPerPage + 1).ToArray();
+        var kickoffs = Enumerable.Repeat(Night, CardPaging.MaxPerPage + 1).ToArray();
 
         var pages = Html.BuildPages(Upcoming(kickoffs), CardLocale.Vietnamese);
 
@@ -153,9 +157,33 @@ public class CardHtmlTests
     }
 
     [Fact]
+    public void Each_competition_has_its_own_page()
+    {
+        var digest = new Digest(DigestKind.Upcoming, [
+            TestData.Match("1", Night) with { Competition = TestData.Competition("uefa.europa") },
+            TestData.Match("2", Night) with { Competition = TestData.Competition("uefa.europa") },
+            TestData.Match("3", Night),
+            TestData.Match("4", Night),
+        ], []);
+
+        var pages = Html.BuildPages(digest, CardLocale.Vietnamese);
+
+        Assert.Equal(2, pages.Count);
+        Assert.Contains("EUROPA LEAGUE", pages[0]);
+        Assert.DoesNotContain("NGOẠI HẠNG ANH", pages[0]);
+        Assert.Contains("NGOẠI HẠNG ANH", pages[1]);
+    }
+
+    [Fact]
+    public void Single_match_digest_still_has_an_image()
+    {
+        Assert.Contains(">03:00<", SinglePage(Upcoming(Night), CardLocale.Vietnamese));
+    }
+
+    [Fact]
     public void Page_logo_is_shown_only_when_provided()
     {
-        var digest = Upcoming(Night);
+        var digest = Upcoming(Night, Night);
 
         Assert.DoesNotContain("page-logo\" src", SinglePage(digest, CardLocale.Vietnamese));
         Assert.Contains("data:image/png;base64,QUJD", new CardHtml(TestData.Clubs, Theme, "", "", "QUJD").BuildPages(digest, CardLocale.Vietnamese).Single());
@@ -164,7 +192,7 @@ public class CardHtmlTests
     [Fact]
     public void Text_is_html_encoded()
     {
-        var digest = new Digest(DigestKind.Upcoming, [TestData.Match("1", Night, homeId: "1", homeName: "<script>")], []);
+        var digest = new Digest(DigestKind.Upcoming, [TestData.Match("1", Night, homeId: "1", homeName: "<script>"), TestData.Match("2", Night)], []);
 
         var page = SinglePage(digest, CardLocale.Vietnamese);
 

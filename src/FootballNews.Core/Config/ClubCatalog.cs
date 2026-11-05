@@ -21,8 +21,6 @@ public sealed class ClubCatalog
 
     public bool IsBigClub(Team team) => _clubs.ContainsKey(team.Id);
 
-    public bool Involves(Match match) => IsBigClub(match.Home.Team) || IsBigClub(match.Away.Team);
-
     public string DisplayName(Team team) => _clubs.TryGetValue(team.Id, out var club) ? club.Name : team.Name;
 
     public string? Hashtag(Team team) => _clubs.GetValueOrDefault(team.Id)?.Hashtag;

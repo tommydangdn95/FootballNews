@@ -75,17 +75,26 @@ try
     var pageLogo = Convert.ToBase64String(File.ReadAllBytes(Path.Combine(root, "assets", "logo.png")));
     var renderer = new CardRenderer(new CardHtml(clubs, theme, LoadFont("Bold"), LoadFont("Medium"), pageLogo));
 
+    // Job daily gửi lịch theo nhóm giải của từng thứ. Chạy force hoặc chạy tay upcoming thì gửi đủ mọi giải.
+    var scheduled = args[0] == "daily" && !force;
+    var upcomingCompetitions = scheduled
+        ? competitions.Where(c => c.IsUpcomingOn(date)).ToList()
+        : competitions;
+    if (upcomingCompetitions.Count == 0)
+        kinds = [DigestKind.Results];
+
     var runner = new DailyRunner(
         new EspnMatchSource(http),
         competitions,
+        upcomingCompetitions,
+        remindWeekend: scheduled && ReportWindow.IsWeekendReminderDay(date),
         clubs,
         new AnnouncedStore(Path.Combine(root, "data", "announced.json")),
         renderer,
         publisher,
         ignoreAnnounced: force,
-        // Chạy force để test: không lưu trạng thái để lần chạy thật vẫn báo đủ, và luôn có tin phản hồi.
-        saveState: !dryRun && !force,
-        notifyWhenEmpty: force || Environment.GetEnvironmentVariable("NOTIFY_WHEN_EMPTY") == "true");
+        // Chạy force để test: không lưu trạng thái để lần chạy thật vẫn báo đủ.
+        saveState: !dryRun && !force);
 
     if (force)
         await publisher.NotifyAsync($"🧪 Chạy test ({args[0]}, {date:yyyy-MM-dd}): gửi lại cả trận đã báo, không lưu trạng thái.", cts.Token);

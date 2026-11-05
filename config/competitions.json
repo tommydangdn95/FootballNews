@@ -1,10 +1,12 @@
 {
   "competitions": [
-    { "slug": "uefa.champions",   "name": "CHAMPIONS LEAGUE",  "englishName": "CHAMPIONS LEAGUE",  "emoji": "⭐", "hashtag": "C1",           "order": 1 },
-    { "slug": "uefa.europa",      "name": "EUROPA LEAGUE",     "englishName": "EUROPA LEAGUE",     "emoji": "🟠", "hashtag": "C2",           "order": 2 },
-    { "slug": "uefa.europa.conf", "name": "CONFERENCE LEAGUE", "englishName": "CONFERENCE LEAGUE", "emoji": "🟢", "hashtag": "C3",           "order": 3 },
-    { "slug": "eng.1",            "name": "NGOẠI HẠNG ANH",    "englishName": "PREMIER LEAGUE",    "emoji": "🏴", "hashtag": "NgoaiHangAnh", "order": 4 },
-    { "slug": "ger.1",            "name": "BUNDESLIGA",        "englishName": "BUNDESLIGA",        "emoji": "🇩🇪", "hashtag": "Bundesliga",   "order": 5 },
-    { "slug": "fra.1",            "name": "LIGUE 1",           "englishName": "LIGUE 1",           "emoji": "🇫🇷", "hashtag": "Ligue1",       "order": 6 }
+    { "slug": "uefa.champions",   "name": "CHAMPIONS LEAGUE",  "englishName": "CHAMPIONS LEAGUE",  "emoji": "⭐", "hashtag": "C1",           "order": 1, "upcomingWeekdays": ["monday", "wednesday", "friday"] },
+    { "slug": "uefa.europa",      "name": "EUROPA LEAGUE",     "englishName": "EUROPA LEAGUE",     "emoji": "🟠", "hashtag": "C2",           "order": 2, "upcomingWeekdays": ["monday", "wednesday", "friday"] },
+    { "slug": "uefa.europa.conf", "name": "CONFERENCE LEAGUE", "englishName": "CONFERENCE LEAGUE", "emoji": "🟢", "hashtag": "C3",           "order": 3, "upcomingWeekdays": ["monday", "wednesday", "friday"] },
+    { "slug": "eng.1",            "name": "NGOẠI HẠNG ANH",    "englishName": "PREMIER LEAGUE",    "emoji": "🏴", "hashtag": "NgoaiHangAnh", "order": 4, "upcomingWeekdays": ["monday", "wednesday", "friday"] },
+    { "slug": "esp.1",            "name": "LA LIGA",           "englishName": "LA LIGA",           "emoji": "🇪🇸", "hashtag": "LaLiga",       "order": 5, "upcomingWeekdays": ["monday", "wednesday", "friday"] },
+    { "slug": "ger.1",            "name": "BUNDESLIGA",        "englishName": "BUNDESLIGA",        "emoji": "🇩🇪", "hashtag": "Bundesliga",   "order": 6, "upcomingWeekdays": ["tuesday", "thursday", "saturday"] },
+    { "slug": "ita.1",            "name": "SERIE A",           "englishName": "SERIE A",           "emoji": "🇮🇹", "hashtag": "SerieA",       "order": 7, "upcomingWeekdays": ["tuesday", "thursday", "saturday"] },
+    { "slug": "fra.1",            "name": "LIGUE 1",           "englishName": "LIGUE 1",           "emoji": "🇫🇷", "hashtag": "Ligue1",       "order": 8, "upcomingWeekdays": ["tuesday", "thursday", "saturday"] }
   ]
 }

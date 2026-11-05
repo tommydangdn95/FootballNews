@@ -49,6 +49,46 @@ public class AnnouncedStateTests
     }
 
     [Fact]
+    public void Reminder_shows_announced_match_again()
+    {
+        var match = TestData.Match("1", Kickoff);
+
+        var digest = StateWithUpcoming("1").BuildUpcoming([], [], UpcomingWindow, [match]);
+
+        Assert.Equal(match, Assert.Single(digest.Matches));
+        Assert.Empty(digest.Updates);
+    }
+
+    [Fact]
+    public void Reminder_of_changed_match_is_only_an_update()
+    {
+        var moved = TestData.Match("1", Kickoff.AddHours(1));
+
+        var digest = StateWithUpcoming("1").BuildUpcoming([moved], [], UpcomingWindow, [moved]);
+
+        Assert.Empty(digest.Matches);
+        Assert.Single(digest.Updates);
+    }
+
+    [Fact]
+    public void Reminder_also_covers_a_match_not_announced_yet()
+    {
+        var digest = new AnnouncedState().BuildUpcoming([], [], UpcomingWindow, [TestData.Match("1", Kickoff)]);
+
+        Assert.Single(digest.Matches);
+    }
+
+    [Fact]
+    public void Reminder_does_not_list_a_match_twice()
+    {
+        var match = TestData.Match("1", Kickoff);
+
+        var digest = StateWithUpcoming("1").BuildUpcoming([match], [], UpcomingWindow, [match]);
+
+        Assert.Single(digest.Matches);
+    }
+
+    [Fact]
     public void Changed_kickoff_becomes_update()
     {
         var digest = StateWithUpcoming("1").BuildUpcoming([TestData.Match("1", Kickoff.AddHours(1))], [], UpcomingWindow);

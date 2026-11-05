@@ -9,9 +9,7 @@ namespace FootballNews.Rendering;
 /// <summary>Dựng HTML của ảnh bảng tỉ số. Ảnh dùng chữ và CSS, không dùng emoji để không phụ thuộc font của máy chạy.</summary>
 public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFontBase64, string mediumFontBase64, string pageLogoBase64 = "")
 {
-    public const int MaxMatchesPerPage = 6;
-
-    /// <summary>Chia digest thành các trang; các trận cập nhật lên đầu.</summary>
+    /// <summary>Chia digest thành các trang theo từng giải; các trận cập nhật lên đầu.</summary>
     public IReadOnlyList<string> BuildPages(Digest digest, CardLocale locale)
     {
         var entries = digest.Updates.Select(m => (Match: m, IsUpdate: true))
@@ -28,7 +26,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
             .Order()
             .ToList();
 
-        var pages = entries.Chunk(MaxMatchesPerPage).ToList();
+        var pages = CardPaging.Paginate(entries.GroupBy(e => e.IsUpdate ? null : e.Match.Competition.Slug).Select(g => g.ToList()));
         return pages.Select((page, i) => BuildPage(digest.Kind, locale, dates, page, i + 1, pages.Count)).ToList();
     }
 

@@ -33,7 +33,7 @@ public sealed record CardLocale(
         ResultsTitle: "KẾT QUẢ",
         UpcomingTitle: "LỊCH THI ĐẤU",
         ResultsSubtitle: "Đêm qua & rạng sáng nay",
-        UpcomingSubtitle: "Tối nay & rạng sáng mai",
+        UpcomingSubtitle: "Các trận sắp diễn ra",
         UpdatesHeading: "CẬP NHẬT",
         Postponed: "HOÃN",
         Cancelled: "HUỶ",

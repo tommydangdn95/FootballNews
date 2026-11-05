@@ -25,17 +25,21 @@ public sealed class AnnouncedState
     /// <param name="matches">Các trận lấy theo khung giờ.</param>
     /// <param name="rechecked">Các trận đã báo được lấy lại theo id, có thể đã dời ra ngoài khung giờ.</param>
     /// <param name="window">Khung giờ của bài lịch đấu.</param>
-    public Digest BuildUpcoming(IEnumerable<Match> matches, IEnumerable<Match> rechecked, ReportWindow window)
+    /// <param name="reminders">Các trận cần hiện lại trong bài dù đã báo và không đổi lịch.</param>
+    public Digest BuildUpcoming(IEnumerable<Match> matches, IEnumerable<Match> rechecked, ReportWindow window, IReadOnlyCollection<Match>? reminders = null)
     {
         var fresh = new List<Match>();
         var updates = new List<Match>();
+        var reminderIds = reminders?.Select(m => m.Id).ToHashSet() ?? [];
 
-        foreach (var match in matches.Where(m => window.Contains(m.KickoffUtc)))
+        foreach (var match in matches.Concat(reminders ?? []).DistinctBy(m => m.Id).Where(m => window.Contains(m.KickoffUtc)))
         {
             if (Upcoming.ContainsKey(match.Id))
             {
                 if (HasChanged(match))
                     updates.Add(match);
+                else if (match.Status == MatchStatus.Scheduled && reminderIds.Contains(match.Id))
+                    fresh.Add(match);
             }
             else if (match.Status == MatchStatus.Scheduled)
             {
