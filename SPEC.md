@@ -110,7 +110,10 @@ GET https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/scoreboard?dates
 - Job **commit file này lại vào repo** sau mỗi lần chạy để lưu trạng thái.
 
 ## 7. Đầu ra: bản nháp gửi Telegram
-Mỗi phần (`results`, `upcoming`) gửi **ảnh bảng tỉ số** trước, rồi **3 tin nhắn**, mỗi tin 1 nền tảng (bấm vào khối chữ để copy nhanh).
+Mỗi phần (`results`, `upcoming`) gửi theo thứ tự (`DigestText`):
+1. **Tin mở đầu:** loại bài, ngày gửi, khoảng ngày thi đấu, tổng số trận và số trận từng giải.
+2. Với mỗi giải: **tin ngăn cách** (tên giải, số trận, khoảng ngày, số ảnh của mỗi bản ngôn ngữ), rồi **ảnh bảng tỉ số** bản tiếng Việt và tiếng Anh. Các giải ghép chung ảnh dùng chung một tin ngăn cách.
+3. **Tin "Bài nháp để đăng"**, rồi các tin của từng nền tảng (bấm vào khối chữ để copy nhanh). Bài nháp là một bài chung cho mọi giải.
 
 **Ảnh:** dựng từ HTML/CSS (`CardHtml`) rồi chụp thành PNG bằng Chrome/Edge có sẵn qua Playwright. Mỗi ảnh vẽ **2 bản tiếng Việt và tiếng Anh** (bài chữ vẫn chỉ tiếng Việt). Bản tiếng Việt dùng giờ VN, bản tiếng Anh dùng giờ Anh (`Europe/London`, tự đổi GMT/BST); cả giờ và ngày đều tính theo múi giờ của từng bản. Đầu ảnh ghi ngày thi đấu; nếu các trận thuộc nhiều ngày thì ghi khoảng ngày và thêm ngày dưới từng trận. Có logo đội, màu và tên trang sửa trong `config/card.json`. Không vẽ được ảnh thì vẫn gửi bài chữ và báo cảnh báo.
 
@@ -150,7 +153,7 @@ Liverpool 0–1 Arsenal
 ## 8. Hạ tầng
 - **Runtime:** .NET (console app), chạy trên **GitHub Actions**.
 - **Lịch chạy:** đặt ở **cron-job.org** lúc 07:00 VN, gọi vào `workflow_dispatch` của nhánh `main`. Workflow không có `schedule` riêng.
-- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (gửi hết: cả kết quả và lịch đấu bất kể thứ trong tuần, kể cả trận đã báo, không lưu trạng thái; `job` khác `daily` thì chỉ gửi phần đã chọn).
+- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (gửi đầy đủ mọi giải: kết quả 7 ngày qua tính đến hết ngày báo cáo và lịch 5 ngày tới, bất kể thứ trong tuần, kể cả trận đã báo, không lưu trạng thái; `job` khác `daily` thì chỉ gửi phần đã chọn).
 - Chạy thử ở máy, không gửi và không ghi trạng thái: `dotnet run --project src/FootballNews.App -- daily --date yyyy-MM-dd --dry-run` (kết quả nằm trong `output/`).
 - **Secrets:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, (tuỳ chọn) `FOOTBALL_DATA_TOKEN`.
 - Workflow cần `permissions: contents: write` để commit `announced.json`.

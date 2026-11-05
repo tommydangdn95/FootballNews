@@ -66,7 +66,8 @@ IPublisher publisher = dryRun
     ? new FilePublisher(Path.Combine(root, "output", date.ToString("yyyy-MM-dd")))
     : new TelegramPublisher(new TelegramClient(http, token!, chatId!));
 
-using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
+// Chạy force có thể gửi hơn 100 tin; job trên GitHub giới hạn 15 phút kể cả thời gian build.
+using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(13));
 try
 {
     var clubs = ClubCatalog.Load(Path.Combine(root, "config", "clubs.json"));
@@ -97,7 +98,7 @@ try
         saveState: !dryRun && !force);
 
     if (force)
-        await publisher.NotifyAsync($"🧪 Chạy test ({args[0]}, {date:yyyy-MM-dd}): gửi lại cả trận đã báo, không lưu trạng thái.", cts.Token);
+        await publisher.NotifyAsync($"🧪 Chạy force ({args[0]}, {date:yyyy-MM-dd}): gửi đầy đủ mọi giải (kết quả {ReportWindow.AllRecentResultsDays} ngày qua, lịch {ReportWindow.UpcomingDays} ngày tới), không lưu trạng thái.", cts.Token);
 
     await runner.RunAsync(kinds, date, cts.Token);
     return 0;

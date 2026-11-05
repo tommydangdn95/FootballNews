@@ -13,7 +13,7 @@ public sealed class XFormatter(ClubCatalog clubs)
     public Draft Format(Digest digest)
     {
         var ordered = _text.Ordered(digest).ToList();
-        var lines = new List<string> { _text.Title(digest.Kind), "" };
+        var lines = new List<string> { _text.Title(digest), "" };
         lines.AddRange(digest.Updates.Select(m => "⚠️ " + _text.UpdateLine(m)));
         lines.AddRange(ordered.Select(m => digest.Kind == DigestKind.Results ? _text.ScoreLine(m) : _text.KickoffLine(m)));
 

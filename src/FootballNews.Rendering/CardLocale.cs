@@ -1,5 +1,6 @@
 using System.Globalization;
 using FootballNews.Core.Filtering;
+using FootballNews.Core.Formatting;
 using FootballNews.Core.Models;
 
 namespace FootballNews.Rendering;
@@ -11,6 +12,7 @@ public sealed record CardLocale(
     string ResultsTitle,
     string UpcomingTitle,
     string ResultsSubtitle,
+    string RecentResultsSubtitle,
     string UpcomingSubtitle,
     string UpdatesHeading,
     string Postponed,
@@ -22,8 +24,6 @@ public sealed record CardLocale(
     Func<DateOnly, string> YearDate,
     Func<DateOnly, string> Weekday)
 {
-    private static readonly string[] VietnameseWeekdays = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
-
     // Giờ Anh đổi theo mùa (GMT/BST) nên phải dùng múi giờ thật, không dùng độ lệch cố định.
     private static readonly TimeZoneInfo UkTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
 
@@ -33,6 +33,7 @@ public sealed record CardLocale(
         ResultsTitle: "KẾT QUẢ",
         UpcomingTitle: "LỊCH THI ĐẤU",
         ResultsSubtitle: "Đêm qua & rạng sáng nay",
+        RecentResultsSubtitle: "Các trận gần đây",
         UpcomingSubtitle: "Các trận sắp diễn ra",
         UpdatesHeading: "CẬP NHẬT",
         Postponed: "HOÃN",
@@ -42,7 +43,7 @@ public sealed record CardLocale(
         CompetitionName: c => c.Name,
         ShortDate: d => d.ToString("dd/MM", CultureInfo.InvariantCulture),
         YearDate: d => d.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
-        Weekday: d => VietnameseWeekdays[(int)d.DayOfWeek]);
+        Weekday: VietnameseCalendar.Weekday);
 
     public static readonly CardLocale English = new(
         Code: "en",
@@ -50,6 +51,7 @@ public sealed record CardLocale(
         ResultsTitle: "RESULTS",
         UpcomingTitle: "FIXTURES",
         ResultsSubtitle: "Full-time scores",
+        RecentResultsSubtitle: "Recent full-time scores",
         UpcomingSubtitle: "Kick-off times in UK time",
         UpdatesHeading: "UPDATES",
         Postponed: "POSTPONED",

@@ -6,11 +6,17 @@ using FootballNews.Core.Models;
 
 namespace FootballNews.Rendering;
 
+/// <summary>Các trang HTML đi cùng nhau của một giải (hoặc các giải ghép chung).</summary>
+public sealed record CardPageSection(IReadOnlyList<Match> Updates, IReadOnlyList<Match> Matches, IReadOnlyList<string> Pages);
+
 /// <summary>Dựng HTML của ảnh bảng tỉ số. Ảnh dùng chữ và CSS, không dùng emoji để không phụ thuộc font của máy chạy.</summary>
 public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFontBase64, string mediumFontBase64, string pageLogoBase64 = "")
 {
-    /// <summary>Chia digest thành các trang theo từng giải; các trận cập nhật lên đầu.</summary>
-    public IReadOnlyList<string> BuildPages(Digest digest, CardLocale locale)
+    public IReadOnlyList<string> BuildPages(Digest digest, CardLocale locale) =>
+        BuildSections(digest, locale).SelectMany(s => s.Pages).ToList();
+
+    /// <summary>Chia digest thành các nhóm trang theo từng giải; các trận cập nhật lên đầu.</summary>
+    public IReadOnlyList<CardPageSection> BuildSections(Digest digest, CardLocale locale)
     {
         var entries = digest.Updates.Select(m => (Match: m, IsUpdate: true))
             .Concat(digest.Matches
@@ -26,8 +32,17 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
             .Order()
             .ToList();
 
-        var pages = CardPaging.Paginate(entries.GroupBy(e => e.IsUpdate ? null : e.Match.Competition.Slug).Select(g => g.ToList()));
-        return pages.Select((page, i) => BuildPage(digest.Kind, locale, dates, page, i + 1, pages.Count)).ToList();
+        var sections = CardPaging.PaginateSections(entries.GroupBy(e => e.IsUpdate ? null : e.Match.Competition.Slug).Select(g => g.ToList()));
+        var pageCount = sections.Sum(s => s.Count);
+        var pageNumber = 0;
+        return sections.Select(section =>
+        {
+            var all = section.SelectMany(p => p).ToList();
+            return new CardPageSection(
+                all.Where(e => e.IsUpdate).Select(e => e.Match).ToList(),
+                all.Where(e => !e.IsUpdate).Select(e => e.Match).ToList(),
+                section.Select(page => BuildPage(digest.Kind, locale, dates, page, ++pageNumber, pageCount)).ToList());
+        }).ToList();
     }
 
     private string BuildPage(DigestKind kind, CardLocale locale, List<DateOnly> dates, (Match Match, bool IsUpdate)[] entries, int page, int pageCount)
@@ -37,7 +52,9 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css()).Append("</style></head><body><div class=\"card\">");
         sb.Append($"<header><div class=\"heading\"><h1>{E(isResults ? locale.ResultsTitle : locale.UpcomingTitle)}</h1>");
         sb.Append($"<div class=\"date\">{E(DateLine(locale, dates))}</div>");
-        sb.Append($"<p>{E(isResults ? locale.ResultsSubtitle : locale.UpcomingSubtitle)}</p></div>");
+        // Bài thường chỉ có đêm qua và rạng sáng nay, tức tối đa 2 ngày; nhiều hơn là bài force.
+        var subtitle = !isResults ? locale.UpcomingSubtitle : dates.Count > 2 ? locale.RecentResultsSubtitle : locale.ResultsSubtitle;
+        sb.Append($"<p>{E(subtitle)}</p></div>");
         if (pageLogoBase64.Length > 0)
             sb.Append($"<img class=\"page-logo\" src=\"data:image/png;base64,{pageLogoBase64}\" alt=\"\">");
         sb.Append("</header>");

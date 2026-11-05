@@ -14,6 +14,12 @@ public sealed record ReportWindow(DateTimeOffset Start, DateTimeOffset End)
     /// <summary>Lịch đấu tính từ hôm nay đến hết ngày thứ 5 sau đó.</summary>
     public const int UpcomingDays = 5;
 
+    /// <summary>
+    /// Chạy force lấy kết quả 7 ngày: giải quốc nội đá hằng tuần nên có vòng gần nhất.
+    /// Cúp châu Âu không đá mỗi tuần nên có thể không có trận nào trong khung này.
+    /// </summary>
+    public const int AllRecentResultsDays = 7;
+
     /// <summary>Bài lịch thứ 6 nhắc lại mọi trận thứ 7 và Chủ nhật, kể cả trận đã báo.</summary>
     public static bool IsWeekendReminderDay(DateOnly vietnamDate) => vietnamDate.DayOfWeek == DayOfWeek.Friday;
 
@@ -27,6 +33,10 @@ public sealed record ReportWindow(DateTimeOffset Start, DateTimeOffset End)
     public static DateOnly VietnamToday(DateTimeOffset now) => DateOnly.FromDateTime(now.ToOffset(VietnamOffset).DateTime);
 
     public static ReportWindow Results(DateTimeOffset reference) => new(reference - ResultsLookback, reference);
+
+    // Kéo đến hết ngày báo cáo để có cả trận vừa đá xong sau giờ chạy thường lệ.
+    public static ReportWindow AllRecentResults(DateTimeOffset reference) =>
+        new(reference.AddDays(-AllRecentResultsDays), reference.AddDays(1));
 
     public static ReportWindow Upcoming(DateTimeOffset reference) =>
         new(reference, new DateTimeOffset(reference.ToOffset(VietnamOffset).Date.AddDays(UpcomingDays + 1), VietnamOffset));

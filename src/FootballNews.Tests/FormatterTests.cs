@@ -64,6 +64,17 @@ public class FormatterTests
     }
 
     [Fact]
+    public void Results_over_many_days_are_not_called_last_night()
+    {
+        var start = new DateTimeOffset(2026, 11, 1, 12, 0, 0, TimeSpan.Zero);
+        var matches = Enumerable.Range(0, 3).Select(i => TestData.Match(i.ToString(), start.AddDays(i), MatchStatus.Finished, homeScore: 1, awayScore: 0)).ToList();
+
+        var text = new FacebookFormatter(TestData.Clubs).Format(new Digest(DigestKind.Results, matches, [])).Parts.Single();
+
+        Assert.StartsWith("⚽ KẾT QUẢ CÁC TRẬN GẦN ĐÂY", text);
+    }
+
+    [Fact]
     public void Facebook_shows_updates_first()
     {
         var digest = new Digest(

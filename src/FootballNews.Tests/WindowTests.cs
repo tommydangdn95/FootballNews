@@ -71,6 +71,16 @@ public class WindowTests
     }
 
     [Fact]
+    public void All_recent_results_cover_a_week_and_the_rest_of_today()
+    {
+        var window = ReportWindow.AllRecentResults(Reference);
+
+        Assert.True(window.Contains(Reference.AddDays(-6)));
+        Assert.True(window.Contains(Reference.AddHours(14)));
+        Assert.False(window.Contains(Reference.AddDays(-8)));
+    }
+
+    [Fact]
     public void Weekend_reminder_is_on_friday_and_uses_vietnam_date()
     {
         Assert.True(ReportWindow.IsWeekendReminderDay(new DateOnly(2026, 11, 6)));

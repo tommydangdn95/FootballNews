@@ -8,7 +8,7 @@ public sealed class TelegramException(string message) : Exception(message);
 
 public sealed class TelegramClient(HttpClient http, string token, string chatId)
 {
-    private const int MaxAttempts = 3;
+    private const int MaxAttempts = 5;
 
     public Task SendHtmlAsync(string html, CancellationToken ct) => SendAsync("sendMessage", () => new FormUrlEncodedContent(new Dictionary<string, string>
     {

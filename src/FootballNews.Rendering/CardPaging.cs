@@ -10,7 +10,11 @@ public static class CardPaging
     public const int MaxPerPage = 6;
 
     public static IReadOnlyList<T[]> Paginate<T>(IEnumerable<IReadOnlyList<T>> groups) =>
-        MergeLoneItems(groups).SelectMany(SplitEvenly).ToList();
+        PaginateSections(groups).SelectMany(s => s).ToList();
+
+    /// <summary>Như Paginate nhưng giữ các trang của cùng một giải (hoặc các giải ghép chung) thành một nhóm.</summary>
+    public static IReadOnlyList<IReadOnlyList<T[]>> PaginateSections<T>(IEnumerable<IReadOnlyList<T>> groups) =>
+        MergeLoneItems(groups).Select(g => (IReadOnlyList<T[]>)SplitEvenly(g).ToList()).ToList();
 
     // Giải chỉ có 1 trận không đủ một ảnh riêng nên đi chung với giải liền kề.
     private static List<List<T>> MergeLoneItems<T>(IEnumerable<IReadOnlyList<T>> groups)

@@ -11,7 +11,7 @@ public sealed class FacebookFormatter(ClubCatalog clubs)
 
     public Draft Format(Digest digest)
     {
-        var sb = new StringBuilder(_text.Title(digest.Kind)).Append('\n');
+        var sb = new StringBuilder(_text.Title(digest)).Append('\n');
 
         if (digest.Updates.Count > 0)
         {

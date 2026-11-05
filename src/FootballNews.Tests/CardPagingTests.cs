@@ -41,6 +41,14 @@ public class CardPagingTests
     }
 
     [Fact]
+    public void Sections_keep_the_pages_of_one_competition_together()
+    {
+        var sections = CardPaging.PaginateSections(Groups(7, 3));
+
+        Assert.Equal([2, 1], sections.Select(s => s.Count));
+    }
+
+    [Fact]
     public void Single_match_overall_still_has_a_page()
     {
         Assert.Equal([1], PageSizes(1));

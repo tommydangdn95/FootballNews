@@ -33,21 +33,21 @@ internal sealed class DailyRunner(
                 ? await BuildResultsAsync(state, reference, ct)
                 : await BuildUpcomingAsync(state, reference, ct);
 
-            Console.WriteLine($"{kind}: {digest.Matches.Count} trận mới, {digest.Updates.Count} cập nhật");
+            Console.WriteLine($"{kind}: {digest.Matches.Count} trận, {digest.Updates.Count} cập nhật");
             if (digest.IsEmpty)
             {
                 await publisher.NotifyAsync(EmptyMessage(kind), ct);
                 continue;
             }
 
-            var cards = await RenderCardsAsync(digest, ct);
+            var sections = await RenderCardsAsync(digest, ct);
             var drafts = new[]
             {
                 new FacebookFormatter(clubs).Format(digest),
                 new ThreadsFormatter(clubs).Format(digest),
                 new XFormatter(clubs).Format(digest),
             };
-            await publisher.PublishAsync(kind, cards, drafts, ct);
+            await publisher.PublishAsync(kind, DigestText.Header(digest, vietnamDate), sections, drafts, ct);
 
             // Gửi xong mới lưu: nếu gửi lỗi, lần chạy sau vẫn báo lại các trận này.
             state.MarkAnnounced(digest, DateTimeOffset.UtcNow);
@@ -69,7 +69,7 @@ internal sealed class DailyRunner(
 
     private async Task<Digest> BuildResultsAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
     {
-        var window = ReportWindow.Results(reference);
+        var window = ignoreAnnounced ? ReportWindow.AllRecentResults(reference) : ReportWindow.Results(reference);
         return state.BuildResults(await FetchAsync(competitions, window, ct), window);
     }
 
@@ -127,7 +127,7 @@ internal sealed class DailyRunner(
     }
 
     // Không vẽ được ảnh thì vẫn gửi bài chữ và báo cho chủ trang biết.
-    private async Task<IReadOnlyList<CardImage>> RenderCardsAsync(Digest digest, CancellationToken ct)
+    private async Task<IReadOnlyList<CardSection>> RenderCardsAsync(Digest digest, CancellationToken ct)
     {
         try
         {

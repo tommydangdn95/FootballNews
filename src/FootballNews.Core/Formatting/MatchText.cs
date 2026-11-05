@@ -6,9 +6,15 @@ namespace FootballNews.Core.Formatting;
 
 internal sealed class MatchText(ClubCatalog clubs)
 {
-    public string Title(DigestKind kind) => kind == DigestKind.Results
-        ? "⚽ KẾT QUẢ ĐÊM QUA & RẠNG SÁNG NAY"
-        : "📅 LỊCH THI ĐẤU SẮP TỚI";
+    public string Title(Digest digest)
+    {
+        if (digest.Kind == DigestKind.Upcoming)
+            return "📅 LỊCH THI ĐẤU SẮP TỚI";
+
+        // Bài thường chỉ có đêm qua và rạng sáng nay, tức tối đa 2 ngày; nhiều hơn là bài force.
+        var days = digest.Matches.Select(m => m.KickoffUtc.ToOffset(ReportWindow.VietnamOffset).Date).Distinct().Count();
+        return days > 2 ? "⚽ KẾT QUẢ CÁC TRẬN GẦN ĐÂY" : "⚽ KẾT QUẢ ĐÊM QUA & RẠNG SÁNG NAY";
+    }
 
     /// <summary>Kết quả: trận nổi bật trước. Lịch đấu trải nhiều ngày nên xếp theo giờ đá cho dễ đọc.</summary>
     public IEnumerable<Match> Ordered(Digest digest) => digest.Kind == DigestKind.Results

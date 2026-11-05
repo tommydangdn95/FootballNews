@@ -19,7 +19,7 @@ public sealed class ThreadsFormatter(ClubCatalog clubs)
         // Mỗi bài đều chừa chỗ cho hashtag, vì bài cuối mới biết sau khi xếp xong.
         var limit = MaxLength - Compose("", hashtags).Length;
         var parts = new List<string>();
-        var body = _text.Title(digest.Kind);
+        var body = _text.Title(digest);
         foreach (var block in blocks)
         {
             if (body.Length + 2 + block.Length > limit)
