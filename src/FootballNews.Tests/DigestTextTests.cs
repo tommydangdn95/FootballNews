@@ -12,6 +12,16 @@ public class DigestTextTests
     private static Match In(string slug, string id, DateTimeOffset kickoff) =>
         TestData.Match(id, kickoff) with { Competition = TestData.Competition(slug) };
 
+    [Theory]
+    [InlineData(DigestKind.Results, false, "⚽ Không có kết quả trận đấu mới. (Chạy thường, không bật force)")]
+    [InlineData(DigestKind.Upcoming, false, "📅 Không có trận mới trong lịch 5 ngày tới. (Chạy thường, không bật force)")]
+    [InlineData(DigestKind.Results, true, "⚽ Không có kết quả trận đấu nào trong 7 ngày qua. (Chạy force)")]
+    [InlineData(DigestKind.Upcoming, true, "📅 Không có trận nào trong lịch 5 ngày tới. (Chạy force)")]
+    public void Empty_message_states_the_run_mode(DigestKind kind, bool force, string expected)
+    {
+        Assert.Equal(expected, DigestText.Empty(kind, force));
+    }
+
     [Fact]
     public void Header_lists_date_range_totals_and_each_competition()
     {

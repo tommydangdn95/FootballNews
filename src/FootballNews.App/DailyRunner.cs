@@ -36,7 +36,7 @@ internal sealed class DailyRunner(
             Console.WriteLine($"{kind}: {digest.Matches.Count} trận, {digest.Updates.Count} cập nhật");
             if (digest.IsEmpty)
             {
-                await publisher.NotifyAsync(EmptyMessage(kind), ct);
+                await publisher.NotifyAsync(DigestText.Empty(kind, ignoreAnnounced), ct);
                 continue;
             }
 
@@ -61,11 +61,6 @@ internal sealed class DailyRunner(
             store.Save(state);
         }
     }
-
-    // Trận đã báo được bỏ qua nên "mới": có thể vẫn còn trận, chỉ là đã báo ở lần trước.
-    private static string EmptyMessage(DigestKind kind) => kind == DigestKind.Results
-        ? "⚽ Không có kết quả trận đấu mới."
-        : $"📅 Không có trận mới trong lịch {ReportWindow.UpcomingDays} ngày tới.";
 
     private async Task<Digest> BuildResultsAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
     {

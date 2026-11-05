@@ -13,6 +13,24 @@ public static class DigestText
 
     public const string DraftsSeparator = $"📝 BÀI NHÁP ĐỂ ĐĂNG\nFacebook · Threads · X\n{LightRule}";
 
+    /// <summary>
+    /// Tin khi không có trận, ghi rõ chế độ chạy. Chạy thường bỏ qua trận đã báo nên chỉ nói "mới":
+    /// có thể vẫn còn trận, chỉ là đã báo ở lần trước.
+    /// </summary>
+    public static string Empty(DigestKind kind, bool force)
+    {
+        if (force)
+        {
+            return kind == DigestKind.Results
+                ? $"⚽ Không có kết quả trận đấu nào trong {ReportWindow.AllRecentResultsDays} ngày qua. (Chạy force)"
+                : $"📅 Không có trận nào trong lịch {ReportWindow.UpcomingDays} ngày tới. (Chạy force)";
+        }
+
+        return kind == DigestKind.Results
+            ? "⚽ Không có kết quả trận đấu mới. (Chạy thường, không bật force)"
+            : $"📅 Không có trận mới trong lịch {ReportWindow.UpcomingDays} ngày tới. (Chạy thường, không bật force)";
+    }
+
     public static string Header(Digest digest, DateOnly vietnamDate)
     {
         var groups = ByCompetition(digest.Matches);

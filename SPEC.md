@@ -26,7 +26,7 @@ Mỗi ngày chạy **một lần lúc 07:00** (job `daily`). Có thể chạy ta
 
 - ESPN không có giờ kết thúc trận nên `results` lọc theo giờ đá, lùi thêm 3 giờ cho thời gian trận đấu.
 - Giữa tuần thường là cúp (C1/C2/C3), cuối tuần là giải quốc nội — app không cần xử lý riêng, cứ lấy theo khung giờ.
-- Không có trận mới trong khung → **luôn gửi 1 dòng thông báo** cho phần đó.
+- Không có trận mới trong khung → **luôn gửi 1 dòng thông báo** cho phần đó, ghi rõ chế độ chạy: `(Chạy thường, không bật force)` hoặc `(Chạy force)`.
 
 ## 3. Giải đấu (ESPN slug)
 | Giải | Slug |
