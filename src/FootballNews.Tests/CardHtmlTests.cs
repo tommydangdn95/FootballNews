@@ -1,3 +1,4 @@
+using System.Net;
 using FootballNews.Core.Filtering;
 using FootballNews.Core.Models;
 using FootballNews.Rendering;
@@ -145,15 +146,47 @@ public class CardHtmlTests
     }
 
     [Fact]
-    public void Pages_are_split_and_numbered()
+    public void Pages_are_split_without_page_numbers()
     {
         var kickoffs = Enumerable.Repeat(Night, CardPaging.MaxPerPage + 1).ToArray();
 
         var pages = Html.BuildPages(Upcoming(kickoffs), CardLocale.Vietnamese);
 
         Assert.Equal(2, pages.Count);
-        Assert.Contains("1/2", pages[0]);
-        Assert.Contains("2/2", pages[1]);
+        Assert.All(pages, page => Assert.Contains("<footer><span>Trang &lt;test&gt;</span></footer>", page));
+    }
+
+    private static Digest Results(params DateTimeOffset[] kickoffs) => new(
+        DigestKind.Results,
+        kickoffs.Select((k, i) => TestData.Match(i.ToString(), k, MatchStatus.Finished, homeScore: 1, awayScore: 0)).ToList(),
+        []);
+
+    [Fact]
+    public void Daily_results_have_no_date_heading_and_say_last_night()
+    {
+        var page = SinglePage(Results(DayBeforeEvening, Night), CardLocale.Vietnamese);
+
+        Assert.DoesNotContain("<div class=\"date\">", page);
+        Assert.Contains(WebUtility.HtmlEncode("Đêm qua & rạng sáng nay"), page);
+    }
+
+    [Fact]
+    public void Results_show_date_and_time_under_every_match()
+    {
+        var digest = Results(Night, Night);
+
+        Assert.Contains("<div class=\"pen\">05/11 · 03:00</div>", SinglePage(digest, CardLocale.Vietnamese));
+        Assert.Contains("<div class=\"pen\">4 Nov · 20:00</div>", SinglePage(digest, CardLocale.English));
+    }
+
+    [Fact]
+    public void Results_over_many_days_show_the_date_range_instead_of_last_night()
+    {
+        var page = SinglePage(Results(Night.AddDays(-6), Night.AddDays(-3), Night), CardLocale.Vietnamese);
+
+        Assert.Contains("30/10 – 05/11/2026", page);
+        Assert.Contains(WebUtility.HtmlEncode("Các trận gần đây"), page);
+        Assert.DoesNotContain("Đêm qua", page);
     }
 
     [Fact]

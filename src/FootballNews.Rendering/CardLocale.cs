@@ -50,7 +50,7 @@ public sealed record CardLocale(
         ToLocalTime: t => TimeZoneInfo.ConvertTime(t, UkTimeZone),
         ResultsTitle: "RESULTS",
         UpcomingTitle: "FIXTURES",
-        ResultsSubtitle: "Full-time scores",
+        ResultsSubtitle: "Last night & this morning",
         RecentResultsSubtitle: "Recent full-time scores",
         UpcomingSubtitle: "Kick-off times in UK time",
         UpdatesHeading: "UPDATES",
