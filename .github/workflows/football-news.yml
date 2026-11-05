@@ -2,8 +2,8 @@ name: football-news
 
 on:
   schedule:
-    # 09:14 giờ Việt Nam.
-    - cron: '14 9 * * *'
+    # 09:25 giờ Việt Nam.
+    - cron: '25 9 * * *'
       timezone: 'Asia/Ho_Chi_Minh'
   workflow_dispatch:
     inputs:
