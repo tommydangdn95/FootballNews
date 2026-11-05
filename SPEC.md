@@ -153,7 +153,7 @@ Liverpool 0–1 Arsenal
 ## 8. Hạ tầng
 - **Runtime:** .NET (console app), chạy trên **GitHub Actions**.
 - **Lịch chạy:** đặt ở **cron-job.org** lúc 07:00 VN, gọi vào `workflow_dispatch` của nhánh `main`. Workflow không có `schedule` riêng.
-- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (gửi đầy đủ mọi giải: kết quả 7 ngày qua tính đến hết ngày báo cáo và lịch 5 ngày tới, bất kể thứ trong tuần, kể cả trận đã báo, không lưu trạng thái; `job` khác `daily` thì chỉ gửi phần đã chọn).
+- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (gửi đầy đủ mọi giải: kết quả 7 ngày qua tính đến hết ngày báo cáo và lịch 5 ngày tới, bất kể thứ trong tuần, kể cả trận đã báo, không lưu trạng thái; luôn gửi cả hai phần dù chọn `job` nào).
 - Chạy thử ở máy, không gửi và không ghi trạng thái: `dotnet run --project src/FootballNews.App -- daily --date yyyy-MM-dd --dry-run` (kết quả nằm trong `output/`).
 - **Secrets:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, (tuỳ chọn) `FOOTBALL_DATA_TOKEN`.
 - Workflow cần `permissions: contents: write` để commit `announced.json`.

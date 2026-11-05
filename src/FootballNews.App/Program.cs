@@ -51,6 +51,10 @@ for (var i = 1; i < args.Length; i++)
     }
 }
 
+// Force để test lại nên luôn gửi đủ cả kết quả và lịch đấu, dù chọn job nào.
+if (force)
+    kinds = [DigestKind.Results, DigestKind.Upcoming];
+
 var token = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 var chatId = Environment.GetEnvironmentVariable("TELEGRAM_CHAT_ID");
 if (!dryRun && (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(chatId)))
