@@ -2,8 +2,8 @@ name: football-news
 
 on:
   schedule:
-    # 07:50 giờ Việt Nam. Chạy sớm 10 phút vì cron của GitHub hay trễ.
-    - cron: '50 0 * * *'
+    # 08:55 giờ Việt Nam (01:55 UTC).
+    - cron: '55 1 * * *'
   workflow_dispatch:
     inputs:
       job:
