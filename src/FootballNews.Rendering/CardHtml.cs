@@ -53,7 +53,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css()).Append("</style></head><body><div class=\"card\">");
         sb.Append($"<header><div class=\"heading\"><h1>{E(isResults ? locale.ResultsTitle : locale.UpcomingTitle)}</h1>");
         // Ảnh ghi ngày dưới từng trận; khoảng ngày nằm trong tin Telegram.
-        var subtitle = !isResults ? locale.UpcomingSubtitle : isDailyResults ? locale.ResultsSubtitle : locale.RecentResultsSubtitle;
+        var subtitle = !isResults ? locale.UpcomingSubtitle(entries.Select(e => e.Match.Competition).Distinct().ToList()) : isDailyResults ? locale.ResultsSubtitle : locale.RecentResultsSubtitle;
         sb.Append($"<p>{E(subtitle)}</p></div>");
         if (pageLogoBase64.Length > 0)
             sb.Append($"<img class=\"page-logo\" src=\"data:image/png;base64,{pageLogoBase64}\" alt=\"\">");
@@ -121,10 +121,10 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
     };
 
     private static string Clock(CardLocale locale, Match m) =>
-        locale.ToLocalTime(m.KickoffUtc).ToString("HH:mm", CultureInfo.InvariantCulture);
+        locale.ToLocalTime(m.KickoffUtc, m.Competition).ToString("HH:mm", CultureInfo.InvariantCulture);
 
     private static DateOnly LocalDate(CardLocale locale, Match m) =>
-        DateOnly.FromDateTime(locale.ToLocalTime(m.KickoffUtc).DateTime);
+        DateOnly.FromDateTime(locale.ToLocalTime(m.KickoffUtc, m.Competition).DateTime);
 
     private static string Logo(Team team) => string.IsNullOrEmpty(team.LogoUrl)
         ? "<span class=\"logo\"></span>"

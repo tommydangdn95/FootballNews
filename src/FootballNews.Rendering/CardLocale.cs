@@ -7,12 +7,12 @@ namespace FootballNews.Rendering;
 /// <summary>Chữ, múi giờ và cách viết ngày của ảnh theo từng ngôn ngữ.</summary>
 public sealed record CardLocale(
     string Code,
-    Func<DateTimeOffset, DateTimeOffset> ToLocalTime,
+    Func<DateTimeOffset, Competition, DateTimeOffset> ToLocalTime,
     string ResultsTitle,
     string UpcomingTitle,
     string ResultsSubtitle,
     string RecentResultsSubtitle,
-    string UpcomingSubtitle,
+    Func<IReadOnlyCollection<Competition>, string> UpcomingSubtitle,
     string UpdatesHeading,
     string Postponed,
     string Cancelled,
@@ -22,17 +22,28 @@ public sealed record CardLocale(
     Func<DateOnly, string> ShortDate,
     Func<Competition?, string> FormNote)
 {
-    // Giờ Anh đổi theo mùa (GMT/BST) nên phải dùng múi giờ thật, không dùng độ lệch cố định.
-    private static readonly TimeZoneInfo UkTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+    // Giờ châu Âu đổi theo mùa nên phải dùng múi giờ thật, không dùng độ lệch cố định.
+    private static readonly (TimeZoneInfo Zone, string Label) UkTime = (TimeZoneInfo.FindSystemTimeZoneById("Europe/London"), "UK time");
+
+    // Ảnh tiếng Anh ghi giờ của nước chủ nhà với giải quốc nội; giải khác (Anh, cúp châu Âu, Ý) dùng giờ Anh.
+    private static readonly Dictionary<string, (TimeZoneInfo Zone, string Label)> LeagueTime = new()
+    {
+        ["esp.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid"), "Spanish time"),
+        ["ger.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"), "German time"),
+        ["fra.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris"), "French time"),
+    };
+
+    private static (TimeZoneInfo Zone, string Label) EnglishTime(Competition c) =>
+        LeagueTime.TryGetValue(c.Slug, out var time) ? time : UkTime;
 
     public static readonly CardLocale Vietnamese = new(
         Code: "vi",
-        ToLocalTime: t => t.ToOffset(ReportWindow.VietnamOffset),
+        ToLocalTime: (t, _) => t.ToOffset(ReportWindow.VietnamOffset),
         ResultsTitle: "KẾT QUẢ",
         UpcomingTitle: "LỊCH THI ĐẤU",
         ResultsSubtitle: "Đêm qua & rạng sáng nay",
         RecentResultsSubtitle: "Các trận gần đây",
-        UpcomingSubtitle: "Các trận sắp diễn ra",
+        UpcomingSubtitle: _ => "Các trận sắp diễn ra",
         UpdatesHeading: "CẬP NHẬT",
         Postponed: "HOÃN",
         Cancelled: "HUỶ",
@@ -44,12 +55,14 @@ public sealed record CardLocale(
 
     public static readonly CardLocale English = new(
         Code: "en",
-        ToLocalTime: t => TimeZoneInfo.ConvertTime(t, UkTimeZone),
+        ToLocalTime: (t, c) => TimeZoneInfo.ConvertTime(t, EnglishTime(c).Zone),
         ResultsTitle: "RESULTS",
         UpcomingTitle: "FIXTURES",
         ResultsSubtitle: "Last night & this morning",
         RecentResultsSubtitle: "Recent full-time scores",
-        UpcomingSubtitle: "Kick-off times in UK time",
+        UpcomingSubtitle: cs => cs.Select(c => EnglishTime(c).Label).Distinct().ToList() is [var label]
+            ? $"Kick-off times in {label}"
+            : "Kick-off times in local time",
         UpdatesHeading: "UPDATES",
         Postponed: "POSTPONED",
         Cancelled: "CANCELLED",

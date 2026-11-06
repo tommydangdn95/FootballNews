@@ -115,6 +115,43 @@ public class CardHtmlTests
         Assert.Contains(">19:00<", page);
     }
 
+    [Theory]
+    [InlineData("esp.1", "Spanish time")]
+    [InlineData("ger.1", "German time")]
+    [InlineData("fra.1", "French time")]
+    public void English_page_uses_the_home_country_time_for_spain_germany_and_france(string slug, string label)
+    {
+        // 20:00 UTC ngày 04/11 là 21:00 giờ Tây Ban Nha/Đức/Pháp (CET).
+        var match = TestData.Match("1", Night) with { Competition = TestData.Competition(slug) };
+        var digest = new Digest(DigestKind.Upcoming, [match], []);
+
+        var english = SinglePage(digest, CardLocale.English);
+        Assert.Contains(">21:00<", english);
+        Assert.Contains("<div class=\"pen\">4 Nov</div>", english);
+        Assert.Contains($"Kick-off times in {label}", english);
+
+        var vietnamese = SinglePage(digest, CardLocale.Vietnamese);
+        Assert.Contains(">03:00<", vietnamese);
+        Assert.Contains("<div class=\"pen\">05/11</div>", vietnamese);
+    }
+
+    [Fact]
+    public void Home_country_time_follows_central_european_summer_time()
+    {
+        var summer = new DateTimeOffset(2026, 7, 1, 18, 0, 0, TimeSpan.Zero);
+        var match = TestData.Match("1", summer) with { Competition = TestData.Competition("esp.1") };
+
+        Assert.Contains(">20:00<", SinglePage(new Digest(DigestKind.Upcoming, [match], []), CardLocale.English));
+    }
+
+    [Fact]
+    public void Results_in_english_use_the_home_country_time()
+    {
+        var match = TestData.Match("1", Night, MatchStatus.Finished, homeScore: 1, awayScore: 0) with { Competition = TestData.Competition("ger.1") };
+
+        Assert.Contains("<div class=\"pen\">4 Nov · 21:00</div>", SinglePage(new Digest(DigestKind.Results, [match], []), CardLocale.English));
+    }
+
     [Fact]
     public void Single_day_still_shows_the_date_under_every_match()
     {
