@@ -10,13 +10,6 @@ public sealed class TelegramClient(HttpClient http, string token, string chatId)
 {
     private const int MaxAttempts = 5;
 
-    public Task SendHtmlAsync(string html, CancellationToken ct) => SendAsync("sendMessage", () => new FormUrlEncodedContent(new Dictionary<string, string>
-    {
-        ["chat_id"] = chatId,
-        ["text"] = html,
-        ["parse_mode"] = "HTML",
-    }), ct);
-
     public Task SendPlainAsync(string text, CancellationToken ct) => SendAsync("sendMessage", () => new FormUrlEncodedContent(new Dictionary<string, string>
     {
         ["chat_id"] = chatId,

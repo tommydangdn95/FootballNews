@@ -13,7 +13,6 @@ internal sealed class DailyRunner(
     IReadOnlyList<Competition> competitions,
     IReadOnlyList<Competition> upcomingCompetitions,
     bool remindWeekend,
-    ClubCatalog clubs,
     AnnouncedStore store,
     CardRenderer renderer,
     IPublisher publisher,
@@ -21,6 +20,7 @@ internal sealed class DailyRunner(
     bool saveState)
 {
     private readonly Dictionary<(string Slug, DateOnly Date), IReadOnlyList<Match>> _cache = [];
+    private readonly Dictionary<(string Slug, string TeamId, int? Season), IReadOnlyList<TeamResult>?> _teamResults = [];
 
     public async Task RunAsync(IReadOnlyList<DigestKind> kinds, DateOnly vietnamDate, CancellationToken ct)
     {
@@ -41,13 +41,7 @@ internal sealed class DailyRunner(
             }
 
             var sections = await RenderCardsAsync(digest, ct);
-            var drafts = new[]
-            {
-                new FacebookFormatter(clubs).Format(digest),
-                new ThreadsFormatter(clubs).Format(digest),
-                new XFormatter(clubs).Format(digest),
-            };
-            await publisher.PublishAsync(kind, DigestText.Header(digest, vietnamDate), sections, drafts, ct);
+            await publisher.PublishAsync(kind, DigestText.Header(digest, vietnamDate), sections, ct);
 
             // Gửi xong mới lưu: nếu gửi lỗi, lần chạy sau vẫn báo lại các trận này.
             state.MarkAnnounced(digest, DateTimeOffset.UtcNow);
@@ -76,7 +70,46 @@ internal sealed class DailyRunner(
             ? (await FetchAsync(competitions, window, ct)).Where(m => ReportWindow.IsWeekend(m.KickoffUtc)).ToList()
             : [];
         var rechecked = await RecheckAsync(state, [.. matches, .. weekend], ct);
-        return state.BuildUpcoming(matches, rechecked, window, weekend);
+        var digest = state.BuildUpcoming(matches, rechecked, window, weekend);
+        return digest with
+        {
+            Matches = await WithFormAsync(digest.Matches, ct),
+            Updates = await WithFormAsync(digest.Updates, ct),
+        };
+    }
+
+    private async Task<IReadOnlyList<Match>> WithFormAsync(IReadOnlyList<Match> matches, CancellationToken ct)
+    {
+        var result = new List<Match>(matches.Count);
+        foreach (var m in matches)
+        {
+            result.Add(m with
+            {
+                Home = m.Home with { Form = await FormAsync(m, m.Home.Team, ct) },
+                Away = m.Away with { Form = await FormAsync(m, m.Away.Team, ct) },
+            });
+        }
+        return result;
+    }
+
+    // Không lấy được lịch của một đội thì đội đó chỉ không có phong độ, bài vẫn gửi.
+    private async Task<string?> FormAsync(Match match, Team team, CancellationToken ct)
+    {
+        var key = (match.Competition.Slug, team.Id, match.Season);
+        if (!_teamResults.TryGetValue(key, out var results))
+        {
+            try
+            {
+                results = await source.GetTeamResultsAsync(match.Competition, team.Id, match.Season, ct);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                Console.WriteLine($"Không lấy được phong độ của {team.Name} ({match.Competition.Slug}): {ex.Message}");
+                results = null;
+            }
+            _teamResults[key] = results;
+        }
+        return results is null ? null : TeamForm.Build(results, match.KickoffUtc);
     }
 
     private async Task<IReadOnlyList<Match>> FetchAsync(IReadOnlyList<Competition> from, ReportWindow window, CancellationToken ct)

@@ -59,9 +59,13 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
             sb.Append($"<img class=\"page-logo\" src=\"data:image/png;base64,{pageLogoBase64}\" alt=\"\">");
         sb.Append("</header>");
 
-        foreach (var group in entries.GroupBy(e => e.IsUpdate ? locale.UpdatesHeading : locale.CompetitionName(e.Match.Competition)))
+        foreach (var group in entries.GroupBy(e => e.IsUpdate ? null : e.Match.Competition.Slug))
         {
-            sb.Append($"<section><h2>{E(group.Key)}</h2>");
+            var competition = group.Key is null ? null : group.First().Match.Competition;
+            sb.Append($"<section><h2>{E(competition is null ? locale.UpdatesHeading : locale.CompetitionName(competition))}</h2>");
+            // Phong độ chỉ hiện ở lịch đấu và trận cập nhật; ghi rõ nó tính trên giải nào.
+            if (!isResults && group.Any(e => !string.IsNullOrEmpty(e.Match.Home.Form) || !string.IsNullOrEmpty(e.Match.Away.Form)))
+                sb.Append($"<p class=\"note\">{E(locale.FormNote(competition))}</p>");
             foreach (var (match, isUpdate) in group)
                 sb.Append(MatchRow(kind, locale, match, isUpdate));
             sb.Append("</section>");
@@ -169,6 +173,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         header p { font-size: 28px; color: {{theme.Muted}}; margin-top: 2px; }
         section { margin-bottom: 28px; }
         h2 { font-size: 26px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-bottom: 14px; }
+        .note { font-size: 21px; color: {{theme.Muted}}; margin: -8px 0 14px; }
         article { background: linear-gradient(90deg, {{theme.Surface}}, {{theme.SurfaceEnd}}); color: {{theme.SurfaceText}}; border-radius: 56px; padding: 22px 36px; margin-bottom: 14px; }
         .line { display: grid; grid-template-columns: 1fr 170px 1fr; align-items: center; column-gap: 14px; }
         .team { display: flex; align-items: center; gap: 16px; min-width: 0; }

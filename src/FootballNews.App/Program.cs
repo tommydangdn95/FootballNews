@@ -93,7 +93,6 @@ try
         competitions,
         upcomingCompetitions,
         remindWeekend: scheduled && ReportWindow.IsWeekendReminderDay(date),
-        clubs,
         new AnnouncedStore(Path.Combine(root, "data", "announced.json")),
         renderer,
         publisher,

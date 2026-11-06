@@ -46,6 +46,31 @@ public class CardHtmlTests
     }
 
     [Fact]
+    public void Upcoming_page_shows_form_in_order_with_note()
+    {
+        var match = TestData.Match("1", Night);
+        match = match with { Home = match.Home with { Form = "WDL" }, Away = match.Away with { Form = "LLWWW" } };
+        var digest = new Digest(DigestKind.Upcoming, [match], []);
+
+        var vi = SinglePage(digest, CardLocale.Vietnamese);
+        Assert.Contains("<b class=\"w\">W</b><b class=\"d\">D</b><b class=\"l\">L</b>", vi);
+        Assert.Contains("Phong độ 5 trận gần nhất tại Ngoại Hạng Anh mùa này, trận mới nhất bên phải", WebUtility.HtmlDecode(vi));
+
+        var en = SinglePage(digest, CardLocale.English);
+        Assert.Contains("Form: last 5 Premier League matches this season, most recent on the right", WebUtility.HtmlDecode(en));
+    }
+
+    [Fact]
+    public void Form_note_is_hidden_without_form_and_on_results()
+    {
+        Assert.DoesNotContain("class=\"note\"", SinglePage(Upcoming(Night), CardLocale.Vietnamese));
+
+        var finished = TestData.Match("1", Night, MatchStatus.Finished, homeScore: 1, awayScore: 0);
+        finished = finished with { Home = finished.Home with { Form = "W" } };
+        Assert.DoesNotContain("class=\"note\"", SinglePage(new Digest(DigestKind.Results, [finished], []), CardLocale.Vietnamese));
+    }
+
+    [Fact]
     public void Upcoming_page_shows_vietnam_time()
     {
         var pages = Html.BuildPages(BuildDigest("ucl-pre-20261104.json", "uefa.champions", DigestKind.Upcoming), CardLocale.Vietnamese);

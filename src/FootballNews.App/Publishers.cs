@@ -8,7 +8,7 @@ namespace FootballNews.App;
 
 internal interface IPublisher
 {
-    Task PublishAsync(DigestKind kind, string header, IReadOnlyList<CardSection> sections, IReadOnlyList<Draft> drafts, CancellationToken ct);
+    Task PublishAsync(DigestKind kind, string header, IReadOnlyList<CardSection> sections, CancellationToken ct);
     Task NotifyAsync(string message, CancellationToken ct);
 }
 
@@ -20,7 +20,7 @@ internal static class CardFileName
 
 internal sealed class TelegramPublisher(TelegramClient telegram) : IPublisher
 {
-    public async Task PublishAsync(DigestKind kind, string header, IReadOnlyList<CardSection> sections, IReadOnlyList<Draft> drafts, CancellationToken ct)
+    public async Task PublishAsync(DigestKind kind, string header, IReadOnlyList<CardSection> sections, CancellationToken ct)
     {
         await telegram.SendPlainAsync(header, ct);
 
@@ -30,19 +30,15 @@ internal sealed class TelegramPublisher(TelegramClient telegram) : IPublisher
             foreach (var card in section.Images)
                 await telegram.SendPhotoAsync(card.Png, CardFileName.For(kind, card), ct);
         }
-
-        await telegram.SendPlainAsync(DigestText.DraftsSeparator, ct);
-        foreach (var message in drafts.SelectMany(TelegramMessages.Build))
-            await telegram.SendHtmlAsync(message, ct);
     }
 
     public Task NotifyAsync(string message, CancellationToken ct) => telegram.SendPlainAsync(message, ct);
 }
 
-/// <summary>Chạy thử: ghi ảnh, bài nháp và thứ tự tin nhắn ra thư mục, không gửi đi đâu.</summary>
+/// <summary>Chạy thử: ghi ảnh và thứ tự tin nhắn ra thư mục, không gửi đi đâu.</summary>
 internal sealed class FilePublisher(string directory) : IPublisher
 {
-    public async Task PublishAsync(DigestKind kind, string header, IReadOnlyList<CardSection> sections, IReadOnlyList<Draft> drafts, CancellationToken ct)
+    public async Task PublishAsync(DigestKind kind, string header, IReadOnlyList<CardSection> sections, CancellationToken ct)
     {
         Directory.CreateDirectory(directory);
         var prefix = kind.ToString().ToLowerInvariant();
@@ -58,15 +54,6 @@ internal sealed class FilePublisher(string directory) : IPublisher
                 order.Append("[ảnh] ").Append(name).Append('\n');
             }
             order.Append('\n');
-        }
-
-        order.Append(DigestText.DraftsSeparator).Append('\n');
-        foreach (var draft in drafts)
-        {
-            var text = string.Join("\n\n--- bài tiếp theo ---\n\n", draft.Parts);
-            var name = $"{prefix}-{draft.Platform.ToLowerInvariant()}.txt";
-            await File.WriteAllTextAsync(Path.Combine(directory, name), text, ct);
-            order.Append("[bài nháp] ").Append(name).Append('\n');
         }
 
         await File.WriteAllTextAsync(Path.Combine(directory, $"{prefix}-messages.txt"), order.ToString(), ct);

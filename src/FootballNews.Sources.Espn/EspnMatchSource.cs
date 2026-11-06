@@ -21,6 +21,13 @@ public sealed class EspnMatchSource(HttpClient http) : IMatchSource
         return EspnParser.ParseSummary(json, matchId, competition);
     }
 
+    public async Task<IReadOnlyList<TeamResult>> GetTeamResultsAsync(Competition competition, string teamId, int? season, CancellationToken ct)
+    {
+        var query = season is { } year ? $"?season={year}" : "";
+        var json = await GetAsync($"{BaseUrl}/{competition.Slug}/teams/{teamId}/schedule{query}", ct);
+        return EspnParser.ParseTeamSchedule(json, teamId, season);
+    }
+
     private async Task<string> GetAsync(string url, CancellationToken ct)
     {
         for (var attempt = 1; ; attempt++)

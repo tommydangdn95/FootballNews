@@ -19,7 +19,8 @@ public sealed record CardLocale(
     string NewTime,
     string OwnGoal,
     Func<Competition, string> CompetitionName,
-    Func<DateOnly, string> ShortDate)
+    Func<DateOnly, string> ShortDate,
+    Func<Competition?, string> FormNote)
 {
     // Giờ Anh đổi theo mùa (GMT/BST) nên phải dùng múi giờ thật, không dùng độ lệch cố định.
     private static readonly TimeZoneInfo UkTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
@@ -38,7 +39,8 @@ public sealed record CardLocale(
         NewTime: "giờ mới",
         OwnGoal: "phản lưới",
         CompetitionName: c => c.Name,
-        ShortDate: d => d.ToString("dd/MM", CultureInfo.InvariantCulture));
+        ShortDate: d => d.ToString("dd/MM", CultureInfo.InvariantCulture),
+        FormNote: c => $"Phong độ {TeamForm.MaxMatches} trận gần nhất tại {(c is null ? "giải của từng trận" : TitleCase(c.Name))} mùa này, trận mới nhất bên phải");
 
     public static readonly CardLocale English = new(
         Code: "en",
@@ -54,7 +56,14 @@ public sealed record CardLocale(
         NewTime: "new time",
         OwnGoal: "o.g.",
         CompetitionName: c => c.EnglishName,
-        ShortDate: d => d.ToString("d MMM", CultureInfo.InvariantCulture));
+        ShortDate: d => d.ToString("d MMM", CultureInfo.InvariantCulture),
+        FormNote: c => c is null
+            ? $"Form: last {TeamForm.MaxMatches} matches in each fixture's competition this season, most recent on the right"
+            : $"Form: last {TeamForm.MaxMatches} {TitleCase(c.EnglishName)} matches this season, most recent on the right");
+
+    // Tên giải trong config viết hoa (dùng cho tiêu đề); câu chú thích cần viết thường.
+    private static string TitleCase(string name) =>
+        CultureInfo.InvariantCulture.TextInfo.ToTitleCase(name.ToLowerInvariant());
 
     /// <summary>Các ngôn ngữ cần vẽ, theo thứ tự gửi đi.</summary>
     public static readonly IReadOnlyList<CardLocale> All = [Vietnamese, English];

@@ -19,7 +19,8 @@ public static partial class EspnParser
             .Select(e => ParseCompetition(
                 Required(e, "id").GetString()!,
                 Required(e, "competitions")[0],
-                competition))
+                competition,
+                SeasonYear(e)))
             .ToList();
     }
 
@@ -27,10 +28,76 @@ public static partial class EspnParser
     {
         using var doc = JsonDocument.Parse(json);
         var header = Required(doc.RootElement, "header");
-        return ParseCompetition(matchId, Required(header, "competitions")[0], competition);
+        return ParseCompetition(matchId, Required(header, "competitions")[0], competition, SeasonYear(header));
     }
 
-    private static Match ParseCompetition(string id, JsonElement c, Competition competition)
+    /// <summary>
+    /// Lịch thi đấu của một đội (<c>teams/{id}/schedule</c>): chỉ lấy trận đã đá xong, có tỉ số.
+    /// Trận phân thắng thua bằng luân lưu lấy kết quả cuối cùng.
+    /// </summary>
+    public static IReadOnlyList<TeamResult> ParseTeamSchedule(string json, string teamId, int? season)
+    {
+        using var doc = JsonDocument.Parse(json);
+        if (!doc.RootElement.TryGetProperty("events", out var events) || events.ValueKind != JsonValueKind.Array)
+            throw new FormatException($"ESPN lịch đội {teamId}: không có mảng events");
+
+        var results = new List<TeamResult>();
+        foreach (var e in events.EnumerateArray())
+        {
+            if (season is not null && SeasonYear(e) is { } year && year != season)
+                continue;
+            var c = Required(e, "competitions")[0];
+            var type = Required(Required(c, "status"), "type");
+            if (!Flag(type, "completed") || (type.TryGetProperty("state", out var state) ? state.GetString() : null) != "post")
+                continue;
+
+            var competitors = Required(c, "competitors").EnumerateArray().ToList();
+            var self = competitors.FirstOrDefault(x => Required(Required(x, "team"), "id").GetString() == teamId);
+            var other = competitors.FirstOrDefault(x => Required(Required(x, "team"), "id").GetString() != teamId);
+            if (self.ValueKind == JsonValueKind.Undefined || other.ValueKind == JsonValueKind.Undefined
+                || ReadScore(self) is not { } mine || ReadScore(other) is not { } theirs)
+                continue;
+
+            var kickoff = DateTimeOffset.Parse(
+                Required(e, "date").GetString()!,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+            results.Add(new TeamResult(kickoff, Outcome(mine, theirs, type, self, other)));
+        }
+        return results;
+    }
+
+    /// <summary>
+    /// Lấy kết quả cuối cùng: hoà rồi đá luân lưu thì đội thắng luân lưu là W.
+    /// Lịch đội không có tỉ số luân lưu, chỉ có trạng thái STATUS_FINAL_PEN và cờ "winner".
+    /// Chỉ dùng "winner" khi có luân lưu: ở lượt về cúp, cờ này có thể đánh dấu đội đi tiếp nhờ tổng tỉ số dù trận chỉ hoà.
+    /// </summary>
+    private static char Outcome(int mine, int theirs, JsonElement statusType, JsonElement self, JsonElement other)
+    {
+        if (mine != theirs)
+            return mine > theirs ? 'W' : 'L';
+
+        var name = statusType.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+        if (!name.Contains("PEN"))
+            return 'D';
+        if (ReadInt(self, "shootoutScore") is { } myPens && ReadInt(other, "shootoutScore") is { } theirPens && myPens != theirPens)
+            return myPens > theirPens ? 'W' : 'L';
+        return Flag(self, "winner") ? 'W' : Flag(other, "winner") ? 'L' : 'D';
+    }
+
+    private static int? SeasonYear(JsonElement e) =>
+        e.TryGetProperty("season", out var s) && s.ValueKind == JsonValueKind.Object
+            && s.TryGetProperty("year", out var y) && y.ValueKind == JsonValueKind.Number
+            ? y.GetInt32()
+            : null;
+
+    // Lịch đội trả score dạng object { value, displayValue }; scoreboard trả chuỗi.
+    private static int? ReadScore(JsonElement competitor) =>
+        competitor.TryGetProperty("score", out var score) && score.ValueKind == JsonValueKind.Object
+            ? ReadInt(score, "value")
+            : ReadInt(competitor, "score");
+
+    private static Match ParseCompetition(string id, JsonElement c, Competition competition, int? season)
     {
         var status = ParseStatus(Required(Required(c, "status"), "type"));
         var competitors = Required(c, "competitors").EnumerateArray().ToList();
@@ -48,7 +115,7 @@ public static partial class EspnParser
             ? details.EnumerateArray().Select(ParseEvent).OfType<MatchEvent>().ToList()
             : [];
 
-        return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events, ParseVenue(c));
+        return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events, ParseVenue(c), season);
     }
 
     // Không bắt buộc: thiếu tên sân thì ảnh chỉ không ghi sân.
@@ -94,7 +161,8 @@ public static partial class EspnParser
             new Team(Required(team, "id").GetString()!, Required(team, "displayName").GetString()!, logo),
             hasScore ? ReadInt(competitor, "score") : null,
             hasScore ? ReadInt(competitor, "shootoutScore") : null,
-            competitor.TryGetProperty("form", out var form) ? form.GetString() : null);
+            // Không dùng "form" của ESPN: chuỗi đó trộn nhiều giải và xếp mới đến cũ. Xem TeamForm.
+            null);
     }
 
     private static MatchEvent? ParseEvent(JsonElement d)
@@ -137,7 +205,7 @@ public static partial class EspnParser
             return null;
         return value.ValueKind switch
         {
-            JsonValueKind.Number => value.GetInt32(),
+            JsonValueKind.Number => (int)value.GetDouble(),
             JsonValueKind.String when int.TryParse(value.GetString(), out var parsed) => parsed,
             _ => null,
         };

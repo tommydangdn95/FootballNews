@@ -3,7 +3,7 @@
 > Đặt file này ở thư mục gốc repo. Claude (hoặc dev khác) đọc file này trước khi code.
 
 ## 1. Mục tiêu
-Mỗi ngày tự động tổng hợp **toàn bộ kết quả và lịch đấu của các giải trong mục 3**, soạn bản nháp cho **Facebook, X, Threads**, gửi về **Telegram** để chủ trang duyệt và tự đăng. App **không** tự đăng lên mạng xã hội (v1).
+Mỗi ngày tự động tổng hợp **toàn bộ kết quả và lịch đấu của các giải trong mục 3**, vẽ **ảnh bảng tỉ số**, gửi về **Telegram** để chủ trang duyệt và tự đăng. App **không** tự đăng lên mạng xã hội (v1).
 
 ## 2. Lịch chạy (giờ Việt Nam, UTC+7)
 Mỗi ngày chạy **một lần lúc 07:00** (job `daily`). Có thể chạy tay từng phần.
@@ -41,7 +41,7 @@ Mỗi ngày chạy **một lần lúc 07:00** (job `daily`). Có thể chạy ta
 | Serie A | `ita.1` |
 
 ## 4. Danh sách ông lớn (config `clubs.json`, sửa tay được)
-**Không dùng để lọc:** mọi trận của các giải trong mục 3 đều được báo. Danh sách chỉ dùng cho tên quen thuộc, hashtag và thứ tự nổi bật trên X/Threads. Match theo **ESPN team id** (ổn định hơn tên).
+**Không dùng để lọc:** mọi trận của các giải trong mục 3 đều được báo. Danh sách chỉ dùng cho tên quen thuộc trên ảnh (`hashtag` và `priority` còn trong file nhưng không dùng nữa). Match theo **ESPN team id** (ổn định hơn tên).
 
 - **Anh:** Arsenal, Man City, Liverpool, Man United, Chelsea, Tottenham, Newcastle, Aston Villa
 - **Đức:** Bayern Munich, Borussia Dortmund, RB Leipzig, Bayer Leverkusen
@@ -50,7 +50,7 @@ Mỗi ngày chạy **một lần lúc 07:00** (job `daily`). Có thể chạy ta
 - **Ý:** Inter, Milan, Juventus, Napoli
 - **Chỉ xuất hiện ở cúp châu Âu:** Benfica, Porto, Ajax
 
-Trường `priority` (1 = top, 2 = đáng chú ý) quyết định thứ tự nổi bật. Đội ngoài danh sách vẫn được báo, dùng tên của ESPN và không có hashtag riêng.
+Đội ngoài danh sách vẫn được báo, dùng tên của ESPN.
 
 ## 5. Nguồn dữ liệu
 
@@ -62,6 +62,8 @@ GET https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/scoreboard?dates
 - `results`: gọi 3 ngày × 8 giải = 24 request. `upcoming`: gọi 7 ngày × số giải của hôm đó (3 hoặc 5; thứ 6 là cả 8 giải để nhắc lại cuối tuần). Chạy `force`, phần kết quả gọi 9 ngày × 8 giải = 72 request. Ngày trùng nhau chỉ gọi một lần.
 - Lưu ý: tham số `dates` theo ngày của ESPN (giờ Mỹ), nên luôn lấy dư 1 ngày rồi lọc lại theo UTC trong code.
 - **Không đặt User-Agent có chữ "bot":** Akamai của ESPN trả 403 cho `FootballNewsBot/1.0` (đã thử 04/11/2026). Dùng mặc định của `HttpClient`, không giả danh trình duyệt.
+- Phong độ (chỉ cho bài lịch đấu): `GET .../soccer/{slug}/teams/{teamId}/schedule?season={year}` trả các trận đã đá của đội **trong đúng giải đó** và mùa đó; score dạng `{ "value": 2.0 }`. Mỗi đội gọi một lần mỗi lần chạy (khoảng 2 request mỗi trận).
+- **Không dùng `competitors[].form` của ESPN:** chuỗi này xếp mới → cũ và trộn nhiều giải (vd Liverpool `LLWWW` ngày 08/11/2026 gồm cả Ngoại Hạng Anh lẫn C1 nhưng bỏ Carabao Cup).
 - Kiểm tra lại một trận đã báo: `GET .../soccer/{slug}/summary?event={id}`, đọc `header.competitions[0]`.
 
 **Mapping trường (đã kiểm chứng với trận Liverpool 0-1 Arsenal, 01/11/2026):**
@@ -73,7 +75,7 @@ GET https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/scoreboard?dates
 | Đội, sân nhà/khách | `competitors[].team.id`, `.displayName`, `.abbreviation`, `.homeAway` |
 | Tỷ số | `competitors[].score` |
 | Logo | `competitors[].team.logo` |
-| Phong độ | `competitors[].form` (vd `LWWWW`) |
+| Mùa giải | `events[].season.year` (vd `2026` cho mùa 2026-27); summary: `header.season.year` |
 | Thống kê | `competitors[].statistics[]` (`possessionPct`, `totalShots`, `shotsOnTarget`…) |
 | Sự kiện | `competitions[0].details[]` |
 | – Bàn thắng | `scoringPlay == true`; kèm `penaltyKick`, `ownGoal` |
@@ -109,11 +111,10 @@ GET https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/scoreboard?dates
 - Dọn mục cũ hơn 30 ngày.
 - Job **commit file này lại vào repo** sau mỗi lần chạy để lưu trạng thái.
 
-## 7. Đầu ra: bản nháp gửi Telegram
+## 7. Đầu ra: tin và ảnh gửi Telegram
 Mỗi phần (`results`, `upcoming`) gửi theo thứ tự (`DigestText`):
 1. **Tin mở đầu:** loại bài, ngày gửi, khoảng ngày thi đấu, tổng số trận và số trận từng giải.
 2. Với mỗi giải: **tin ngăn cách** (tên giải, số trận, khoảng ngày, số ảnh của mỗi bản ngôn ngữ), rồi **ảnh bảng tỉ số** bản tiếng Việt và tiếng Anh. Các giải ghép chung ảnh dùng chung một tin ngăn cách.
-3. **Tin "Bài nháp để đăng"**, rồi các tin của từng nền tảng (bấm vào khối chữ để copy nhanh). Bài nháp là một bài chung cho mọi giải.
 
 Chạy `force` có thêm một dòng đầu tiên bắt đầu bằng `🧪 Chạy force`.
 
@@ -142,49 +143,12 @@ Tổng: 3 trận · 2 giải
 ──────────────────
 ```
 
-**Mẫu tin trước bài nháp:**
-```
-📝 BÀI NHÁP ĐỂ ĐĂNG
-Facebook · Threads · X
-──────────────────
-```
-
-**Ảnh:** dựng từ HTML/CSS (`CardHtml`) rồi chụp thành PNG bằng Chrome/Edge có sẵn qua Playwright. Mỗi ảnh vẽ **2 bản tiếng Việt và tiếng Anh** (bài chữ vẫn chỉ tiếng Việt). Bản tiếng Việt dùng giờ VN, bản tiếng Anh dùng giờ Anh (`Europe/London`, tự đổi GMT/BST); cả giờ và ngày đều tính theo múi giờ của từng bản. Đầu ảnh không ghi ngày để dùng đăng bài được; khoảng ngày, kể cả khi chạy `force`, nằm trong tin mở đầu và tin ngăn cách trên Telegram. Ảnh **lịch đấu**: dưới giờ đá mỗi trận ghi ngày đá và tên sân (lấy từ ESPN, thiếu thì bỏ qua; bài chữ và ảnh kết quả không ghi sân). Ảnh **kết quả**: dưới tỉ số mỗi trận ghi ngày và giờ đá. Đầu ảnh ghi "Đêm qua & rạng sáng nay", riêng khi chạy `force` trải nhiều ngày thì ghi "Các trận gần đây". Chân ảnh chỉ ghi tên trang, không đánh số trang. Có logo đội. Ô mỗi trận có nền chuyển màu từ xanh chanh sang xanh ngọc, chữ trong ô màu tối. Màu và tên trang sửa trong `config/card.json`. Không vẽ được ảnh thì vẫn gửi bài chữ và báo cảnh báo.
+**Ảnh:** dựng từ HTML/CSS (`CardHtml`) rồi chụp thành PNG bằng Chrome/Edge có sẵn qua Playwright. Mỗi ảnh vẽ **2 bản tiếng Việt và tiếng Anh**; không có bài chữ để đăng. Bản tiếng Việt dùng giờ VN, bản tiếng Anh dùng giờ Anh (`Europe/London`, tự đổi GMT/BST); cả giờ và ngày đều tính theo múi giờ của từng bản. Đầu ảnh không ghi ngày để dùng đăng bài được; khoảng ngày, kể cả khi chạy `force`, nằm trong tin mở đầu và tin ngăn cách trên Telegram. Ảnh **lịch đấu**: dưới giờ đá mỗi trận ghi ngày đá và tên sân (lấy từ ESPN, thiếu thì bỏ qua; ảnh kết quả không ghi sân). Ảnh lịch đấu có **phong độ** mỗi đội: tối đa 5 trận gần nhất **trong cùng giải và cùng mùa**, đá trước giờ bóng lăn của trận (trận Ngoại Hạng Anh chỉ tính trận Ngoại Hạng Anh, trận C1 chỉ tính trận C1…). Xếp cũ → mới, trận gần nhất ở bên phải. Mùa mới đá ít hơn 5 trận thì hiện ít ô hơn, không lấy mùa trước; chưa đá trận nào hoặc lấy lỗi thì không hiện. Trận hoà rồi đá luân lưu lấy kết quả cuối cùng: đội thắng luân lưu là W, đội thua là L (lịch đội của ESPN không có tỉ số luân lưu, chỉ có trạng thái `STATUS_FINAL_PEN` và cờ `winner`; cờ này chỉ dùng khi có luân lưu vì ở lượt về cúp nó có thể đánh dấu đội đi tiếp nhờ tổng tỉ số). Dưới tên giải có dòng giải thích, vd "Phong độ 5 trận gần nhất tại Ngoại Hạng Anh mùa này, trận mới nhất bên phải". Ảnh **kết quả**: dưới tỉ số mỗi trận ghi ngày và giờ đá. Đầu ảnh ghi "Đêm qua & rạng sáng nay", riêng khi chạy `force` trải nhiều ngày thì ghi "Các trận gần đây". Chân ảnh chỉ ghi tên trang, không đánh số trang. Có logo đội. Ô mỗi trận có nền chuyển màu từ xanh chanh sang xanh ngọc, chữ trong ô màu tối. Màu và tên trang sửa trong `config/card.json`. Không vẽ được ảnh thì vẫn gửi tin mở đầu, tin ngăn cách và báo cảnh báo.
 
 **Chia ảnh (`CardPaging`):** mỗi giải có ảnh riêng, mỗi ảnh **2–6 trận**. Giải nhiều trận thì chia đều thành nhiều ảnh (7 trận → 4 + 3). Giải chỉ có 1 trận thì ghép chung với giải liền kề. Ngoại lệ duy nhất: cả phần chỉ có đúng 1 trận thì vẫn vẽ một ảnh cho trận đó.
 
-| Nền tảng | Giới hạn | Định dạng |
-|---|---|---|
-| Facebook | dài thoải mái | Đầy đủ: nhóm theo giải, tỷ số, người ghi bàn + phút, thẻ đỏ (thẻ vàng tóm tắt số lượng), hashtag |
-| Threads | 500 ký tự/bài | Tất cả các trận: tỷ số + người ghi bàn; nếu dài thì tách thành nhiều bài nối tiếp, hashtag ở bài cuối |
-| X | 280 ký tự/tweet (tài khoản thường) | Tất cả các trận, chỉ tỷ số hoặc giờ đá; nếu dài thì tách thành thread nhiều tweet, hashtag ở tweet cuối |
-
-- Thứ tự trên Threads và X: bài kết quả xếp trận nổi bật trước, bài lịch đấu xếp theo giờ đá.
-- Telegram giới hạn 4096 ký tự/tin → tự chia nhỏ nếu vượt.
-- Giờ trong bài chữ luôn là giờ VN, kèm ngày đá ở bài lịch (`🕒 03:00 06/11 | ...`).
-- Tiêu đề bài chữ kết quả khi chạy `force` trải hơn 2 ngày là `⚽ KẾT QUẢ CÁC TRẬN GẦN ĐÂY`.
+- Telegram giới hạn 4096 ký tự/tin.
 - Tên đội: dùng tên quen thuộc với người Việt (map trong `clubs.json`, vd "Man Utd", "Bayern").
-
-**Ví dụ Facebook – kết quả:**
-```
-⚽ KẾT QUẢ ĐÊM QUA & RẠNG SÁNG NAY
-
-🏴 NGOẠI HẠNG ANH
-Liverpool 0–1 Arsenal
-⚽ Havertz 16'
-🟨 Liverpool 4 – Arsenal 4
-
-#NgoaiHangAnh #Liverpool #Arsenal
-```
-
-**Ví dụ Facebook – sắp diễn ra:**
-```
-📅 LỊCH THI ĐẤU SẮP TỚI
-
-⭐ CHAMPIONS LEAGUE
-🕒 03:00 06/11 | Real Madrid vs Liverpool
-   Phong độ: WWDWL | WLWWW
-```
 
 ## 8. Hạ tầng
 - **Runtime:** .NET 8 (`net8.0`, console app), chạy trên **GitHub Actions** với `dotnet-version: 8.0.x`. Hạ từ .NET 10 xuống vì máy phát triển không cài được .NET 10.
@@ -194,9 +158,9 @@ Liverpool 0–1 Arsenal
 - Workflow cần `permissions: contents: write` để commit `announced.json`.
 
 **Cài trên máy mới:**
-- Cần .NET SDK có thể build `net8.0` kèm runtime .NET 8 (đã chạy được với SDK 9.0.102 + runtime 8.0.12), và Chrome hoặc Edge để vẽ ảnh. Thiếu trình duyệt thì vẫn có bài chữ, chỉ không có ảnh.
+- Cần .NET SDK có thể build `net8.0` kèm runtime .NET 8 (đã chạy được với SDK 9.0.102 + runtime 8.0.12), và Chrome hoặc Edge để vẽ ảnh. Thiếu trình duyệt thì chỉ có tin chữ trên Telegram, không có ảnh.
 - Chạy test: `dotnet test src/FootballNews.Tests/FootballNews.Tests.csproj`.
-- Chạy thử, không gửi và không ghi trạng thái: `dotnet run --project src/FootballNews.App -- daily --date yyyy-MM-dd --dry-run [--force]`. Kết quả nằm trong `output/`, gồm ảnh, bài nháp và `*-messages.txt` ghi thứ tự tin nhắn.
+- Chạy thử, không gửi và không ghi trạng thái: `dotnet run --project src/FootballNews.App -- daily --date yyyy-MM-dd --dry-run [--force]`. Kết quả nằm trong `output/`, gồm ảnh và `*-messages.txt` ghi thứ tự tin nhắn.
 - `FootballNews.slnx` cần SDK từ 9.0.200 trở lên; SDK cũ hơn thì build trực tiếp từng project như lệnh trên.
 - Bot tự commit `data/announced.json` lên `main`, nên luôn `git pull --rebase` trước khi push.
 
@@ -211,11 +175,11 @@ Liverpool 0–1 Arsenal
 ├─ tests/fixtures/                # JSON mẫu ESPN
 └─ src/
    ├─ FootballNews.Core/          # model, interface, logic thuần (dễ test)
-   │   ├─ Models/ (Match, MatchEvent, Team, Competition)
+   │   ├─ Models/ (Match, MatchEvent, Team, Competition, TeamForm)
    │   ├─ Sources/IMatchSource.cs
    │   ├─ Filtering/ReportWindow.cs
    │   ├─ Dedup/AnnouncedStore.cs
-   │   └─ Formatting/ (FacebookFormatter, ThreadsFormatter, XFormatter, DigestText)
+   │   └─ Formatting/ (DigestText: các tin chữ trên Telegram)
    ├─ FootballNews.Sources.Espn/  # adapter ESPN
    ├─ FootballNews.Sources.FootballData/  # adapter dự phòng (làm sau)
    ├─ FootballNews.Rendering/     # vẽ ảnh bảng tỉ số (CardHtml, CardPaging, CardRenderer)
@@ -227,7 +191,7 @@ Liverpool 0–1 Arsenal
 - Lưu sẵn file JSON ESPN mẫu (vd trận Liverpool–Arsenal) vào `tests/fixtures` để test parser offline.
 
 ## 10. Lộ trình
-1. **v1 (MVP):** ESPN adapter, 1 lần chạy lúc 07:00 (kết quả mỗi ngày, lịch đấu theo nhóm giải), chống trùng, ảnh bảng tỉ số có logo, formatter 3 nền tảng, gửi Telegram, GitHub Actions.
+1. **v1 (MVP):** ESPN adapter, 1 lần chạy lúc 07:00 (kết quả mỗi ngày, lịch đấu theo nhóm giải), chống trùng, ảnh bảng tỉ số có logo và phong độ, gửi Telegram, GitHub Actions.
 2. **v2:** Thêm tin tức (RSS) + AI viết lại bằng tiếng Việt; adapter dự phòng football-data.org.
 3. **v3 (tuỳ chọn):** Nút "Duyệt" trên Telegram để tự đăng lên Facebook Page/X/Threads qua API.
 
@@ -247,5 +211,4 @@ Liverpool 0–1 Arsenal
 - Trận đã báo rồi dời sang ngày khác chỉ báo "giờ mới" một lần, không hiện lại trong lịch ngày đá (trừ phần nhắc lại cuối tuần).
 - Trận đang đá lúc chạy không xuất hiện ở cả kết quả lẫn lịch đấu, kể cả khi `force`.
 - `force` chỉ lấy kết quả 7 ngày, nên cúp châu Âu không đá trong tuần có thể vắng mặt.
-- Bài chữ kết quả khi `force` không ghi ngày đá từng trận; ảnh thì có.
 - Telegram trả lỗi không phải JSON (vd 502 dạng HTML) sẽ báo lỗi parse thay vì lỗi thật, và lỗi 5xx không được thử lại.

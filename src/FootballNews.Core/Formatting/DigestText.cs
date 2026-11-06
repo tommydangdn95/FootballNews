@@ -4,14 +4,12 @@ using FootballNews.Core.Models;
 
 namespace FootballNews.Core.Formatting;
 
-/// <summary>Các tin ngăn cách trên Telegram: mở đầu mỗi phần, trước ảnh từng giải và trước bài nháp.</summary>
+/// <summary>Các tin ngăn cách trên Telegram: mở đầu mỗi phần và trước ảnh từng giải.</summary>
 public static class DigestText
 {
     private const string HeavyRule = "━━━━━━━━━━━━━━━━━━";
     private const string LightRule = "──────────────────";
     private const string UpdatesLabel = "CẬP NHẬT";
-
-    public const string DraftsSeparator = $"📝 BÀI NHÁP ĐỂ ĐĂNG\nFacebook · Threads · X\n{LightRule}";
 
     /// <summary>
     /// Tin khi không có trận, ghi rõ chế độ chạy. Chạy thường bỏ qua trận đã báo nên chỉ nói "mới":
