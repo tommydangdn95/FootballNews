@@ -87,6 +87,16 @@ internal sealed class LiveRunner(
                     continue;
                 }
 
+                // ESPN bị kẹt, quá lâu sau giờ bóng lăn vẫn chưa báo kết thúc: bỏ theo dõi để không chạy mãi.
+                if (!watch.Finished && Now >= config.WatchDeadline(watch))
+                {
+                    var limit = config.WatchDeadline(watch) - watch.KickoffUtc;
+                    var duration = limit.Minutes > 0 ? $"{(int)limit.TotalHours} tiếng {limit.Minutes} phút" : $"{(int)limit.TotalHours} tiếng";
+                    await NotifyAsync($"⚠️ ESPN chưa báo kết thúc trận {MatchName(watch)} sau {duration} kể từ giờ bóng lăn. Bot dừng theo dõi.", ct);
+                    await StopWatchAsync("🚫 Bot dừng theo dõi vì quá giờ, bản nháp không được đăng.", ct);
+                    break;
+                }
+
                 if (Now >= nextPoll)
                 {
                     await PollAsync(ct);

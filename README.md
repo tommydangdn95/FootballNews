@@ -54,6 +54,8 @@ Mỗi sự kiện là một bản nháp gồm ảnh xem trước và caption, k�
 - Bản nháp **hết hạn sau 10 phút** tính từ lúc bot phát hiện sự kiện.
 - VAR huỷ một bàn: bàn đã đăng thì có bản nháp báo huỷ; bàn còn chờ duyệt thì bản nháp đó được gắn cảnh báo ⚠️; bàn đã Bỏ hoặc hết hạn thì không có gì.
 - Mỗi lúc chỉ theo dõi **một trận**. Muốn đổi trận thì `/unwatch` trước.
+- Hết trận và không còn bản nháp chờ thì bot nhắn "Đã theo dõi xong" rồi workflow tự dừng (muộn nhất khoảng 15 phút sau tiếng còi).
+- Phòng khi ESPN bị kẹt: quá **3 tiếng** sau giờ bóng lăn (**3 tiếng 45 phút** nếu có hiệp phụ) mà chưa thấy kết thúc thì bot tự dừng theo dõi và báo lý do.
 - Đăng Facebook lỗi thì bot báo về Telegram, bản nháp giữ nguyên để bấm Đăng lại.
 
 ### Menu lệnh trong Telegram (tuỳ chọn)
@@ -87,7 +89,7 @@ help - Danh sách lệnh
 
 ### Đổi màu và nội dung
 
-- Màu nền ảnh từng loại sự kiện, chu kỳ hỏi ESPN, hạn bản nháp, danh sách cúp: [config/live.json](config/live.json).
+- Màu nền ảnh từng loại sự kiện, chu kỳ hỏi ESPN, hạn bản nháp, giới hạn thời gian theo dõi, danh sách cúp: [config/live.json](config/live.json).
 - Tên đội và hashtag đội: [config/clubs.json](config/clubs.json).
 - Xem trước ảnh mọi loại sự kiện trên máy (cần Chrome hoặc Edge), kết quả trong `output/live-preview/`:
 

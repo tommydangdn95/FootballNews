@@ -337,3 +337,19 @@ public class LiveSupportTests
         Assert.DoesNotContain(System.Net.WebUtility.HtmlEncode("BÀN THẮNG!"), custom);
     }
 }
+
+public class LiveWatchLimitTests
+{
+    [Fact]
+    public void Watch_limit_is_three_hours_or_three_and_three_quarters_with_extra_time()
+    {
+        var config = Core.Live.LiveConfig.Load(Path.Combine(TestData.Root, "config", "live.json"));
+        var kickoff = new DateTimeOffset(2026, 11, 7, 15, 0, 0, TimeSpan.Zero);
+        var watch = new WatchedMatch { KickoffUtc = kickoff };
+
+        Assert.Equal(kickoff.AddHours(3), config.WatchDeadline(watch));
+
+        watch.HadExtraTime = true;
+        Assert.Equal(kickoff.AddMinutes(225), config.WatchDeadline(watch));
+    }
+}

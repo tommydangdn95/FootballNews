@@ -2,6 +2,8 @@
   "hashtag": "MatchdayChallenge",
   "pollSeconds": 210,
   "draftMinutes": 10,
+  "watchLimitMinutes": 180,
+  "watchLimitExtraTimeMinutes": 225,
   "gradients": {
     "goal":            ["#FF0F5B", "#3B2BD6"],
     "redCard":         ["#D7002A", "#3A0718"],
