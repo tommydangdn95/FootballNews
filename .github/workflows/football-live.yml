@@ -1,14 +1,16 @@
 name: football-live
 
 on:
-  # cron-job.org gọi workflow_dispatch 10 phút một lần (SPEC mục 13.7).
-  # Không theo dõi trận nào thì job chỉ đọc lệnh Telegram rồi thoát.
+  # Chủ trang bấm Run workflow bằng tay (SPEC mục 13.7). Không có cron.
+  # Chưa chọn trận thì bot nghe lệnh 5 phút rồi tắt; đã chọn trận thì chạy đến hết trận.
   workflow_dispatch:
 
 permissions:
   contents: write
+  # Để tự bật lượt chạy mới khi hết giới hạn thời gian mà trận chưa xong.
+  actions: write
 
-# Group riêng để không chặn job hằng ngày. Đang có job live chạy thì lần gọi mới xếp hàng chờ.
+# Group riêng để không chặn job hằng ngày. Đang có job live chạy thì lần bấm mới xếp hàng chờ.
 concurrency:
   group: football-live
   cancel-in-progress: false
@@ -52,4 +54,16 @@ jobs:
             git commit -m "chore: update live.json"
             git pull --rebase
             git push
+          fi
+
+      # App dừng vì hết giới hạn thời gian mà trận chưa xong thì bật lượt mới để chạy tiếp.
+      # workflow_dispatch gọi bằng GITHUB_TOKEN vẫn được GitHub cho chạy.
+      - name: Continue in a new run
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f .live-continue ]; then
+            gh workflow run football-live.yml --ref "${{ github.ref_name }}"
+            echo "Đã bật lượt chạy mới."
           fi

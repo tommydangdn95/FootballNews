@@ -282,12 +282,15 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 ### 13.7 Cách chạy
 - Workflow riêng `.github/workflows/football-live.yml`, job `live`, **concurrency group riêng** `football-live` (không chặn job hằng ngày). Repo để **public** nên không giới hạn số phút Actions.
 - Chu kỳ hỏi ESPN (`pollSeconds`, mặc định 210 giây) và hạn bản nháp (`draftMinutes`, mặc định 10) nằm trong `config/live.json`.
-- **cron-job.org gọi workflow 10 phút một lần** (`POST .../actions/workflows/football-live.yml/dispatches`, body `{"ref":"main"}`). Mỗi lần chạy:
+- **Không dùng cron.** Chủ trang gõ `/watch` trên Telegram rồi **bấm Run workflow** `football-live` (trên web hoặc app GitHub); làm theo thứ tự nào cũng được. Mỗi lần chạy:
   1. Đọc lệnh và nút bấm mới bằng `getUpdates` (Telegram giữ tin 24 giờ, `offset` đánh dấu đã đọc).
-  2. Không theo dõi trận nào, hoặc trận còn hơn 15 phút nữa mới đá → thoát. Riêng khi chủ trang vừa nhắn lệnh thì chờ thêm 3 phút, để bấm chọn trận sau `/watch` được xử lý ngay.
-  3. Trận sắp đá hoặc đang đá → **chạy liên tục suốt trận**: cứ **3–4 phút** hỏi ESPN một lần (khoảng 30–40 request cho một trận), giữa các lần thì đọc Telegram liên tục (long polling) để bấm nút là xử lý ngay.
-  4. Thoát khi trận đã xong và hàng đợi trống (tối đa thêm 10 phút), hoặc gần hết giới hạn 6 giờ của GitHub (job đặt `timeout-minutes: 330`). Lần gọi sau của cron-job.org sẽ chạy tiếp từ trạng thái đã lưu.
-- Trong lúc job live đang chạy, các lần gọi của cron-job.org xếp hàng chờ. Khi được chạy thì thấy không còn việc và thoát ngay.
+  2. Chưa chọn trận → nghe lệnh **5 phút** kể từ lúc bật hoặc từ tin nhắn gần nhất của chủ trang, rồi tắt.
+  3. Đã chọn trận nhưng còn hơn 15 phút nữa mới đá → **chạy tiếp và chờ**, vẫn trả lời lệnh trong lúc chờ.
+  4. Trận sắp đá hoặc đang đá → **chạy liên tục suốt trận**: cứ **3–4 phút** hỏi ESPN một lần (khoảng 30–40 request cho một trận), giữa các lần thì đọc Telegram liên tục (long polling) để bấm nút là xử lý ngay.
+  5. Thoát khi trận đã xong và hàng đợi trống (tối đa thêm 10 phút).
+- **Giới hạn 6 giờ của GitHub:** app tự dừng sau `LIVE_MAX_MINUTES` (320 phút, job đặt `timeout-minutes: 340`). Nếu lúc đó vẫn đang theo dõi trận, app báo lên Telegram và ghi file `.live-continue`; bước cuối của workflow thấy file thì gọi `gh workflow run football-live.yml` bằng `GITHUB_TOKEN` (cần `permissions: actions: write`) để bật lượt mới chạy tiếp từ trạng thái đã lưu. Chọn trận còn vài ngày nữa mới đá thì bot cứ thế nối nhiều lượt chạy cho tới giờ đá.
+- App bị lỗi hoặc bị huỷ tay thì không nối lượt; trận vẫn được ghi trong `live.json`, bấm Run workflow lại là chạy tiếp.
+- Đang có lượt live chạy mà bấm Run workflow thêm thì lượt mới xếp hàng chờ, khi được chạy sẽ nghe lệnh 5 phút rồi tắt.
 
 ### 13.8 Trạng thái
 - File riêng `data/live.json`, tách khỏi `announced.json`:
@@ -301,4 +304,4 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 - ESPN chậm 1–2 phút và đôi khi sửa sự kiện sau vài phút (đổi người ghi bàn, đổi phút). Bot chỉ báo theo lần đầu thấy.
 - Bản nháp bị xếp hàng sau một bản chưa duyệt có thể hết hạn trước khi kịp hiện ra.
 - Đăng dồn dập nhiều bài có thể bị bộ lọc spam của Facebook hạn chế. Hàng đợi một bản một lúc giúp giãn khoảng cách.
-- cron-job.org lỗi thì lệnh `/watch` không được đọc và trận không được theo dõi.
+- Quên bấm Run workflow sau khi `/watch` thì lệnh nằm chờ trên Telegram (tối đa 24 giờ) và trận không được theo dõi.

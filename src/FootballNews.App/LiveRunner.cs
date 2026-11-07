@@ -31,7 +31,8 @@ internal sealed class LiveRunner(
     // Bắt đầu hỏi ESPN từ 15 phút trước giờ đá.
     private static readonly TimeSpan WarmUp = TimeSpan.FromMinutes(15);
     private const int LongPollSeconds = 25;
-    private static readonly TimeSpan InteractionWindow = TimeSpan.FromMinutes(3);
+    // Chạy bằng tay: nghe lệnh ít nhất chừng này kể từ lúc bật hoặc từ tin nhắn gần nhất của chủ trang.
+    private static readonly TimeSpan InteractionWindow = TimeSpan.FromMinutes(5);
     private const int MaxSearchResults = 8;
 
     private static readonly CultureInfo Invariant = CultureInfo.InvariantCulture;
@@ -40,18 +41,23 @@ internal sealed class LiveRunner(
     private readonly DateTimeOffset _startedAt = DateTimeOffset.UtcNow;
     private LiveState _state = new();
     private long? _offset;
-    private DateTimeOffset _lastInteraction = DateTimeOffset.MinValue;
+    private DateTimeOffset _lastInteraction = DateTimeOffset.UtcNow;
     private bool _dirty;
 
     private TimeSpan DraftLifetime => TimeSpan.FromMinutes(config.DraftMinutes);
     private TimeSpan PollInterval => TimeSpan.FromSeconds(config.PollSeconds);
     private static DateTimeOffset Now => DateTimeOffset.UtcNow;
 
-    public async Task RunAsync(CancellationToken ct)
+    /// <summary>
+    /// Chạy đến khi xong việc. Trả <c>true</c> khi phải dừng vì hết giới hạn thời gian mà trận vẫn đang theo dõi:
+    /// workflow sẽ tự bật lượt chạy mới để chạy tiếp.
+    /// </summary>
+    public async Task<bool> RunAsync(CancellationToken ct)
     {
         _state = store.Load();
         var deadline = _startedAt + maxRuntime;
         var nextPoll = DateTimeOffset.MinValue;
+        var continuation = false;
 
         try
         {
@@ -59,18 +65,23 @@ internal sealed class LiveRunner(
             while (!ct.IsCancellationRequested && Now < deadline)
             {
                 var watch = _state.Watch;
-                if (watch is null || Now < watch.KickoffUtc - WarmUp)
+                if (watch is null)
                 {
-                    // Chủ trang vừa nhắn thì chờ thêm một lúc để bấm chọn trận được xử lý ngay.
+                    // Chưa chọn trận: nghe lệnh một lúc rồi tắt.
                     if (Now - _lastInteraction < InteractionWindow)
                     {
                         await ReadUpdatesAsync(LongPollSeconds, ct);
                         continue;
                     }
-                    Console.WriteLine(watch is null
-                        ? "Không theo dõi trận nào."
-                        : $"Trận {watch.MatchId} đá lúc {watch.KickoffUtc:u}, chưa đến giờ theo dõi.");
+                    Console.WriteLine("Không theo dõi trận nào.");
                     break;
+                }
+                if (Now < watch.KickoffUtc - WarmUp)
+                {
+                    // Đã chọn trận nhưng chưa đến giờ: chạy tiếp và chờ, vẫn trả lời lệnh trong lúc chờ.
+                    var untilStart = (int)(watch.KickoffUtc - WarmUp - Now).TotalSeconds;
+                    await ReadUpdatesAsync(Math.Clamp(untilStart, 1, LongPollSeconds), ct);
+                    continue;
                 }
 
                 if (Now >= nextPoll)
@@ -93,6 +104,12 @@ internal sealed class LiveRunner(
                 await ReadUpdatesAsync(wait, ct);
             }
 
+            if (_state.Watch is not null && Now >= deadline)
+            {
+                await NotifyAsync("⏳ Hết giới hạn thời gian của một lượt chạy GitHub. Bot tự bật lượt mới để theo dõi tiếp, mất khoảng 1–2 phút.", ct);
+                continuation = true;
+            }
+
             // Đánh dấu đã đọc mọi tin đã xử lý.
             if (_offset is not null)
             {
@@ -110,6 +127,7 @@ internal sealed class LiveRunner(
         {
             await SaveAsync("chore: update live.json", force: true);
         }
+        return continuation;
     }
 
     private DateTimeOffset Earliest(DateTimeOffset nextPoll)
@@ -599,7 +617,7 @@ internal sealed class LiveRunner(
         var kickoff = match.KickoffUtc.ToOffset(ReportWindow.VietnamOffset).ToString("HH:mm dd/MM", Invariant);
         var status = match.Status == MatchStatus.Live
             ? $"Trận đang đá, tỉ số hiện tại {match.Home.Score}-{match.Away.Score}. Bot chỉ báo các sự kiện từ bây giờ."
-            : $"Đá lúc {kickoff}. Bot bắt đầu theo dõi từ 15 phút trước giờ đá.";
+            : $"Đá lúc {kickoff}. Bot đang chạy và sẽ chờ đến 15 phút trước giờ đá thì bắt đầu theo dõi, không cần bấm chạy lại.";
         await NotifyAsync($"👀 Đã chọn theo dõi {MatchName(_state.Watch)} ({competition!.Name}).\n{status}", ct);
         await SaveAsync($"chore: start live watch {match.Id}", force: true);
     }

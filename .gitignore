@@ -5,3 +5,4 @@ output/
 .vscode/
 *.user
 .env
+.live-continue

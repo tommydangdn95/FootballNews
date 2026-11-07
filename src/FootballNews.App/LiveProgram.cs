@@ -11,6 +11,8 @@ namespace FootballNews.App;
 /// <summary>Đọc cấu hình và biến môi trường cho job <c>live</c>.</summary>
 internal static class LiveProgram
 {
+    public const string ContinueFlag = ".live-continue";
+
     public static async Task<int> RunAsync()
     {
         var token = Environment.GetEnvironmentVariable("LIVE_TELEGRAM_BOT_TOKEN");
@@ -57,7 +59,11 @@ internal static class LiveProgram
                 new LiveCardRenderer(html),
                 new GitCommitter(root, commit),
                 TimeSpan.FromMinutes(maxMinutes));
-            await runner.RunAsync(cts.Token);
+            if (await runner.RunAsync(cts.Token))
+            {
+                // Workflow thấy file này thì tự bật lượt chạy mới (SPEC mục 13.7).
+                await File.WriteAllTextAsync(Path.Combine(root, ContinueFlag), "");
+            }
             return 0;
         }
         catch (Exception ex)
