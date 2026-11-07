@@ -29,10 +29,29 @@
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
+    "fullTimeDone": true,
     "nextGoalId": 2
   },
-  "drafts": [],
-  "nextDraftId": 1,
+  "drafts": [
+    {
+      "id": 1,
+      "kind": "fullTime",
+      "createdAt": "2026-11-07T16:58:16.6126863+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 0,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Arsenal 1-0 Hull City",
+      "hashtags": "#Arsenal #HullCity #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": 25,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122102780775539980"
+    }
+  ],
+  "nextDraftId": 2,
   "editingDraftId": null
 }
