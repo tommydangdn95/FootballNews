@@ -1,57 +1,6 @@
 {
-  "watch": {
-    "matchId": "401878760",
-    "competition": "eng.1",
-    "kickoffUtc": "2026-11-07T15:00:00+00:00",
-    "home": {
-      "id": "359",
-      "name": "Arsenal",
-      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
-    },
-    "away": {
-      "id": "306",
-      "name": "Hull City",
-      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/306.png"
-    },
-    "homeScore": 1,
-    "awayScore": 0,
-    "goals": [
-      {
-        "id": "g1",
-        "teamId": "359",
-        "player": "",
-        "minute": "72'",
-        "type": "goal",
-        "cancelled": false
-      }
-    ],
-    "redCards": [],
-    "halfTimeDone": true,
-    "endOfRegulationDone": false,
-    "hadExtraTime": false,
-    "fullTimeDone": true,
-    "nextGoalId": 2
-  },
-  "drafts": [
-    {
-      "id": 1,
-      "kind": "fullTime",
-      "createdAt": "2026-11-07T16:58:16.6126863+00:00",
-      "status": "posted",
-      "homeScore": 1,
-      "awayScore": 0,
-      "title": "KẾT THÚC",
-      "detail": null,
-      "customLines": null,
-      "text": "\uD83C\uDFC1 Kết thúc: Arsenal 1-0 Hull City",
-      "hashtags": "#Arsenal #HullCity #NgoaiHangAnh #MatchdayChallenge",
-      "goalId": null,
-      "varWarning": false,
-      "telegramMessageId": 25,
-      "telegramIsPhoto": true,
-      "facebookPostId": "1302280479644878_122102780775539980"
-    }
-  ],
+  "watch": null,
+  "drafts": [],
   "nextDraftId": 2,
   "editingDraftId": null
 }
