@@ -1,0 +1,38 @@
+{
+  "watch": {
+    "matchId": "401878760",
+    "competition": "eng.1",
+    "kickoffUtc": "2026-11-07T15:00:00+00:00",
+    "home": {
+      "id": "359",
+      "name": "Arsenal",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
+    },
+    "away": {
+      "id": "306",
+      "name": "Hull City",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/306.png"
+    },
+    "homeScore": 1,
+    "awayScore": 0,
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "359",
+        "player": "",
+        "minute": "72'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
+    "redCards": [],
+    "halfTimeDone": true,
+    "endOfRegulationDone": false,
+    "hadExtraTime": false,
+    "fullTimeDone": false,
+    "nextGoalId": 2
+  },
+  "drafts": [],
+  "nextDraftId": 1,
+  "editingDraftId": null
+}
