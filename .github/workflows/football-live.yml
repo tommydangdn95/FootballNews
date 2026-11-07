@@ -1,0 +1,55 @@
+name: football-live
+
+on:
+  # cron-job.org gọi workflow_dispatch 10 phút một lần (SPEC mục 13.7).
+  # Không theo dõi trận nào thì job chỉ đọc lệnh Telegram rồi thoát.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Group riêng để không chặn job hằng ngày. Đang có job live chạy thì lần gọi mới xếp hàng chờ.
+concurrency:
+  group: football-live
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    # App tự dừng sau LIVE_MAX_MINUTES; phần còn lại cho build và commit. GitHub giới hạn 6 giờ.
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run live bot
+        env:
+          LIVE_TELEGRAM_BOT_TOKEN: ${{ secrets.LIVE_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_ADMIN_ID: ${{ secrets.TELEGRAM_ADMIN_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          LIVE_GIT_COMMIT: "true"
+          LIVE_MAX_MINUTES: "320"
+        run: dotnet run -c Release --project src/FootballNews.App -- live
+
+      # App đã tự commit sau mỗi thay đổi quan trọng; bước này phòng khi app bị dừng giữa chừng.
+      - name: Commit state
+        if: always()
+        run: |
+          if [ ! -f data/live.json ]; then exit 0; fi
+          git add data/live.json
+          if git diff --cached --quiet; then
+            echo "Không có thay đổi."
+          else
+            git commit -m "chore: update live.json"
+            git pull --rebase
+            git push
+          fi

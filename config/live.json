@@ -1,0 +1,21 @@
+{
+  "hashtag": "MatchdayChallenge",
+  "pollSeconds": 210,
+  "draftMinutes": 10,
+  "gradients": {
+    "goal":            ["#FF0F5B", "#3B2BD6"],
+    "redCard":         ["#D7002A", "#3A0718"],
+    "halfTime":        ["#0F9B8E", "#00122E"],
+    "endOfRegulation": ["#F7971E", "#B3123E"],
+    "fullTime":        ["#00122E", "#2CB5E0"],
+    "goalCancelled":   ["#4B4B5A", "#7A1F2B"]
+  },
+  "extraCompetitions": [
+    { "slug": "eng.fa",              "name": "FA CUP",          "englishName": "FA CUP",          "emoji": "🏆", "hashtag": "FACup",         "order": 101, "upcomingWeekdays": [] },
+    { "slug": "eng.league_cup",      "name": "CARABAO CUP",     "englishName": "CARABAO CUP",     "emoji": "🏆", "hashtag": "CarabaoCup",    "order": 102, "upcomingWeekdays": [] },
+    { "slug": "esp.copa_del_rey",    "name": "COPA DEL REY",    "englishName": "COPA DEL REY",    "emoji": "🏆", "hashtag": "CopaDelRey",    "order": 103, "upcomingWeekdays": [] },
+    { "slug": "ger.dfb_pokal",       "name": "DFB POKAL",       "englishName": "DFB POKAL",       "emoji": "🏆", "hashtag": "DFBPokal",      "order": 104, "upcomingWeekdays": [] },
+    { "slug": "ita.coppa_italia",    "name": "COPPA ITALIA",    "englishName": "COPPA ITALIA",    "emoji": "🏆", "hashtag": "CoppaItalia",   "order": 105, "upcomingWeekdays": [] },
+    { "slug": "fra.coupe_de_france", "name": "COUPE DE FRANCE", "englishName": "COUPE DE FRANCE", "emoji": "🏆", "hashtag": "CoupeDeFrance", "order": 106, "upcomingWeekdays": [] }
+  ]
+}

@@ -11,7 +11,11 @@ using FootballNews.Telegram;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-const string usage = "Cách dùng: <daily|results|upcoming> [--date yyyy-MM-dd] [--dry-run] [--force]";
+// Báo trực tiếp dùng bot Telegram riêng và cấu hình riêng (SPEC mục 13).
+if (args.FirstOrDefault() == "live")
+    return args.Contains("--preview") ? await LiveProgram.PreviewAsync() : await LiveProgram.RunAsync();
+
+const string usage = "Cách dùng: <daily|results|upcoming> [--date yyyy-MM-dd] [--dry-run] [--force] | live [--preview]";
 
 DigestKind[]? kinds = args.FirstOrDefault() switch
 {
@@ -63,7 +67,7 @@ if (!dryRun && (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(chatId)))
     return 2;
 }
 
-var root = FindRepoRoot();
+var root = RepoRoot.Find();
 using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
 
 IPublisher publisher = dryRun
@@ -122,13 +126,3 @@ catch (Exception ex)
 
 string LoadFont(string weight) =>
     Convert.ToBase64String(File.ReadAllBytes(Path.Combine(root, "assets", "fonts", $"BeVietnamPro-{weight}.ttf")));
-
-static string FindRepoRoot()
-{
-    for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir is not null; dir = dir.Parent)
-    {
-        if (File.Exists(Path.Combine(dir.FullName, "config", "clubs.json")))
-            return dir.FullName;
-    }
-    throw new DirectoryNotFoundException("Không tìm thấy thư mục gốc chứa config/clubs.json");
-}

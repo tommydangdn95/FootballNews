@@ -168,13 +168,13 @@ Tổng: 3 trận · 2 giải
 ```
 /
 ├─ SPEC.md
-├─ .github/workflows/football-news.yml
-├─ config/ (clubs.json, competitions.json, card.json)
-├─ data/announced.json
+├─ .github/workflows/football-news.yml, football-live.yml
+├─ config/ (clubs.json, competitions.json, card.json, live.json)
+├─ data/announced.json, data/live.json
 ├─ assets/                        # logo.png của trang, fonts/ (Be Vietnam Pro) cho ảnh
 ├─ tests/fixtures/                # JSON mẫu ESPN
 └─ src/
-   ├─ FootballNews.Core/          # model, interface, logic thuần (dễ test)
+   ├─ FootballNews.Core/          # model, interface, logic thuần (dễ test); Live/ cho phần báo trực tiếp
    │   ├─ Models/ (Match, MatchEvent, Team, Competition, TeamForm)
    │   ├─ Sources/IMatchSource.cs
    │   ├─ Filtering/ReportWindow.cs
@@ -212,7 +212,7 @@ Tổng: 3 trận · 2 giải
 - Trận đã báo rồi dời sang ngày khác chỉ báo "giờ mới" một lần, không hiện lại trong lịch ngày đá (trừ phần nhắc lại cuối tuần).
 - Trận đang đá lúc chạy không xuất hiện ở cả kết quả lẫn lịch đấu, kể cả khi `force`.
 - `force` chỉ lấy kết quả 7 ngày, nên cúp châu Âu không đá trong tuần có thể vắng mặt.
-- Telegram trả lỗi không phải JSON (vd 502 dạng HTML) sẽ báo lỗi parse thay vì lỗi thật, và lỗi 5xx không được thử lại.
+- Telegram trả lỗi không phải JSON (vd 502 dạng HTML) được báo rõ là lỗi HTTP; lỗi 5xx được thử lại tối đa 5 lần.
 
 ## 13. Báo trực tiếp (live) lên Fanpage
 
@@ -226,7 +226,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 ### 13.2 Lệnh
 | Lệnh | Tác dụng |
 |---|---|
-| `/watch <tên đội>` | Tìm trận của 8 giải trong mục 3, từ hôm nay đến 5 ngày tới (giờ VN). Bot trả danh sách trận khớp kèm nút để chọn. |
+| `/watch <tên đội>` | Tìm trận của 8 giải trong mục 3 và các cúp quốc nội trong `config/live.json` (FA Cup, Carabao Cup, Copa del Rey, DFB Pokal, Coppa Italia, Coupe de France), từ hôm nay đến 5 ngày tới (giờ VN), chưa đá hoặc đang đá. Bot trả tối đa 8 trận khớp kèm nút để chọn. Tìm không phân biệt hoa thường và dấu, mọi từ phải khớp tên đội. |
 | `/list` | Xem trận đang theo dõi và bản nháp đang chờ. |
 | `/unwatch` | Bỏ theo dõi. Các bản nháp đang chờ bị huỷ, không đăng. |
 | `/fbtest` | Đăng thử một bài lên Fanpage và gửi link về để kiểm tra người ngoài xem được. |
@@ -261,7 +261,9 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 
 ### 13.5 Nội dung bài đăng
 - **Chỉ tiếng Việt.** Tên đội lấy từ `clubs.json` như bài hằng ngày.
-- **Ảnh vuông 1080×1080**, nền chuyển màu (giống kiểu bài chữ nền màu của Facebook, vì Graph API không hỗ trợ chính thức kiểu bài đó), chữ trắng đậm ở giữa, có logo trang. Mỗi loại sự kiện một bộ màu, sửa trong `config/card.json`.
+- **Ảnh vuông 1080×1080** (`LiveCardHtml`), nền chuyển màu (giống kiểu bài chữ nền màu của Facebook, vì Graph API không hỗ trợ chính thức kiểu bài đó), chữ trắng đậm ở giữa: tên giải, tiêu đề, logo và tên hai đội, tỉ số, dòng chi tiết, chân ảnh có logo và tên trang. Không dùng emoji trên ảnh. Mỗi loại sự kiện một bộ màu, sửa trong `config/live.json` (`gradients`). Bản nháp đã sửa thì ảnh chỉ vẽ các dòng chủ trang gõ, cỡ chữ tự nhỏ lại theo độ dài.
+- Xem trước ảnh mọi loại sự kiện: `dotnet run --project src/FootballNews.App -- live --preview`, ảnh và caption nằm trong `output/live-preview/`.
+- Không vẽ được ảnh thì bản nháp gửi dạng chữ và bài đăng dạng chữ (`/feed`).
 - Mẫu chữ trên ảnh:
   - Bàn thắng: `⚽ BÀN THẮNG!` / `Arsenal 1-0 Hull City` / `Declan Rice 23'`
   - Thẻ đỏ: `🟥 THẺ ĐỎ` / `Hull City – Tên cầu thủ 61'` / `Arsenal 1-0 Hull City`
@@ -279,9 +281,10 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 
 ### 13.7 Cách chạy
 - Workflow riêng `.github/workflows/football-live.yml`, job `live`, **concurrency group riêng** `football-live` (không chặn job hằng ngày). Repo để **public** nên không giới hạn số phút Actions.
-- **cron-job.org gọi workflow 10 phút một lần.** Mỗi lần chạy:
+- Chu kỳ hỏi ESPN (`pollSeconds`, mặc định 210 giây) và hạn bản nháp (`draftMinutes`, mặc định 10) nằm trong `config/live.json`.
+- **cron-job.org gọi workflow 10 phút một lần** (`POST .../actions/workflows/football-live.yml/dispatches`, body `{"ref":"main"}`). Mỗi lần chạy:
   1. Đọc lệnh và nút bấm mới bằng `getUpdates` (Telegram giữ tin 24 giờ, `offset` đánh dấu đã đọc).
-  2. Không theo dõi trận nào, hoặc trận còn hơn 15 phút nữa mới đá → thoát.
+  2. Không theo dõi trận nào, hoặc trận còn hơn 15 phút nữa mới đá → thoát. Riêng khi chủ trang vừa nhắn lệnh thì chờ thêm 3 phút, để bấm chọn trận sau `/watch` được xử lý ngay.
   3. Trận sắp đá hoặc đang đá → **chạy liên tục suốt trận**: cứ **3–4 phút** hỏi ESPN một lần (khoảng 30–40 request cho một trận), giữa các lần thì đọc Telegram liên tục (long polling) để bấm nút là xử lý ngay.
   4. Thoát khi trận đã xong và hàng đợi trống (tối đa thêm 10 phút), hoặc gần hết giới hạn 6 giờ của GitHub (job đặt `timeout-minutes: 330`). Lần gọi sau của cron-job.org sẽ chạy tiếp từ trạng thái đã lưu.
 - Trong lúc job live đang chạy, các lần gọi của cron-job.org xếp hàng chờ. Khi được chạy thì thấy không còn việc và thoát ngay.
@@ -291,7 +294,8 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
   - Trận đang theo dõi (id, giải, giờ đá).
   - Tỉ số và danh sách sự kiện đã thấy (để biết sự kiện nào mới, bàn nào bị huỷ).
   - Các bản nháp: loại sự kiện, nội dung, caption, lúc tạo, trạng thái (`queued`, `active`, `posted`, `skipped`, `expired`), id tin Telegram, id bài Facebook.
-- Ghi file sau mỗi thay đổi. **Commit và push sau mỗi lần đăng Facebook** và khi job kết thúc, để job chết giữa chừng thì lần sau không đăng lại bài đã đăng.
+- Ghi file sau mỗi thay đổi. **Commit và push sau mỗi lần đăng Facebook**, khi bắt đầu/kết thúc theo dõi và khi job kết thúc (`GitCommitter`, chỉ bật khi `LIVE_GIT_COMMIT=true`), để job chết giữa chừng thì lần sau không đăng lại bài đã đăng.
+- Ảnh không lưu trong trạng thái: chạy lại thì vẽ lại từ nội dung bản nháp.
 
 ### 13.9 Rủi ro
 - ESPN chậm 1–2 phút và đôi khi sửa sự kiện sau vài phút (đổi người ghi bàn, đổi phút). Bot chỉ báo theo lần đầu thấy.

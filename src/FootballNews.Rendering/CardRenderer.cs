@@ -11,12 +11,10 @@ public sealed record CardSection(IReadOnlyList<Match> Updates, IReadOnlyList<Mat
 /// <summary>Chụp HTML thành PNG bằng Chrome hoặc Edge có sẵn trên máy.</summary>
 public sealed class CardRenderer(CardHtml html)
 {
-    private static readonly string[] BrowserChannels = ["chrome", "msedge"];
-
     public async Task<IReadOnlyList<CardSection>> RenderAsync(Digest digest)
     {
         using var playwright = await Playwright.CreateAsync();
-        await using var browser = await LaunchAsync(playwright);
+        await using var browser = await BrowserLauncher.LaunchAsync(playwright);
         var page = await browser.NewPageAsync(new BrowserNewPageOptions
         {
             ViewportSize = new ViewportSize { Width = 1080, Height = 1350 },
@@ -45,21 +43,5 @@ public sealed class CardRenderer(CardHtml html)
             result.Add(new CardSection(section.Updates, section.Matches, section.Pages.Count, images));
         }
         return result;
-    }
-
-    private static async Task<IBrowser> LaunchAsync(IPlaywright playwright)
-    {
-        foreach (var channel in BrowserChannels)
-        {
-            try
-            {
-                return await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Channel = channel });
-            }
-            catch (PlaywrightException)
-            {
-                Console.WriteLine($"Không mở được trình duyệt {channel}, thử trình duyệt khác.");
-            }
-        }
-        throw new InvalidOperationException("Không tìm thấy Chrome hoặc Edge để vẽ ảnh.");
     }
 }

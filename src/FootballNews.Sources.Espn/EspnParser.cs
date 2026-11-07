@@ -99,7 +99,9 @@ public static partial class EspnParser
 
     private static Match ParseCompetition(string id, JsonElement c, Competition competition, int? season)
     {
-        var status = ParseStatus(Required(Required(c, "status"), "type"));
+        var statusElement = Required(c, "status");
+        var statusType = Required(statusElement, "type");
+        var status = ParseStatus(statusType);
         var competitors = Required(c, "competitors").EnumerateArray().ToList();
         var home = competitors.FirstOrDefault(x => Required(x, "homeAway").GetString() == "home");
         var away = competitors.FirstOrDefault(x => Required(x, "homeAway").GetString() == "away");
@@ -115,7 +117,9 @@ public static partial class EspnParser
             ? details.EnumerateArray().Select(ParseEvent).OfType<MatchEvent>().ToList()
             : [];
 
-        return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events, ParseVenue(c), season);
+        var statusName = statusType.TryGetProperty("name", out var n) ? n.GetString() : null;
+        return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events, ParseVenue(c), season,
+            statusName, ReadInt(statusElement, "period"));
     }
 
     // Không bắt buộc: thiếu tên sân thì ảnh chỉ không ghi sân.
