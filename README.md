@@ -32,6 +32,7 @@ Chi tiết đầy đủ nằm trong [SPEC.md](SPEC.md) (bot live ở mục 13).
 | `/watch <tên đội>` | Tìm trận để theo dõi, vd `/watch arsenal hull`. Không phân biệt hoa thường và dấu; mọi từ phải khớp tên đội. Tìm trận chưa đá hoặc đang đá, từ hôm nay đến 5 ngày tới, trong 8 giải chính và các cúp quốc nội (FA Cup, Carabao Cup, Copa del Rey, DFB Pokal, Coppa Italia, Coupe de France). Trả tối đa 8 trận kèm nút để chọn. |
 | `/list` | Trận đang theo dõi, tỉ số bot đã thấy và trạng thái từng bản nháp. |
 | `/unwatch` | Bỏ theo dõi. Bản nháp đang chờ bị huỷ, không đăng. |
+| `/stop` | Bỏ theo dõi (nếu có), huỷ bản nháp đang chờ và **tắt workflow ngay**, không nghe lệnh thêm 5 phút và không tự nối lượt mới. Muốn dùng lại thì bấm Run workflow. |
 | `/fbtest` | Đăng thử một bài chữ lên Fanpage và gửi link về. Mở link bằng cửa sổ ẩn danh để chắc người ngoài xem được, rồi xoá bài. |
 | `/whoami` | Xem user id Telegram (dùng để cài `TELEGRAM_ADMIN_ID`). Lệnh duy nhất trả lời cả người lạ. |
 | `/help`, `/start` | Danh sách lệnh. |
@@ -67,6 +68,7 @@ live - Các trận đang đá và sắp đá trong 3 giờ tới
 watch - Tìm trận để theo dõi, vd /watch arsenal hull
 list - Trận đang theo dõi và bản nháp
 unwatch - Bỏ theo dõi trận hiện tại
+stop - Bỏ theo dõi và tắt bot ngay
 fbtest - Đăng thử một bài lên Fanpage
 whoami - Xem user id Telegram
 help - Danh sách lệnh

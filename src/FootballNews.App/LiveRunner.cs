@@ -47,6 +47,9 @@ internal sealed class LiveRunner(
     private DateTimeOffset _lastInteraction = DateTimeOffset.UtcNow;
     private bool _dirty;
 
+    // Chủ trang gõ /stop: tắt ngay, không nghe lệnh thêm và không nối lượt chạy mới.
+    private bool _stopRequested;
+
     private TimeSpan DraftLifetime => TimeSpan.FromMinutes(config.DraftMinutes);
     private TimeSpan PollInterval => TimeSpan.FromSeconds(config.PollSeconds);
     private static DateTimeOffset Now => DateTimeOffset.UtcNow;
@@ -65,7 +68,7 @@ internal sealed class LiveRunner(
         try
         {
             await ReadUpdatesAsync(0, ct);
-            while (!ct.IsCancellationRequested && Now < deadline)
+            while (!_stopRequested && !ct.IsCancellationRequested && Now < deadline)
             {
                 var watch = _state.Watch;
                 if (watch is null)
@@ -371,6 +374,9 @@ internal sealed class LiveRunner(
 
         foreach (var update in updates)
         {
+            // Tin đến sau /stop để lại cho lượt chạy sau.
+            if (_stopRequested)
+                break;
             _offset = update.UpdateId + 1;
             try
             {
@@ -436,6 +442,19 @@ internal sealed class LiveRunner(
                 var name = MatchName(_state.Watch);
                 await StopWatchAsync("🚫 Đã bỏ theo dõi, không đăng.", ct);
                 await NotifyAsync($"👋 Đã bỏ theo dõi {name}.", ct);
+                break;
+            case "/stop":
+                if (_state.Watch is { } watching)
+                {
+                    var stopped = MatchName(watching);
+                    await StopWatchAsync("🛑 Đã dừng bot, không đăng.", ct);
+                    await NotifyAsync($"🛑 Đã bỏ theo dõi {stopped} và tắt bot. Muốn dùng lại thì bấm Run workflow.", ct);
+                }
+                else
+                {
+                    await NotifyAsync("🛑 Đã tắt bot. Muốn dùng lại thì bấm Run workflow.", ct);
+                }
+                _stopRequested = true;
                 break;
             case "/fbtest":
                 await FacebookTestAsync(ct);
@@ -724,6 +743,7 @@ internal sealed class LiveRunner(
         /watch <tên đội> — tìm trận để theo dõi, vd /watch arsenal hull
         /list — trận đang theo dõi và bản nháp
         /unwatch — bỏ theo dõi
+        /stop — bỏ theo dõi và tắt bot ngay
         /fbtest — đăng thử một bài lên Fanpage
         /whoami — xem user id
 

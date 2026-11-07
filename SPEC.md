@@ -230,6 +230,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 | `/watch <tên đội>` | Tìm trận của 8 giải trong mục 3 và các cúp quốc nội trong `config/live.json` (FA Cup, Carabao Cup, Copa del Rey, DFB Pokal, Coppa Italia, Coupe de France), từ hôm nay đến 5 ngày tới (giờ VN), chưa đá hoặc đang đá. Bot trả tối đa 8 trận khớp kèm nút để chọn. Tìm không phân biệt hoa thường và dấu, mọi từ phải khớp tên đội. |
 | `/list` | Xem trận đang theo dõi và bản nháp đang chờ. |
 | `/unwatch` | Bỏ theo dõi. Các bản nháp đang chờ bị huỷ, không đăng. |
+| `/stop` | Bỏ theo dõi (nếu có), huỷ bản nháp đang chờ và **tắt workflow ngay**, không nghe lệnh thêm 5 phút và không tự nối lượt mới. Muốn dùng lại thì bấm Run workflow. |
 | `/fbtest` | Đăng thử một bài lên Fanpage và gửi link về để kiểm tra người ngoài xem được. |
 | `/whoami` | Trả lại user id của người nhắn (để cài `TELEGRAM_ADMIN_ID`). Lệnh duy nhất trả lời cả người lạ. |
 | `/help` | Danh sách lệnh. |
