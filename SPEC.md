@@ -226,6 +226,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 ### 13.2 Lệnh
 | Lệnh | Tác dụng |
 |---|---|
+| `/live` | Các trận **đang đá** (kèm tỉ số) và **sắp đá trong 3 giờ tới** của mọi giải, mỗi trận một nút để bấm theo dõi luôn (tối đa 20 nút). Đang theo dõi trận khác thì chỉ liệt kê, không có nút. |
 | `/watch <tên đội>` | Tìm trận của 8 giải trong mục 3 và các cúp quốc nội trong `config/live.json` (FA Cup, Carabao Cup, Copa del Rey, DFB Pokal, Coppa Italia, Coupe de France), từ hôm nay đến 5 ngày tới (giờ VN), chưa đá hoặc đang đá. Bot trả tối đa 8 trận khớp kèm nút để chọn. Tìm không phân biệt hoa thường và dấu, mọi từ phải khớp tên đội. |
 | `/list` | Xem trận đang theo dõi và bản nháp đang chờ. |
 | `/unwatch` | Bỏ theo dõi. Các bản nháp đang chờ bị huỷ, không đăng. |

@@ -34,6 +34,9 @@ internal sealed class LiveRunner(
     // Chạy bằng tay: nghe lệnh ít nhất chừng này kể từ lúc bật hoặc từ tin nhắn gần nhất của chủ trang.
     private static readonly TimeSpan InteractionWindow = TimeSpan.FromMinutes(5);
     private const int MaxSearchResults = 8;
+    private const int MaxLiveButtons = 20;
+    // /live liệt kê cả trận sắp đá trong chừng này giờ.
+    private static readonly TimeSpan UpcomingWindow = TimeSpan.FromHours(3);
 
     private static readonly CultureInfo Invariant = CultureInfo.InvariantCulture;
 
@@ -405,6 +408,9 @@ internal sealed class LiveRunner(
             case "/start" or "/help":
                 await NotifyAsync(HelpText, ct);
                 break;
+            case "/live":
+                await LiveListAsync(ct);
+                break;
             case "/watch":
                 await WatchSearchAsync(argument, ct);
                 break;
@@ -563,10 +569,24 @@ internal sealed class LiveRunner(
         var today = ReportWindow.VietnamToday(now);
         var end = new DateTimeOffset(today.AddDays(ReportWindow.UpcomingDays + 1).ToDateTime(TimeOnly.MinValue), ReportWindow.VietnamOffset);
         // Ngày của ESPN theo giờ Mỹ nên lấy dư một ngày phía trước.
-        var dates = Enumerable.Range(-1, ReportWindow.UpcomingDays + 2).Select(i => today.AddDays(i)).ToList();
+        var all = await FetchAsync(Enumerable.Range(-1, ReportWindow.UpcomingDays + 2).Select(i => today.AddDays(i)), ct);
 
+        return all
+            .Where(m => m.Status is MatchStatus.Scheduled or MatchStatus.Live)
+            .Where(m => m.KickoffUtc >= now.AddHours(-3) && m.KickoffUtc < end)
+            .Where(m => TextSearch.MatchesAllWords(query,
+                $"{m.Home.Team.Name} {clubs.DisplayName(m.Home.Team)} {m.Away.Team.Name} {clubs.DisplayName(m.Away.Team)}"))
+            .OrderBy(m => m.KickoffUtc)
+            .Take(MaxSearchResults)
+            .ToList();
+    }
+
+    /// <summary>Lịch của mọi giải (cả cúp trong live.json) trong các ngày đã cho, bỏ trận trùng.</summary>
+    private async Task<IReadOnlyList<Match>> FetchAsync(IEnumerable<DateOnly> dates, CancellationToken ct)
+    {
+        var days = dates.ToList();
         using var gate = new SemaphoreSlim(8);
-        var tasks = competitions.SelectMany(c => dates.Select(async date =>
+        var tasks = competitions.SelectMany(c => days.Select(async date =>
         {
             await gate.WaitAsync(ct);
             try
@@ -583,18 +603,63 @@ internal sealed class LiveRunner(
                 gate.Release();
             }
         }));
-        var all = (await Task.WhenAll(tasks)).SelectMany(x => x);
-
-        return all
-            .Where(m => m.Status is MatchStatus.Scheduled or MatchStatus.Live)
-            .Where(m => m.KickoffUtc >= now.AddHours(-3) && m.KickoffUtc < end)
-            .Where(m => TextSearch.MatchesAllWords(query,
-                $"{m.Home.Team.Name} {clubs.DisplayName(m.Home.Team)} {m.Away.Team.Name} {clubs.DisplayName(m.Away.Team)}"))
-            .DistinctBy(m => m.Id)
-            .OrderBy(m => m.KickoffUtc)
-            .Take(MaxSearchResults)
-            .ToList();
+        return (await Task.WhenAll(tasks)).SelectMany(x => x).DistinctBy(m => m.Id).ToList();
     }
+
+    /// <summary>/live: trận đang đá và sắp đá trong vài giờ tới, kèm nút để chọn theo dõi.</summary>
+    private async Task LiveListAsync(CancellationToken ct)
+    {
+        await NotifyAsync("🔎 Đang lấy các trận đang đá và sắp đá…", ct);
+        var now = Now;
+        var today = ReportWindow.VietnamToday(now);
+        var all = await FetchAsync([today.AddDays(-1), today, today.AddDays(1)], ct);
+
+        var live = all.Where(m => m.Status == MatchStatus.Live).OrderBy(m => m.KickoffUtc).ToList();
+        var soon = all
+            .Where(m => m.Status == MatchStatus.Scheduled && m.KickoffUtc >= now.AddMinutes(-15) && m.KickoffUtc <= now + UpcomingWindow)
+            .OrderBy(m => m.KickoffUtc)
+            .ToList();
+        if (live.Count == 0 && soon.Count == 0)
+        {
+            await NotifyAsync($"Không có trận nào đang đá hoặc đá trong {UpcomingWindow.TotalHours:0} giờ tới. Dùng /watch <tên đội> để tìm trận các ngày tới.", ct);
+            return;
+        }
+
+        var lines = new List<string>();
+        if (live.Count > 0)
+        {
+            lines.Add($"🔴 ĐANG ĐÁ ({live.Count})");
+            lines.AddRange(live.Select(m => $"• {m.Competition.Name}: {clubs.DisplayName(m.Home.Team)} {m.Home.Score}-{m.Away.Score} {clubs.DisplayName(m.Away.Team)}{(m.StatusName == "STATUS_HALFTIME" ? " (nghỉ giữa hiệp)" : "")}"));
+        }
+        if (soon.Count > 0)
+        {
+            if (lines.Count > 0)
+                lines.Add("");
+            lines.Add($"🕒 SẮP ĐÁ TRONG {UpcomingWindow.TotalHours:0} GIỜ ({soon.Count})");
+            lines.AddRange(soon.Select(m => $"• {VietnamTime(m.KickoffUtc)} {m.Competition.Name}: {clubs.DisplayName(m.Home.Team)} – {clubs.DisplayName(m.Away.Team)}"));
+        }
+
+        IReadOnlyList<IReadOnlyList<InlineButton>>? buttons = null;
+        if (_state.Watch is { } current)
+        {
+            lines.Add("");
+            lines.Add($"Đang theo dõi {MatchName(current)}. Gõ /unwatch nếu muốn chọn trận khác.");
+        }
+        else
+        {
+            lines.Add("");
+            lines.Add("Bấm nút bên dưới để chọn trận theo dõi.");
+            buttons = live.Select(m => $"🔴 {clubs.DisplayName(m.Home.Team)} {m.Home.Score}-{m.Away.Score} {clubs.DisplayName(m.Away.Team)}")
+                .Zip(live, (text, m) => (Text: text, Match: m))
+                .Concat(soon.Select(m => (Text: $"🕒 {VietnamTime(m.KickoffUtc)} {clubs.DisplayName(m.Home.Team)} – {clubs.DisplayName(m.Away.Team)}", Match: m)))
+                .Take(MaxLiveButtons)
+                .Select(x => (IReadOnlyList<InlineButton>)[new InlineButton(x.Text, $"w|{x.Match.Competition.Slug}|{x.Match.Id}")])
+                .ToList();
+        }
+        await telegram.SendMessageAsync(string.Join("\n", lines), buttons, ct);
+    }
+
+    private static string VietnamTime(DateTimeOffset utc) => utc.ToOffset(ReportWindow.VietnamOffset).ToString("HH:mm", Invariant);
 
     private async Task StartWatchAsync(string slug, string matchId, CancellationToken ct)
     {
@@ -645,6 +710,7 @@ internal sealed class LiveRunner(
 
     private const string HelpText = """
         ⚽ Matchday Live Bot
+        /live — các trận đang đá và sắp đá trong 3 giờ tới, bấm để theo dõi
         /watch <tên đội> — tìm trận để theo dõi, vd /watch arsenal hull
         /list — trận đang theo dõi và bản nháp
         /unwatch — bỏ theo dõi

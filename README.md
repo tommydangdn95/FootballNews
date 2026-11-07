@@ -16,9 +16,9 @@ Chi tiết đầy đủ nằm trong [SPEC.md](SPEC.md) (bot live ở mục 13).
 
 ## Bot live: cách dùng
 
-1. Trên Telegram, nhắn cho bot live: `/watch arsenal hull`
+1. Trên Telegram, nhắn cho bot live `/live` để xem các trận đang đá và sắp đá, hoặc `/watch arsenal hull` để tìm một trận cụ thể.
 2. Vào GitHub **Actions → football-live → Run workflow** (web hoặc app điện thoại). Bước 1 và 2 làm theo thứ tự nào cũng được: mỗi lần chạy, bot nghe lệnh 5 phút.
-3. Khoảng 1 phút sau bot gửi danh sách trận khớp. Bấm chọn trận.
+3. Khoảng 1 phút sau bot gửi danh sách trận. Bấm chọn trận.
 4. Bot tự chạy và chờ đến 15 phút trước giờ đá, theo dõi hết trận rồi tự tắt. Không cần bấm lại.
 
 > Nên bấm Run workflow trong ngày đá. Mỗi lượt chạy GitHub tối đa 6 giờ; trận còn xa hơn thì bot tự nối lượt mới để chờ tiếp.
@@ -28,6 +28,7 @@ Chi tiết đầy đủ nằm trong [SPEC.md](SPEC.md) (bot live ở mục 13).
 
 | Lệnh | Tác dụng |
 |---|---|
+| `/live` | Các trận **đang đá** (kèm tỉ số) và **sắp đá trong 3 giờ tới** của mọi giải, mỗi trận một nút để bấm theo dõi luôn (tối đa 20 nút). Đang theo dõi trận khác thì chỉ liệt kê, không có nút. |
 | `/watch <tên đội>` | Tìm trận để theo dõi, vd `/watch arsenal hull`. Không phân biệt hoa thường và dấu; mọi từ phải khớp tên đội. Tìm trận chưa đá hoặc đang đá, từ hôm nay đến 5 ngày tới, trong 8 giải chính và các cúp quốc nội (FA Cup, Carabao Cup, Copa del Rey, DFB Pokal, Coppa Italia, Coupe de France). Trả tối đa 8 trận kèm nút để chọn. |
 | `/list` | Trận đang theo dõi, tỉ số bot đã thấy và trạng thái từng bản nháp. |
 | `/unwatch` | Bỏ theo dõi. Bản nháp đang chờ bị huỷ, không đăng. |
@@ -60,6 +61,7 @@ Mỗi sự kiện là một bản nháp gồm ảnh xem trước và caption, k�
 Trong @BotFather gõ `/setcommands`, chọn bot live, dán:
 
 ```
+live - Các trận đang đá và sắp đá trong 3 giờ tới
 watch - Tìm trận để theo dõi, vd /watch arsenal hull
 list - Trận đang theo dõi và bản nháp
 unwatch - Bỏ theo dõi trận hiện tại
