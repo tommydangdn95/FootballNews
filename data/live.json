@@ -50,13 +50,41 @@
       }
     ],
     "redCards": [],
-    "halfTimeDone": false,
+    "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
     "nextGoalId": 5
   },
-  "drafts": [],
-  "nextDraftId": 8,
+  "drafts": [
+    {
+      "id": 8,
+      "kind": "halfTime",
+      "createdAt": "2026-11-08T17:25:18.2617075+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 2,
+      "title": "HẾT HIỆP 1",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Fernandes 16' (pen)",
+        "Tielemans 44'"
+      ],
+      "awayLines": [
+        "Alysson 1'",
+        "Jackson 4'"
+      ],
+      "customLines": null,
+      "text": "⏸️ Hết hiệp 1: Man Utd 2-2 Aston Villa\n⚽ Man Utd: Fernandes 16' (pen), Tielemans 44'\n⚽ Aston Villa: Alysson 1', Jackson 4'",
+      "hashtags": "#MU #AstonVilla #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": 49,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103775137539980"
+    }
+  ],
+  "nextDraftId": 9,
   "editingDraftId": null
 }
