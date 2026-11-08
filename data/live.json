@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png"
     },
     "homeScore": 2,
-    "awayScore": 3,
+    "awayScore": 4,
     "goals": [
       {
         "id": "g1",
@@ -55,6 +55,14 @@
         "minute": "48'",
         "type": "penaltyGoal",
         "cancelled": false
+      },
+      {
+        "id": "g6",
+        "teamId": "362",
+        "player": "Goretzka",
+        "minute": "53'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -62,7 +70,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 6
+    "nextGoalId": 7
   },
   "drafts": [
     {
@@ -112,8 +120,29 @@
       "telegramMessageId": 50,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122103787335539980"
+    },
+    {
+      "id": 10,
+      "kind": "goal",
+      "createdAt": "2026-11-08T17:46:24.8441976+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 4,
+      "title": "VÀOOOOO",
+      "detail": "Goretzka 53'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Goretzka 53' ghi bàn cho Aston Villa! Man Utd 2-4 Aston Villa",
+      "hashtags": "#MU #AstonVilla #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g6",
+      "varWarning": false,
+      "telegramMessageId": 51,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103789717539980"
     }
   ],
-  "nextDraftId": 10,
+  "nextDraftId": 11,
   "editingDraftId": null
 }
