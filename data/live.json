@@ -13,7 +13,7 @@
       "name": "Liverpool",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png"
     },
-    "homeScore": 0,
+    "homeScore": 1,
     "awayScore": 3,
     "goals": [
       {
@@ -39,14 +39,22 @@
         "minute": "89'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g4",
+        "teamId": "384",
+        "player": "Nketiah",
+        "minute": "90'+5'",
+        "type": "penaltyGoal",
+        "cancelled": false
       }
     ],
     "redCards": [],
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
-    "nextGoalId": 4
+    "fullTimeDone": true,
+    "nextGoalId": 5
   },
   "drafts": [
     {
@@ -134,8 +142,56 @@
       "telegramMessageId": 41,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122103684741539980"
+    },
+    {
+      "id": 6,
+      "kind": "goal",
+      "createdAt": "2026-11-08T15:56:53.1737892+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 3,
+      "title": "VÀOOOOO",
+      "detail": "Nketiah 90'+5' (phạt đền)",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Nketiah 90'+5' (phạt đền) ghi bàn cho Crystal Palace! Crystal Palace 1-3 Liverpool",
+      "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g4",
+      "varWarning": false,
+      "telegramMessageId": 42,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103686877539980"
+    },
+    {
+      "id": 7,
+      "kind": "fullTime",
+      "createdAt": "2026-11-08T15:56:53.1737892+00:00",
+      "status": "queued",
+      "homeScore": 1,
+      "awayScore": 3,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Nketiah 90'+5' (pen)"
+      ],
+      "awayLines": [
+        "Mac Allister 40'",
+        "Wirtz 54'",
+        "Isak 89'"
+      ],
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Crystal Palace 1-3 Liverpool\n⚽ Crystal Palace: Nketiah 90'+5' (pen)\n⚽ Liverpool: Mac Allister 40', Wirtz 54', Isak 89'",
+      "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": null
     }
   ],
-  "nextDraftId": 6,
+  "nextDraftId": 8,
   "editingDraftId": null
 }
