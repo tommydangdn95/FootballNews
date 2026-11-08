@@ -26,7 +26,7 @@
       }
     ],
     "redCards": [],
-    "halfTimeDone": false,
+    "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
@@ -42,6 +42,7 @@
       "awayScore": 1,
       "title": "BÀN THẮNG!",
       "detail": null,
+      "teamId": null,
       "homeLines": null,
       "awayLines": null,
       "customLines": null,
@@ -52,8 +53,31 @@
       "telegramMessageId": 36,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122103636567539980"
+    },
+    {
+      "id": 3,
+      "kind": "halfTime",
+      "createdAt": "2026-11-08T14:54:05.5081363+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 1,
+      "title": "HẾT HIỆP 1",
+      "detail": null,
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": [
+        "? 40'"
+      ],
+      "customLines": null,
+      "text": "⏸️ Hết hiệp 1: Crystal Palace 0-1 Liverpool\n⚽ Liverpool: ? 40'",
+      "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": 39,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103642333539980"
     }
   ],
-  "nextDraftId": 3,
+  "nextDraftId": 4,
   "editingDraftId": null
 }
