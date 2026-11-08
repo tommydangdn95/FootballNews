@@ -14,16 +14,46 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png"
     },
     "homeScore": 0,
-    "awayScore": 0,
-    "goals": [],
+    "awayScore": 1,
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "364",
+        "player": "",
+        "minute": "40'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
     "redCards": [],
     "halfTimeDone": false,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 1
+    "nextGoalId": 2
   },
-  "drafts": [],
-  "nextDraftId": 2,
+  "drafts": [
+    {
+      "id": 2,
+      "kind": "goal",
+      "createdAt": "2026-11-08T14:42:13.645938+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 1,
+      "title": "BÀN THẮNG!",
+      "detail": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Liverpool ghi bàn! Crystal Palace 0-1 Liverpool",
+      "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g1",
+      "varWarning": false,
+      "telegramMessageId": 36,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103636567539980"
+    }
+  ],
+  "nextDraftId": 3,
   "editingDraftId": null
 }
