@@ -267,7 +267,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 - Xem trước ảnh mọi loại sự kiện: `dotnet run --project src/FootballNews.App -- live --preview`, ảnh và caption nằm trong `output/live-preview/`.
 - Không vẽ được ảnh thì bản nháp gửi dạng chữ và bài đăng dạng chữ (`/feed`).
 - Mẫu chữ trên ảnh:
-  - Bàn thắng: `⚽ BÀN THẮNG!` / `Arsenal 1-0 Hull City` / `Declan Rice 23'`
+  - Bàn thắng: `⚽ VÀOOOOO` / `Arsenal 1-0 Hull City` / `Declan Rice 23'`
   - Thẻ đỏ: `🟥 THẺ ĐỎ` / `Hull City – Tên cầu thủ 61'` / `Arsenal 1-0 Hull City`
   - Hết hiệp 1: `⏸️ HẾT HIỆP 1` / `Arsenal 1-0 Hull City`
   - Hết 90 phút: `⏱️ HẾT 90 PHÚT` / `Arsenal 1-1 Hull City`

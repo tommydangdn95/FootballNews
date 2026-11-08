@@ -79,7 +79,7 @@ public sealed class LiveSession(LiveState state, ClubCatalog clubs, Competition 
                     MatchEventType.OwnGoal => " (phản lưới)",
                     _ => "",
                 };
-                draft.Title = "BÀN THẮNG!";
+                draft.Title = "VÀOOOOO";
                 draft.Detail = player.Length > 0 ? Join(player, minute) + note : null;
                 var opener = e.HomeScore + e.AwayScore == 1;
                 draft.Text = player.Length == 0

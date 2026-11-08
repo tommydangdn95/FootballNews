@@ -53,7 +53,7 @@ public sealed class Draft
     public int HomeScore { get; set; }
     public int AwayScore { get; set; }
 
-    /// <summary>Dòng tiêu đề trên ảnh, vd "BÀN THẮNG!".</summary>
+    /// <summary>Dòng tiêu đề trên ảnh, vd "VÀOOOOO".</summary>
     public string Title { get; set; } = "";
 
     /// <summary>Dòng chi tiết trên ảnh dưới tỉ số, vd "Declan Rice 23'".</summary>

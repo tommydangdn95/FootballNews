@@ -46,7 +46,7 @@ public class LiveTrackerTests
         var draft = Assert.Single(update.NewDrafts);
         Assert.Equal(LiveEventKind.Goal, draft.Kind);
         Assert.Equal((1, 0), (draft.HomeScore, draft.AwayScore));
-        Assert.Equal("BÀN THẮNG!", draft.Title);
+        Assert.Equal("VÀOOOOO", draft.Title);
         Assert.Equal("Rice 23'", draft.Detail);
         Assert.Contains("mở tỉ số cho Arsenal", draft.Text);
         Assert.Contains("#Arsenal #HullCity #NgoaiHangAnh #MatchdayChallenge", draft.Caption);
