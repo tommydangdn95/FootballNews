@@ -315,7 +315,9 @@ internal sealed class LiveRunner(
             from,
             to,
             draft.HomeLines,
-            draft.AwayLines);
+            draft.AwayLines,
+            RedCardIcon: draft.Kind == LiveEventKind.RedCard,
+            TeamId: draft.TeamId);
         try
         {
             var png = await renderer.RenderAsync(card);

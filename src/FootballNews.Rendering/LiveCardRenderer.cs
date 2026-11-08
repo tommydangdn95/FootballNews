@@ -12,6 +12,7 @@ public sealed class LiveCardRenderer(LiveCardHtml html)
         var page = await browser.NewPageAsync(new BrowserNewPageOptions
         {
             ViewportSize = new ViewportSize { Width = 1080, Height = 1080 },
+            DeviceScaleFactor = RenderScale.DeviceScaleFactor,
         });
         await page.SetContentAsync(html.Build(card), new PageSetContentOptions { WaitUntil = WaitUntilState.NetworkIdle });
         await page.EvaluateAsync("() => document.fonts.ready.then(() => true)");

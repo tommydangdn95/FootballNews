@@ -91,7 +91,9 @@ public sealed class LiveSession(LiveState state, ClubCatalog clubs, Competition 
 
             case LiveEventKind.RedCard:
                 draft.Title = "THẺ ĐỎ";
-                draft.Detail = player.Length > 0 ? $"{Join(player, minute)} ({team})" : team;
+                draft.TeamId = e.TeamId;
+                // Ảnh đã có logo và tên đội nên chi tiết chỉ còn cầu thủ và phút.
+                draft.Detail = player.Length > 0 ? Join(player, minute) : null;
                 draft.Text = player.Length > 0
                     ? $"🟥 {player} ({team}) nhận thẻ đỏ{(minute.Length > 0 ? $" phút {minute}" : "")}! {score}"
                     : $"🟥 {team} nhận thẻ đỏ! {score}";
@@ -117,8 +119,8 @@ public sealed class LiveSession(LiveState state, ClubCatalog clubs, Competition 
                 break;
 
             case LiveEventKind.GoalCancelled:
-                draft.Title = "VAR HUỶ BÀN THẮNG";
-                draft.Detail = player.Length > 0 ? $"Bàn của {Join(player, minute)}" : $"Bàn của {team}";
+                // Tên người ghi bàn nằm luôn trong tiêu đề, không có dòng chi tiết.
+                draft.Title = $"VAR HỦY BÀN THẮNG CỦA {(player.Length > 0 ? Join(player, minute) : team).ToUpperInvariant()}";
                 draft.Text = $"❌ VAR huỷ bàn thắng {(player.Length > 0 ? $"của {Join(player, minute)}" : $"của {team}")}. Tỉ số trở lại {score}";
                 break;
         }

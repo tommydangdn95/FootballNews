@@ -18,6 +18,7 @@ public sealed class CardRenderer(CardHtml html)
         var page = await browser.NewPageAsync(new BrowserNewPageOptions
         {
             ViewportSize = new ViewportSize { Width = 1080, Height = 1350 },
+            DeviceScaleFactor = RenderScale.DeviceScaleFactor,
         });
 
         var byLocale = CardLocale.All.Select(locale => (locale.Code, Sections: html.BuildSections(digest, locale))).ToList();

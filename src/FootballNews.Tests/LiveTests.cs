@@ -89,7 +89,8 @@ public class LiveTrackerTests
         var var = Assert.Single(update.NewDrafts);
         Assert.Equal(LiveEventKind.GoalCancelled, var.Kind);
         Assert.Equal((0, 0), (var.HomeScore, var.AwayScore));
-        Assert.Equal("Bàn của Rice 23'", var.Detail);
+        Assert.Equal("VAR HỦY BÀN THẮNG CỦA RICE 23'", var.Title);
+        Assert.Null(var.Detail);
         Assert.Equal(0, state.Watch!.HomeScore);
     }
 
@@ -142,7 +143,8 @@ public class LiveTrackerTests
 
         var draft = Assert.Single(first.NewDrafts);
         Assert.Equal(LiveEventKind.RedCard, draft.Kind);
-        Assert.Equal("Smith 61' (Hull City)", draft.Detail);
+        Assert.Equal("Smith 61'", draft.Detail);
+        Assert.Equal("306", draft.TeamId);
         Assert.Empty(second.NewDrafts);
     }
 
@@ -395,6 +397,13 @@ public class LiveSupportTests
             null, [$"Smith 61' {Draft.RedCardMark}"]));
         Assert.Contains("61&#39;<i class=\"red-card\"></i></p>", card);
         Assert.DoesNotContain(Draft.RedCardMark, card);
+
+        var red = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 0, 0, "THẺ ĐỎ", "Smith 61'", null, "#111", "#222",
+            RedCardIcon: true, TeamId: "306"));
+        Assert.Contains("<i class=\"red-card big\"></i>", red);
+        Assert.Contains("<div class=\"solo\"><div class=\"name\">Hull City</div></div>", red);
+        Assert.DoesNotContain("class=\"score\"", red);
+        Assert.DoesNotContain("red-card big", page);
     }
 }
 

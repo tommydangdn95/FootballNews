@@ -62,6 +62,9 @@ public sealed class Draft
     /// <summary>Cuối một dòng dưới tên đội: dòng đó là thẻ đỏ, ảnh vẽ hình thẻ đỏ thay cho ký hiệu này.</summary>
     public const string RedCardMark = "🟥";
 
+    /// <summary>Đội của sự kiện (bài thẻ đỏ vẽ logo đội này thay cho tỉ số).</summary>
+    public string? TeamId { get; set; }
+
     /// <summary>Các dòng nhỏ dưới tên đội nhà trên ảnh: người ghi bàn, thẻ đỏ (bài hết hiệp, hết trận).</summary>
     public List<string>? HomeLines { get; set; }
 

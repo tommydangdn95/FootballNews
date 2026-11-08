@@ -8,6 +8,8 @@ namespace FootballNews.Rendering;
 /// <summary>
 /// Nội dung một ảnh live. Có <see cref="CustomLines"/> thì chỉ vẽ các dòng đó thay cho tiêu đề, tỉ số và chi tiết.
 /// <see cref="HomeLines"/>, <see cref="AwayLines"/>: các dòng nhỏ dưới tên mỗi đội (người ghi bàn, thẻ đỏ).
+/// <see cref="RedCardIcon"/>: bài thẻ đỏ. Vẽ thẻ đỏ lớn cạnh tiêu đề, không có tỉ số; chỉ logo và tên đội
+/// <see cref="TeamId"/> cùng dòng chi tiết (cầu thủ, phút).
 /// </summary>
 public sealed record LiveCard(
     string Competition,
@@ -23,7 +25,9 @@ public sealed record LiveCard(
     string GradientFrom,
     string GradientTo,
     IReadOnlyList<string>? HomeLines = null,
-    IReadOnlyList<string>? AwayLines = null);
+    IReadOnlyList<string>? AwayLines = null,
+    bool RedCardIcon = false,
+    string? TeamId = null);
 
 /// <summary>
 /// Ảnh vuông 1080×1080 nền chuyển màu, chữ trắng ở giữa, giống kiểu bài chữ nền màu của Facebook.
@@ -47,10 +51,27 @@ public sealed class LiveCardHtml(string pageName, string boldFontBase64, string 
                 sb.Append($"<p>{E(line)}</p>");
             sb.Append("</div>");
         }
+        else if (card.RedCardIcon)
+        {
+            // Logo đội là điểm nhấn của ảnh nên tiêu đề nhỏ hơn các ảnh khác.
+            sb.Append($"<div class=\"title\" style=\"font-size:{Math.Min(TitleFontSize(card.Title), 56)}px\"><i class=\"red-card big\"></i>{E(card.Title)}</div>");
+            var (team, name) = card.TeamId == card.Home.Id ? (card.Home, card.HomeName)
+                : card.TeamId == card.Away.Id ? (card.Away, card.AwayName)
+                : (null, null);
+            if (team is not null)
+            {
+                sb.Append("<div class=\"solo\">");
+                if (!string.IsNullOrEmpty(team.LogoUrl))
+                    sb.Append($"<img src=\"{E(team.LogoUrl)}\" alt=\"\" onerror=\"this.remove()\">");
+                sb.Append($"<div class=\"name\">{E(name!)}</div></div>");
+            }
+            if (!string.IsNullOrWhiteSpace(card.Detail))
+                sb.Append($"<div class=\"detail\">{E(card.Detail)}</div>");
+        }
         else
         {
             var size = TeamLinesFontSize(Math.Max(card.HomeLines?.Count ?? 0, card.AwayLines?.Count ?? 0));
-            sb.Append($"<div class=\"title\">{E(card.Title)}</div>");
+            sb.Append($"<div class=\"title\" style=\"font-size:{TitleFontSize(card.Title)}px\">{E(card.Title)}</div>");
             sb.Append("<div class=\"teams\">");
             sb.Append(TeamBlock(card.Home, card.HomeName, card.HomeLines, size));
             sb.Append($"<div class=\"score\">{card.HomeScore}<span>-</span>{card.AwayScore}</div>");
@@ -76,6 +97,9 @@ public sealed class LiveCardHtml(string pageName, string boldFontBase64, string 
         var byHeight = lines.Count <= 3 ? 96 : lines.Count <= 5 ? 64 : 48;
         return Math.Min(byWidth, byHeight);
     }
+
+    /// <summary>Tiêu đề dài (vd "VAR HỦY BÀN THẮNG CỦA ...") thì chữ nhỏ lại để không chiếm quá nhiều dòng.</summary>
+    public static int TitleFontSize(string title) => title.Length <= 18 ? 92 : title.Length <= 28 ? 72 : 54;
 
     /// <summary>Càng nhiều dòng dưới tên đội thì chữ càng nhỏ, để vừa khung 1080px.</summary>
     public static int TeamLinesFontSize(int lines) => lines <= 3 ? 32 : lines <= 5 ? 28 : 24;
@@ -166,6 +190,11 @@ public sealed class LiveCardHtml(string pageName, string boldFontBase64, string 
         .red-card { display: inline-block; width: .62em; height: .85em; margin-left: .35em; vertical-align: -.08em;
                     background: #E10600; border: 2px solid #FFFFFF; border-radius: 3px; transform: rotate(8deg);
                     box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+        .red-card.big { width: .62em; height: .86em; margin: 0 .3em 0 0; vertical-align: -.1em;
+                        border: 5px solid #FFFFFF; border-radius: 10px; transform: rotate(-10deg); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+        .solo { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+        .solo img { width: 260px; height: 260px; object-fit: contain; filter: drop-shadow(0 10px 24px rgba(0,0,0,.3)); }
+        .solo .name { font-size: 56px; }
         .score { align-self: start; font-size: 150px; line-height: 1; white-space: nowrap; text-shadow: 0 8px 28px rgba(0,0,0,.3); }
         .score span { margin: 0 24px; opacity: .8; }
         .detail { font-size: 50px; font-weight: 500; line-height: 1.25; background: rgba(0,0,0,.22); border-radius: 28px; padding: 16px 40px; }

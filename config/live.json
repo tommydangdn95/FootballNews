@@ -6,7 +6,7 @@
   "watchLimitExtraTimeMinutes": 225,
   "gradients": {
     "goal":            ["#7F00FF", "#E100FF"],
-    "redCard":         ["#D7002A", "#3A0718"],
+    "redCard":         ["#FDC830", "#F37335"],
     "halfTime":        ["#11998E", "#38EF7D"],
     "endOfRegulation": ["#F7971E", "#B3123E"],
     "fullTime":        ["#FF0F5B", "#3B2BD6"],

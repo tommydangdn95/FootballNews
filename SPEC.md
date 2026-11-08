@@ -268,11 +268,11 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 - Không vẽ được ảnh thì bản nháp gửi dạng chữ và bài đăng dạng chữ (`/feed`).
 - Mẫu chữ trên ảnh:
   - Bàn thắng: `⚽ VÀOOOOO` / `Arsenal 1-0 Hull City` / `Declan Rice 23'`
-  - Thẻ đỏ: `🟥 THẺ ĐỎ` / `Hull City – Tên cầu thủ 61'` / `Arsenal 1-0 Hull City`
+  - Thẻ đỏ: `🟥 THẺ ĐỎ` (kèm hình thẻ đỏ) / logo và tên đội / `Tên cầu thủ 61'`. Ảnh không có tỉ số, caption vẫn có.
   - Hết hiệp 1: `⏸️ HẾT HIỆP 1` / `Arsenal 1-0 Hull City`
   - Hết 90 phút: `⏱️ HẾT 90 PHÚT` / `Arsenal 1-1 Hull City`
   - Kết thúc: `🏁 KẾT THÚC` / `Arsenal 2-1 Hull City` (có hiệp phụ thì `🏁 HẾT HIỆP PHỤ`)
-  - VAR huỷ: `❌ VAR HUỶ BÀN THẮNG` / `Bàn của Declan Rice 23'` / `Tỉ số: Arsenal 0-0 Hull City`
+  - VAR huỷ: `❌ VAR HỦY BÀN THẮNG CỦA DECLAN RICE 23'` / `Tỉ số: Arsenal 0-0 Hull City`
 - **Caption:** một dòng ngắn và hashtag, vd `⚽ Declan Rice mở tỷ số cho Arsenal! #Arsenal #HullCity #MatchdayChallenge`.
 
 ### 13.6 Đăng lên Facebook
