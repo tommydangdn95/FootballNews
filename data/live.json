@@ -168,7 +168,7 @@
       "id": 7,
       "kind": "fullTime",
       "createdAt": "2026-11-08T15:56:53.1737892+00:00",
-      "status": "queued",
+      "status": "posted",
       "homeScore": 1,
       "awayScore": 3,
       "title": "KẾT THÚC",
@@ -187,9 +187,9 @@
       "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
       "goalId": null,
       "varWarning": false,
-      "telegramMessageId": null,
-      "telegramIsPhoto": false,
-      "facebookPostId": null
+      "telegramMessageId": 43,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103687765539980"
     }
   ],
   "nextDraftId": 8,
