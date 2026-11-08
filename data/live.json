@@ -1,5 +1,28 @@
 {
-  "watch": null,
+  "watch": {
+    "matchId": "401879243",
+    "competition": "eng.1",
+    "kickoffUtc": "2026-11-08T14:00:00+00:00",
+    "home": {
+      "id": "384",
+      "name": "Crystal Palace",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/384.png"
+    },
+    "away": {
+      "id": "364",
+      "name": "Liverpool",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png"
+    },
+    "homeScore": 0,
+    "awayScore": 0,
+    "goals": [],
+    "redCards": [],
+    "halfTimeDone": false,
+    "endOfRegulationDone": false,
+    "hadExtraTime": false,
+    "fullTimeDone": false,
+    "nextGoalId": 1
+  },
   "drafts": [],
   "nextDraftId": 2,
   "editingDraftId": null
