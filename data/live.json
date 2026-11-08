@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png"
     },
     "homeScore": 0,
-    "awayScore": 2,
+    "awayScore": 3,
     "goals": [
       {
         "id": "g1",
@@ -31,6 +31,14 @@
         "minute": "54'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g3",
+        "teamId": "364",
+        "player": "Isak",
+        "minute": "89'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -38,7 +46,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 3
+    "nextGoalId": 4
   },
   "drafts": [
     {
@@ -105,8 +113,29 @@
       "telegramMessageId": 40,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122103662811539980"
+    },
+    {
+      "id": 5,
+      "kind": "goal",
+      "createdAt": "2026-11-08T15:53:22.486094+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 3,
+      "title": "VÀOOOOO",
+      "detail": "Isak 89'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Isak 89' ghi bàn cho Liverpool! Crystal Palace 0-3 Liverpool",
+      "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g3",
+      "varWarning": false,
+      "telegramMessageId": 41,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103684741539980"
     }
   ],
-  "nextDraftId": 5,
+  "nextDraftId": 6,
   "editingDraftId": null
 }
