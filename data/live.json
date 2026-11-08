@@ -14,13 +14,21 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png"
     },
     "homeScore": 0,
-    "awayScore": 1,
+    "awayScore": 2,
     "goals": [
       {
         "id": "g1",
         "teamId": "364",
         "player": "",
         "minute": "40'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "364",
+        "player": "Wirtz",
+        "minute": "54'",
         "type": "goal",
         "cancelled": false
       }
@@ -30,7 +38,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 2
+    "nextGoalId": 3
   },
   "drafts": [
     {
@@ -76,8 +84,29 @@
       "telegramMessageId": 39,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122103642333539980"
+    },
+    {
+      "id": 4,
+      "kind": "goal",
+      "createdAt": "2026-11-08T15:18:12.7355278+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 2,
+      "title": "VÀOOOOO",
+      "detail": "Wirtz 54'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Wirtz 54' ghi bàn cho Liverpool! Crystal Palace 0-2 Liverpool",
+      "hashtags": "#CrystalPalace #Liverpool #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g2",
+      "varWarning": false,
+      "telegramMessageId": 40,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103662811539980"
     }
   ],
-  "nextDraftId": 4,
+  "nextDraftId": 5,
   "editingDraftId": null
 }
