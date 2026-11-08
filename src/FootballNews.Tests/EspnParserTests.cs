@@ -74,6 +74,17 @@ public class EspnParserTests
         Assert.False(string.IsNullOrEmpty(match.Home.Team.Name));
     }
 
+    [Fact]
+    public void Reads_scorer_from_participants_when_athletes_involved_is_missing()
+    {
+        // Crystal Palace 0-1 Liverpool lúc nghỉ giữa hiệp: ESPN ghi người ghi bàn ở participants[].athlete
+        // (người thứ hai là kiến tạo), không còn athletesInvolved.
+        var match = EspnParser.ParseSummary(TestData.Fixture("summary-401879243-ht.json"), "401879243", TestData.Competition("eng.1"));
+
+        var goal = Assert.Single(match.Events, e => e.IsGoal);
+        Assert.Equal(new MatchEvent(MatchEventType.Goal, "40'", "Mac Allister", "364"), goal);
+    }
+
     [Theory]
     [InlineData("STATUS_POSTPONED", "post", "false", MatchStatus.Postponed)]
     [InlineData("STATUS_CANCELED", "post", "false", MatchStatus.Cancelled)]

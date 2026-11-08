@@ -192,12 +192,20 @@ public static partial class EspnParser
         return new MatchEvent(type.Value, minute, PlayerName(d), teamId);
     }
 
-    /// <summary>"K. Havertz" thành "Havertz"; "K. De Bruyne" thành "De Bruyne".</summary>
+    /// <summary>
+    /// "K. Havertz" thành "Havertz"; "K. De Bruyne" thành "De Bruyne". Người đầu tiên là cầu thủ ghi bàn hoặc nhận thẻ
+    /// (người sau là kiến tạo). ESPN ghi người này ở <c>athletesInvolved[]</c> hoặc, kiểu mới, ở <c>participants[].athlete</c>.
+    /// </summary>
     private static string PlayerName(JsonElement detail)
     {
-        if (!detail.TryGetProperty("athletesInvolved", out var athletes) || athletes.GetArrayLength() == 0)
+        JsonElement athlete;
+        if (detail.TryGetProperty("athletesInvolved", out var athletes) && athletes.ValueKind == JsonValueKind.Array && athletes.GetArrayLength() > 0)
+            athlete = athletes[0];
+        else if (detail.TryGetProperty("participants", out var participants) && participants.ValueKind == JsonValueKind.Array
+            && participants.GetArrayLength() > 0 && participants[0].TryGetProperty("athlete", out var a))
+            athlete = a;
+        else
             return "";
-        var athlete = athletes[0];
         if (athlete.TryGetProperty("shortName", out var s) && s.GetString() is { Length: > 0 } shortName)
             return InitialPrefix().Replace(shortName, "");
         return athlete.TryGetProperty("displayName", out var d) ? d.GetString() ?? "" : "";
