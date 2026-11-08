@@ -1,5 +1,61 @@
 {
-  "watch": null,
+  "watch": {
+    "matchId": "401879240",
+    "competition": "eng.1",
+    "kickoffUtc": "2026-11-08T16:30:00+00:00",
+    "home": {
+      "id": "360",
+      "name": "Manchester United",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png"
+    },
+    "away": {
+      "id": "362",
+      "name": "Aston Villa",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png"
+    },
+    "homeScore": 2,
+    "awayScore": 2,
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "362",
+        "player": "Alysson",
+        "minute": "1'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "362",
+        "player": "Jackson",
+        "minute": "4'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g3",
+        "teamId": "360",
+        "player": "Fernandes",
+        "minute": "16'",
+        "type": "penaltyGoal",
+        "cancelled": false
+      },
+      {
+        "id": "g4",
+        "teamId": "360",
+        "player": "Tielemans",
+        "minute": "44'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
+    "redCards": [],
+    "halfTimeDone": false,
+    "endOfRegulationDone": false,
+    "hadExtraTime": false,
+    "fullTimeDone": false,
+    "nextGoalId": 5
+  },
   "drafts": [],
   "nextDraftId": 8,
   "editingDraftId": null
