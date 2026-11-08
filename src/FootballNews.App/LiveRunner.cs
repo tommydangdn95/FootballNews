@@ -313,7 +313,9 @@ internal sealed class LiveRunner(
             draft.Detail,
             draft.CustomLines,
             from,
-            to);
+            to,
+            draft.HomeLines,
+            draft.AwayLines);
         try
         {
             var png = await renderer.RenderAsync(card);

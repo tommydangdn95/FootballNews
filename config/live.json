@@ -9,7 +9,7 @@
     "redCard":         ["#D7002A", "#3A0718"],
     "halfTime":        ["#0F9B8E", "#00122E"],
     "endOfRegulation": ["#F7971E", "#B3123E"],
-    "fullTime":        ["#00122E", "#2CB5E0"],
+    "fullTime":        ["#FF0F5B", "#3B2BD6"],
     "goalCancelled":   ["#4B4B5A", "#7A1F2B"]
   },
   "extraCompetitions": [

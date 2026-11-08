@@ -169,6 +169,47 @@ public class LiveTrackerTests
         Assert.Equal(LiveEventKind.FullTime, draft.Kind);
         Assert.Equal("KẾT THÚC", draft.Title);
         Assert.Contains("Kết thúc: Arsenal 2-1 Hull City", draft.Text);
+        // ESPN trả danh sách sự kiện rỗng lúc hết trận: vẫn có tên người ghi bàn từ những bàn bot đã thấy.
+        Assert.Equal(["A 10'", "B 20'"], draft.HomeLines!);
+        Assert.Equal(["C 30'"], draft.AwayLines!);
+    }
+
+    [Fact]
+    public void Half_time_and_full_time_list_scorers_and_red_cards()
+    {
+        var (_, session) = Start(Live(0, 0));
+        MatchEvent[] firstHalf =
+        [
+            Goal("359", "Saka", "12'"),
+            Goal("306", "Smith", "30'", MatchEventType.PenaltyGoal),
+            new(MatchEventType.RedCard, "40'", "Jones", "306"),
+            Goal("359", "Rice", "45'+2'"),
+        ];
+        var ht = session.Apply(Live(2, 1, "STATUS_HALFTIME", 1, events: firstHalf), T0).NewDrafts.Last();
+
+        Assert.Equal(LiveEventKind.HalfTime, ht.Kind);
+        Assert.Null(ht.Detail);
+        Assert.Equal(["Saka 12'", "Rice 45'+2'"], ht.HomeLines!);
+        Assert.Equal(["Smith 30' (pen)", $"Jones 40' {Draft.RedCardMark}"], ht.AwayLines!);
+        Assert.Equal(
+            "⏸️ Hết hiệp 1: Arsenal 2-1 Hull City\n⚽ Arsenal: Saka 12', Rice 45'+2'\n⚽ Hull City: Smith 30' (pen)\n🟥 Thẻ đỏ: Jones 40' (Hull City)",
+            ht.Text);
+
+        var ft = session.Apply(Live(3, 1, "STATUS_FULL_TIME", 2, MatchStatus.Finished, [.. firstHalf, Goal("306", "Gabriel", "80'", MatchEventType.OwnGoal)]), T0.AddHours(1)).NewDrafts.Last();
+        Assert.Equal(LiveEventKind.FullTime, ft.Kind);
+        Assert.Contains("⚽ Arsenal: Saka 12', Rice 45'+2'", ft.Text);
+        Assert.Contains("Hull City: Smith 30' (pen), Gabriel 80' (phản lưới)", ft.Text);
+    }
+
+    [Fact]
+    public void Goalless_half_time_has_no_summary()
+    {
+        var (_, session) = Start(Live(0, 0));
+        var ht = Assert.Single(session.Apply(Live(0, 0, "STATUS_HALFTIME", 1), T0).NewDrafts);
+        Assert.Null(ht.Detail);
+        Assert.Null(ht.HomeLines);
+        Assert.Null(ht.AwayLines);
+        Assert.Equal("⏸️ Hết hiệp 1: Arsenal 0-0 Hull City", ht.Text);
     }
 
     [Fact]
@@ -335,6 +376,25 @@ public class LiveSupportTests
         var custom = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 1, 0, "BÀN THẮNG!", null, ["VÀOOO!"], "#111", "#222"));
         Assert.Contains(System.Net.WebUtility.HtmlEncode("VÀOOO!"), custom);
         Assert.DoesNotContain(System.Net.WebUtility.HtmlEncode("BÀN THẮNG!"), custom);
+    }
+
+    [Fact]
+    public void Live_card_lists_scorers_under_each_team_with_short_names_ready()
+    {
+        var html = new LiveCardHtml("Matchday Challenge", "", "");
+        var home = new Team("359", "Arsenal", null);
+        var away = new Team("306", "Hull City", null);
+
+        var page = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 1, 0, "KẾT THÚC", null, null, "#111", "#222",
+            ["Martin Ødegaard 90'+6' (pen)"], null));
+
+        Assert.Contains("<span class=\"player\" data-short=\"M. &#216;degaard|&#216;degaard\">Martin &#216;degaard</span> 90&#39;+6&#39; (pen)", page);
+        Assert.Equal(1, page.Split("class=\"events\"").Length - 1);
+
+        var card = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 1, 0, "KẾT THÚC", null, null, "#111", "#222",
+            null, [$"Smith 61' {Draft.RedCardMark}"]));
+        Assert.Contains("61&#39;<i class=\"red-card\"></i></p>", card);
+        Assert.DoesNotContain(Draft.RedCardMark, card);
     }
 }
 

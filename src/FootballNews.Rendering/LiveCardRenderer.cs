@@ -15,6 +15,7 @@ public sealed class LiveCardRenderer(LiveCardHtml html)
         });
         await page.SetContentAsync(html.Build(card), new PageSetContentOptions { WaitUntil = WaitUntilState.NetworkIdle });
         await page.EvaluateAsync("() => document.fonts.ready.then(() => true)");
+        await page.EvaluateAsync(LiveCardHtml.FitScript);
         return await page.Locator(".card").ScreenshotAsync(new LocatorScreenshotOptions { Type = ScreenshotType.Png });
     }
 }

@@ -12,7 +12,8 @@ public sealed record LiveEvent(
     string? TeamId = null,
     string? Player = null,
     string? Minute = null,
-    bool ExtraTime = false);
+    bool ExtraTime = false,
+    IReadOnlyList<MatchEvent>? Summary = null);
 
 /// <summary>
 /// So dữ liệu ESPN mới nhất với những gì đã thấy để tìm sự kiện mới: bàn thắng, VAR huỷ bàn, thẻ đỏ,
@@ -92,7 +93,7 @@ public static class LiveTracker
         if (status == "STATUS_HALFTIME" && !watch.HalfTimeDone)
         {
             watch.HalfTimeDone = true;
-            events.Add(new LiveEvent(LiveEventKind.HalfTime, watch.HomeScore, watch.AwayScore));
+            events.Add(new LiveEvent(LiveEventKind.HalfTime, watch.HomeScore, watch.AwayScore, Summary: Summary(watch, match)));
         }
         // Đã sang hiệp 2 mà chưa kịp thấy giờ nghỉ thì thôi, không báo muộn.
         if (period >= 2)
@@ -103,13 +104,13 @@ public static class LiveTracker
             watch.EndOfRegulationDone = true;
             watch.HadExtraTime = true;
             var (home, away) = RegulationScore(watch);
-            events.Add(new LiveEvent(LiveEventKind.EndOfRegulation, home, away));
+            events.Add(new LiveEvent(LiveEventKind.EndOfRegulation, home, away, Summary: Summary(watch, match)));
         }
 
         if (!watch.FullTimeDone && (match.Status == MatchStatus.Finished || (watch.HadExtraTime && IsPastExtraTime(status, period))))
         {
             watch.FullTimeDone = true;
-            events.Add(new LiveEvent(LiveEventKind.FullTime, watch.HomeScore, watch.AwayScore, ExtraTime: watch.HadExtraTime));
+            events.Add(new LiveEvent(LiveEventKind.FullTime, watch.HomeScore, watch.AwayScore, ExtraTime: watch.HadExtraTime, Summary: Summary(watch, match)));
         }
 
         return events;
@@ -123,6 +124,24 @@ public static class LiveTracker
             return double.MaxValue;
         var extra = parts.Length > 1 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var e) ? e : 0;
         return main + extra / 100.0;
+    }
+
+    /// <summary>
+    /// Bàn thắng và thẻ đỏ tính đến lúc này, xếp theo phút: dùng cho bài hết hiệp, hết trận.
+    /// Bàn của mỗi đội lấy theo ESPN; danh sách ESPN thiếu so với tỉ số thì lấy các bàn bot đã ghi nhận.
+    /// </summary>
+    private static IReadOnlyList<MatchEvent> Summary(WatchedMatch watch, Match match)
+    {
+        var events = new List<MatchEvent>();
+        foreach (var (teamId, score) in new[] { (watch.Home.Id, watch.HomeScore), (watch.Away.Id, watch.AwayScore) })
+        {
+            var espn = match.Events.Where(e => e.IsGoal && e.TeamId == teamId).ToList();
+            events.AddRange(espn.Count >= score
+                ? espn
+                : watch.Goals.Where(g => g.TeamId == teamId && !g.Cancelled).Select(g => new MatchEvent(g.Type, g.Minute, g.Player, g.TeamId)));
+        }
+        events.AddRange(match.Events.Where(e => e.Type == MatchEventType.RedCard));
+        return events.OrderBy(e => MinuteOrder(e.Minute)).ToList();
     }
 
     private static List<GoalRecord> CancelGoals(WatchedMatch watch, Match match, string teamId, int score)

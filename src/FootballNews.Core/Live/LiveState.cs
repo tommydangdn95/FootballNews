@@ -59,6 +59,15 @@ public sealed class Draft
     /// <summary>Dòng chi tiết trên ảnh dưới tỉ số, vd "Declan Rice 23'".</summary>
     public string? Detail { get; set; }
 
+    /// <summary>Cuối một dòng dưới tên đội: dòng đó là thẻ đỏ, ảnh vẽ hình thẻ đỏ thay cho ký hiệu này.</summary>
+    public const string RedCardMark = "🟥";
+
+    /// <summary>Các dòng nhỏ dưới tên đội nhà trên ảnh: người ghi bàn, thẻ đỏ (bài hết hiệp, hết trận).</summary>
+    public List<string>? HomeLines { get; set; }
+
+    /// <summary>Như <see cref="HomeLines"/>, cho đội khách.</summary>
+    public List<string>? AwayLines { get; set; }
+
     /// <summary>Chủ trang sửa nội dung thì ảnh chỉ vẽ các dòng này thay cho tiêu đề, tỉ số và chi tiết.</summary>
     public List<string>? CustomLines { get; set; }
 

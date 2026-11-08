@@ -96,13 +96,18 @@ internal static class LiveProgram
         var state = new LiveState { Watch = new WatchedMatch { Home = home, Away = away, Competition = competition.Slug } };
         var session = new LiveSession(state, clubs, competition, config.Hashtag);
         var goal = new GoalRecord { Id = "g1", TeamId = "359", Player = "Declan Rice", Minute = "23'" };
+        var rice = new FootballNews.Core.Models.MatchEvent(FootballNews.Core.Models.MatchEventType.Goal, "23'", "Declan Rice", "359");
+        var smith = new FootballNews.Core.Models.MatchEvent(FootballNews.Core.Models.MatchEventType.RedCard, "61'", "Smith", "306");
+        var hullGoal = new FootballNews.Core.Models.MatchEvent(FootballNews.Core.Models.MatchEventType.Goal, "78'", "Oscar Estupiñán", "306");
+        var saka = new FootballNews.Core.Models.MatchEvent(FootballNews.Core.Models.MatchEventType.Goal, "90'+2'", "Bukayo Saka", "359");
+        var pen = new FootballNews.Core.Models.MatchEvent(FootballNews.Core.Models.MatchEventType.PenaltyGoal, "90'+6'", "Martin Ødegaard", "359");
         var samples = new (string Name, LiveEvent Event)[]
         {
             ("goal", new LiveEvent(LiveEventKind.Goal, 1, 0, goal, "359", "Declan Rice", "23'")),
             ("red-card", new LiveEvent(LiveEventKind.RedCard, 1, 0, null, "306", "Smith", "61'")),
-            ("half-time", new LiveEvent(LiveEventKind.HalfTime, 1, 0)),
-            ("end-of-90", new LiveEvent(LiveEventKind.EndOfRegulation, 1, 1)),
-            ("full-time", new LiveEvent(LiveEventKind.FullTime, 2, 1)),
+            ("half-time", new LiveEvent(LiveEventKind.HalfTime, 1, 0, Summary: [rice, smith])),
+            ("end-of-90", new LiveEvent(LiveEventKind.EndOfRegulation, 1, 1, Summary: [rice, smith, hullGoal])),
+            ("full-time", new LiveEvent(LiveEventKind.FullTime, 3, 1, Summary: [rice, smith, hullGoal, saka, pen])),
             ("var", new LiveEvent(LiveEventKind.GoalCancelled, 0, 0, goal, "359", "Declan Rice", "23'")),
         };
 
@@ -115,7 +120,7 @@ internal static class LiveProgram
                 LiveSession.ApplyEdit(draft, "VÀOOOO!!!\nSiêu phẩm sút xa của Declan Rice\nArsenal 1-0 Hull City");
             var (from, to) = config.Gradient(draft.Kind);
             var png = await renderer.RenderAsync(new LiveCard(competition.Name, home, away, clubs.DisplayName(home), clubs.DisplayName(away),
-                draft.HomeScore, draft.AwayScore, draft.Title, draft.Detail, draft.CustomLines, from, to));
+                draft.HomeScore, draft.AwayScore, draft.Title, draft.Detail, draft.CustomLines, from, to, draft.HomeLines, draft.AwayLines));
             await File.WriteAllBytesAsync(Path.Combine(dir, $"{name}.png"), png);
             await File.WriteAllTextAsync(Path.Combine(dir, $"{name}.txt"), draft.Caption);
             Console.WriteLine($"Đã vẽ {name}.png");
