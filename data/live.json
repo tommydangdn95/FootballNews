@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png"
     },
     "homeScore": 2,
-    "awayScore": 2,
+    "awayScore": 3,
     "goals": [
       {
         "id": "g1",
@@ -47,6 +47,14 @@
         "minute": "44'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g5",
+        "teamId": "362",
+        "player": "McGinn",
+        "minute": "48'",
+        "type": "penaltyGoal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -54,7 +62,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 5
+    "nextGoalId": 6
   },
   "drafts": [
     {
@@ -83,8 +91,29 @@
       "telegramMessageId": 49,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122103775137539980"
+    },
+    {
+      "id": 9,
+      "kind": "goal",
+      "createdAt": "2026-11-08T17:42:51.8405711+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 3,
+      "title": "VÀOOOOO",
+      "detail": "McGinn 48' (phạt đền)",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ McGinn 48' (phạt đền) ghi bàn cho Aston Villa! Man Utd 2-3 Aston Villa",
+      "hashtags": "#MU #AstonVilla #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g5",
+      "varWarning": false,
+      "telegramMessageId": 50,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122103787335539980"
     }
   ],
-  "nextDraftId": 9,
+  "nextDraftId": 10,
   "editingDraftId": null
 }
