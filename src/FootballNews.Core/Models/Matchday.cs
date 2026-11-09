@@ -47,6 +47,22 @@ public static partial class Matchday
         return matches.Select(m => rounds.TryGetValue(m.Id, out var r) ? m with { Round = r } : m).ToList();
     }
 
+    /// <summary>
+    /// Chỉ giữ vòng mới nhất của mỗi giải (dùng khi chạy force, để không lẫn trận của vòng trước).
+    /// Trận không có số vòng (vòng loại trực tiếp, hoặc không lấy được bảng xếp hạng) được giữ nguyên.
+    /// Trận đá bù của vòng cũ có số vòng nhỏ hơn nên bị bỏ.
+    /// </summary>
+    public static IReadOnlyList<Match> LatestRoundOnly(IReadOnlyList<Match> matches)
+    {
+        var latest = matches
+            .Where(m => m.Round is not null)
+            .GroupBy(m => (m.Competition.Slug, m.Stage))
+            .ToDictionary(g => g.Key, g => g.Max(m => m.Round!.Value));
+        return matches
+            .Where(m => m.Round is null || m.Round == latest[(m.Competition.Slug, m.Stage)])
+            .ToList();
+    }
+
     [GeneratedRegex(@"^\d{4}-\d{2}-")]
     private static partial Regex LeagueSeason();
 }

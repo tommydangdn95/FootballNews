@@ -61,7 +61,11 @@ internal sealed class DailyRunner(
     {
         var window = ignoreAnnounced ? ReportWindow.AllRecentResults(reference) : ReportWindow.Results(reference);
         var digest = state.BuildResults(await FetchAsync(competitions, window, ct), window);
-        return digest with { Matches = await WithRoundsAsync(digest.Matches, ct) };
+        var matches = await WithRoundsAsync(digest.Matches, ct);
+        // Khung force 7 ngày có thể chứa cả vòng trước (vd trận tối thứ Hai), nên chỉ giữ vòng mới nhất.
+        if (ignoreAnnounced)
+            matches = Matchday.LatestRoundOnly(matches);
+        return digest with { Matches = matches };
     }
 
     private async Task<Digest> BuildUpcomingAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)

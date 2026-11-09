@@ -49,6 +49,31 @@ public class MatchdayTests
     }
 
     [Fact]
+    public void Latest_round_only_drops_the_previous_round_of_each_competition()
+    {
+        var serieA = TestData.Competition("ita.1");
+        var matches = Matchday.LatestRoundOnly([
+            Game("1", "a", "b", Saturday.AddDays(-5), MatchStatus.Finished) with { Round = 9 },
+            Game("2", "c", "d", Saturday, MatchStatus.Finished) with { Round = 10 },
+            Game("3", "e", "f", Saturday, MatchStatus.Finished) with { Round = 10 },
+            Game("4", "g", "h", Saturday.AddDays(-5), MatchStatus.Finished, "2026-27-italian-serie-a") with { Competition = serieA, Round = 11 },
+        ]);
+
+        Assert.Equal(new[] { "2", "3", "4" }, matches.Select(m => m.Id));
+    }
+
+    [Fact]
+    public void Latest_round_only_keeps_matches_without_a_round()
+    {
+        var matches = Matchday.LatestRoundOnly([
+            Game("1", "a", "b", Saturday, MatchStatus.Finished, stage: "round-of-16"),
+            Game("2", "c", "d", Saturday, MatchStatus.Finished),
+        ]);
+
+        Assert.Equal(new[] { "1", "2" }, matches.Select(m => m.Id));
+    }
+
+    [Fact]
     public void Knockout_postponed_and_unknown_teams_get_no_round()
     {
         var matches = Matchday.Assign([
