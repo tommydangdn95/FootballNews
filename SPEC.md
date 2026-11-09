@@ -153,7 +153,7 @@ Tổng: 3 trận · 2 giải
 ## 8. Hạ tầng
 - **Runtime:** .NET 8 (`net8.0`, console app), chạy trên **GitHub Actions** với `dotnet-version: 8.0.x`. Hạ từ .NET 10 xuống vì máy phát triển không cài được .NET 10.
 - **Lịch chạy:** đặt ở **cron-job.org** lúc 07:00 VN (`Asia/Ho_Chi_Minh`), gọi `POST https://api.github.com/repos/tommydangdn95/FootballNews/actions/workflows/football-news.yml/dispatches` với body `{"ref":"main"}`, không truyền `force`. Workflow không có `schedule` riêng.
-- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (gửi đầy đủ mọi giải: kết quả 7 ngày qua tính đến hết ngày báo cáo và lịch 5 ngày tới, bất kể thứ trong tuần, kể cả trận đã báo, không lưu trạng thái; luôn gửi cả hai phần dù chọn `job` nào).
+- Cho phép chạy tay: `workflow_dispatch` với input `job=daily|results|upcoming`, `date` (để test lại ngày cũ) và `force` (gửi đầy đủ mọi giải: kết quả 7 ngày qua tính đến hết ngày báo cáo, mỗi giải đánh số vòng chỉ giữ vòng mới nhất, và lịch 5 ngày tới, bất kể thứ trong tuần, kể cả trận đã báo, không lưu trạng thái; luôn gửi cả hai phần dù chọn `job` nào).
 - **Secrets:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; phần live dùng bot Telegram riêng với `LIVE_TELEGRAM_BOT_TOKEN`, `TELEGRAM_ADMIN_ID`, cùng `FB_PAGE_ID`, `FB_PAGE_TOKEN` (v2 thêm `FOOTBALL_DATA_TOKEN`).
 - Workflow cần `permissions: contents: write` để commit `announced.json`.
 
@@ -212,6 +212,7 @@ Tổng: 3 trận · 2 giải
 - Trận đã báo rồi dời sang ngày khác chỉ báo "giờ mới" một lần, không hiện lại trong lịch ngày đá (trừ phần nhắc lại cuối tuần).
 - Trận đang đá lúc chạy không xuất hiện ở cả kết quả lẫn lịch đấu, kể cả khi `force`.
 - `force` chỉ lấy kết quả 7 ngày, nên cúp châu Âu không đá trong tuần có thể vắng mặt.
+- `force` chỉ giữ vòng mới nhất của mỗi giải VĐQG và vòng phân hạng cúp châu Âu (vd không lẫn trận tối thứ Hai của vòng trước). Trận đá bù của vòng cũ trong 7 ngày đó cũng bị bỏ; không lấy được bảng xếp hạng thì giữ mọi trận của giải.
 - Telegram trả lỗi không phải JSON (vd 502 dạng HTML) được báo rõ là lỗi HTTP; lỗi 5xx được thử lại tối đa 5 lần.
 
 ## 13. Báo trực tiếp (live) lên Fanpage
