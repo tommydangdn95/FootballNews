@@ -33,6 +33,7 @@ Chi tiết đầy đủ nằm trong [SPEC.md](SPEC.md) (bot live ở mục 13).
 | `/list` | Trận đang theo dõi, tỉ số bot đã thấy và trạng thái từng bản nháp. |
 | `/unwatch` | Bỏ theo dõi. Bản nháp đang chờ bị huỷ, không đăng. |
 | `/stop` | Bỏ theo dõi (nếu có), huỷ bản nháp đang chờ và **tắt workflow ngay**, không nghe lệnh thêm 5 phút và không tự nối lượt mới. Muốn dùng lại thì bấm Run workflow. |
+| `/autopilot` | Bật/tắt **tự đăng** cho trận đang theo dõi (gõ không kèm gì để đảo trạng thái, hoặc `/autopilot on`, `/autopilot off`). Bật lên thì mọi bản nháp tự đăng lên Fanpage, không chờ duyệt; bản đang chờ duyệt cũng đăng luôn. Bot vẫn gửi ảnh kèm link bài về Telegram. Tự tắt khi bỏ theo dõi hoặc theo dõi xong. |
 | `/fbtest` | Đăng thử một bài chữ lên Fanpage và gửi link về. Mở link bằng cửa sổ ẩn danh để chắc người ngoài xem được, rồi xoá bài. |
 | `/whoami` | Xem user id Telegram (dùng để cài `TELEGRAM_ADMIN_ID`). Lệnh duy nhất trả lời cả người lạ. |
 | `/help`, `/start` | Danh sách lệnh. |
@@ -58,6 +59,7 @@ Mỗi sự kiện là một bản nháp gồm ảnh xem trước và caption, k�
 - Hết trận và không còn bản nháp chờ thì bot nhắn "Đã theo dõi xong" rồi workflow tự dừng (muộn nhất khoảng 15 phút sau tiếng còi).
 - Phòng khi ESPN bị kẹt: quá **3 tiếng** sau giờ bóng lăn (**3 tiếng 45 phút** nếu có hiệp phụ) mà chưa thấy kết thúc thì bot tự dừng theo dõi và báo lý do.
 - Đăng Facebook lỗi thì bot báo về Telegram, bản nháp giữ nguyên để bấm Đăng lại.
+- **Autopilot** (`/autopilot`): bản nháp đăng ngay khi có, không có nút. Đăng lỗi thì bản đó chuyển sang chờ duyệt như thường. Bản nháp có cảnh báo VAR thì không tự đăng, vẫn chờ bạn quyết. Bỏ hoặc sửa không còn kịp, muốn xoá bài thì xoá trên Fanpage.
 
 ### Menu lệnh trong Telegram (tuỳ chọn)
 
@@ -69,6 +71,7 @@ watch - Tìm trận để theo dõi, vd /watch arsenal hull
 list - Trận đang theo dõi và bản nháp
 unwatch - Bỏ theo dõi trận hiện tại
 stop - Bỏ theo dõi và tắt bot ngay
+autopilot - Bật/tắt tự đăng bài không chờ duyệt
 fbtest - Đăng thử một bài lên Fanpage
 whoami - Xem user id Telegram
 help - Danh sách lệnh

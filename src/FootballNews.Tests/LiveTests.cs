@@ -294,6 +294,30 @@ public class LiveQueueTests
     }
 
     [Fact]
+    public void Autopilot_survives_reload_and_is_cleared_with_the_watch()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"live-{Guid.NewGuid():N}.json");
+        try
+        {
+            var store = new LiveStore(path);
+            var state = new LiveState { Watch = LiveTracker.Start(LiveTrackerTests.Live(0, 0)) };
+            state.Watch.Autopilot = true;
+            store.Save(state);
+
+            var loaded = store.Load();
+            Assert.True(loaded.Watch!.Autopilot);
+
+            loaded.Clear();
+            loaded.Watch = LiveTracker.Start(LiveTrackerTests.Live(0, 0));
+            Assert.False(loaded.Watch.Autopilot);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void State_round_trips_through_json_without_computed_fields()
     {
         var path = Path.Combine(Path.GetTempPath(), $"live-{Guid.NewGuid():N}.json");
@@ -312,6 +336,7 @@ public class LiveQueueTests
             Assert.Equal("Rice", loaded.Watch!.Goals.Single().Player);
             Assert.Equal(LiveEventKind.Goal, loaded.Drafts.Single().Kind);
             Assert.Equal(2, loaded.NextDraftId);
+            Assert.False(loaded.Watch.Autopilot);
         }
         finally
         {

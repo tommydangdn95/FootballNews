@@ -201,13 +201,112 @@ internal sealed class LiveRunner(
         if (expired.Count > 0)
             _dirty = true;
 
-        var next = _state.PromoteNext();
-        if (next is not null)
+        // Autopilot đăng luôn từng bản; đăng lỗi thì bản đó chuyển sang chờ duyệt như thường.
+        while (_state.PromoteNext() is { } next)
         {
             _dirty = true;
+            if (_state.Watch is { Autopilot: true } && !next.VarWarning && await AutoPostAsync(next, ct))
+                continue;
             await SendPreviewAsync(next, ct);
         }
         await SaveAsync(null);
+    }
+
+    /// <summary>Autopilot: đăng thẳng lên Fanpage rồi gửi ảnh kèm link về Telegram. Trả <c>false</c> khi không đăng được.</summary>
+    private async Task<bool> AutoPostAsync(Draft draft, CancellationToken ct)
+    {
+        if (facebook is null)
+        {
+            await NotifyAsync($"❌ Autopilot: chưa cài FB_PAGE_ID và FB_PAGE_TOKEN nên không tự đăng được bản nháp #{draft.Id}, chuyển sang chờ duyệt.", ct);
+            return false;
+        }
+        byte[]? image;
+        string postId;
+        try
+        {
+            image = await RenderAsync(draft);
+            postId = image is not null
+                ? await facebook.PostPhotoAsync(image, draft.Caption, ct)
+                : await facebook.PostTextAsync(draft.Caption, ct);
+        }
+        catch (FacebookException ex)
+        {
+            await NotifyAsync($"❌ Autopilot đăng Facebook lỗi (bản nháp #{draft.Id}): {ex.Message}\nBản nháp chuyển sang chờ duyệt, bấm ✅ Đăng để thử lại.", ct);
+            return false;
+        }
+
+        draft.Status = DraftStatus.Posted;
+        draft.FacebookPostId = postId;
+        _dirty = true;
+        // Lưu và đẩy lên repo ngay: job chết giữa chừng thì lần sau không đăng lại bài này.
+        await SaveAsync($"chore: autopilot posted live draft {draft.Id}", force: true);
+
+        var time = Now.ToOffset(ReportWindow.VietnamOffset).ToString("HH:mm", Invariant);
+        var text = $"🤖 Autopilot đã đăng lúc {time} · #{draft.Id} {LiveSession.KindLabel(draft.Kind)}\n{FacebookClient.PostUrl(postId)}\n──────────\n{draft.Caption}";
+        try
+        {
+            if (image is not null)
+            {
+                draft.TelegramMessageId = await telegram.SendPhotoAsync(image, $"draft-{draft.Id}.png", text, null, ct);
+                draft.TelegramIsPhoto = true;
+            }
+            else
+            {
+                draft.TelegramMessageId = await telegram.SendMessageAsync(text, null, ct);
+                draft.TelegramIsPhoto = false;
+            }
+        }
+        catch (TelegramException ex)
+        {
+            Console.WriteLine($"Không gửi được tin báo autopilot #{draft.Id}: {ex.Message}");
+        }
+        return true;
+    }
+
+    private async Task AutopilotAsync(string argument, CancellationToken ct)
+    {
+        if (_state.Watch is not { } watch)
+        {
+            await NotifyAsync("Chưa theo dõi trận nào. Chọn trận bằng /live hoặc /watch rồi mới bật autopilot.", ct);
+            return;
+        }
+        bool? wanted = argument.Trim().ToLowerInvariant() switch
+        {
+            "" => !watch.Autopilot,
+            "on" or "bat" or "bật" => true,
+            "off" or "tat" or "tắt" => false,
+            _ => null,
+        };
+        if (wanted is not { } on)
+        {
+            await NotifyAsync("Gõ /autopilot để bật/tắt, hoặc /autopilot on, /autopilot off.", ct);
+            return;
+        }
+        if (watch.Autopilot == on)
+        {
+            await NotifyAsync(on ? "🤖 Autopilot đang bật sẵn." : "Autopilot đang tắt sẵn.", ct);
+            return;
+        }
+
+        watch.Autopilot = on;
+        _dirty = true;
+        await SaveAsync($"chore: autopilot {(on ? "on" : "off")}", force: true);
+        if (!on)
+        {
+            await NotifyAsync("✋ Đã tắt autopilot. Bản nháp từ giờ chờ bạn duyệt như thường.", ct);
+            return;
+        }
+
+        await NotifyAsync($"🤖 Đã bật autopilot cho {MatchName(watch)}. Mọi bản nháp sẽ tự đăng lên Fanpage, không chờ duyệt. Gõ /autopilot off để tắt.", ct);
+        // Bản đang chờ duyệt cũng đăng luôn, trừ bản có cảnh báo VAR thì để chủ trang tự quyết.
+        if (_state.Active is { } active)
+        {
+            if (active.VarWarning)
+                await NotifyAsync($"⚠️ Bản nháp #{active.Id} có cảnh báo VAR nên không tự đăng, bạn tự duyệt bản này.", ct);
+            else
+                await PostAsync(active, ct);
+        }
+        await AdvanceQueueAsync(ct);
     }
 
     private async Task FinishWatchAsync(CancellationToken ct)
@@ -459,6 +558,9 @@ internal sealed class LiveRunner(
                     await NotifyAsync("🛑 Đã tắt bot. Muốn dùng lại thì bấm Run workflow.", ct);
                 }
                 _stopRequested = true;
+                break;
+            case "/autopilot":
+                await AutopilotAsync(argument, ct);
                 break;
             case "/fbtest":
                 await FacebookTestAsync(ct);
@@ -748,6 +850,7 @@ internal sealed class LiveRunner(
         /list — trận đang theo dõi và bản nháp
         /unwatch — bỏ theo dõi
         /stop — bỏ theo dõi và tắt bot ngay
+        /autopilot — bật/tắt tự đăng bài, không chờ duyệt (on/off)
         /fbtest — đăng thử một bài lên Fanpage
         /whoami — xem user id
 
@@ -764,6 +867,7 @@ internal sealed class LiveRunner(
         {
             $"👀 {MatchName(w)} ({FindCompetition(w.Competition).Name}), đá lúc {kickoff}",
             $"Tỉ số bot đã thấy: {w.HomeScore}-{w.AwayScore}",
+            w.Autopilot ? "🤖 Autopilot: bật, bản nháp tự đăng" : "Autopilot: tắt, bản nháp chờ duyệt",
         };
         if (_state.Drafts.Count == 0)
             lines.Add("Chưa có bản nháp nào.");

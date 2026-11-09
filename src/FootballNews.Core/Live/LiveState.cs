@@ -37,6 +37,9 @@ public sealed class WatchedMatch
     public bool FullTimeDone { get; set; }
     public int NextGoalId { get; set; } = 1;
 
+    /// <summary>Chủ trang bật /autopilot: bản nháp tự đăng lên Fanpage, không chờ duyệt. Tắt khi bỏ theo dõi.</summary>
+    public bool Autopilot { get; set; }
+
     /// <summary>Đã báo hết trận: chỉ còn chờ xử lý xong hàng đợi bản nháp.</summary>
     [JsonIgnore]
     public bool Finished => FullTimeDone;

@@ -3,7 +3,7 @@
 > Đặt file này ở thư mục gốc repo. Claude (hoặc dev khác) đọc file này trước khi code.
 
 ## 1. Mục tiêu
-Mỗi ngày tự động tổng hợp **toàn bộ kết quả và lịch đấu của các giải trong mục 3**, vẽ **ảnh bảng tỉ số**, gửi về **Telegram** để chủ trang duyệt và tự đăng. Bài tổng hợp hằng ngày **không** tự đăng lên mạng xã hội. Riêng phần **báo trực tiếp** (mục 13) đăng lên Fanpage Facebook, nhưng chỉ sau khi chủ trang bấm duyệt trên Telegram.
+Mỗi ngày tự động tổng hợp **toàn bộ kết quả và lịch đấu của các giải trong mục 3**, vẽ **ảnh bảng tỉ số**, gửi về **Telegram** để chủ trang duyệt và tự đăng. Bài tổng hợp hằng ngày **không** tự đăng lên mạng xã hội. Riêng phần **báo trực tiếp** (mục 13) đăng lên Fanpage Facebook, nhưng chỉ sau khi chủ trang bấm duyệt trên Telegram, hoặc tự đăng khi chủ trang bật `/autopilot`.
 
 ## 2. Lịch chạy (giờ Việt Nam, UTC+7)
 Mỗi ngày chạy **một lần lúc 07:00** (job `daily`). Có thể chạy tay từng phần.
@@ -231,6 +231,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 | `/list` | Xem trận đang theo dõi và bản nháp đang chờ. |
 | `/unwatch` | Bỏ theo dõi. Các bản nháp đang chờ bị huỷ, không đăng. |
 | `/stop` | Bỏ theo dõi (nếu có), huỷ bản nháp đang chờ và **tắt workflow ngay**, không nghe lệnh thêm 5 phút và không tự nối lượt mới. Muốn dùng lại thì bấm Run workflow. |
+| `/autopilot` | Bật/tắt chế độ **tự đăng** cho trận đang theo dõi (xem 13.4). Không kèm gì thì đảo trạng thái; `on`/`off` để chọn rõ. Chưa theo dõi trận nào thì bot từ chối. |
 | `/fbtest` | Đăng thử một bài lên Fanpage và gửi link về để kiểm tra người ngoài xem được. |
 | `/whoami` | Trả lại user id của người nhắn (để cài `TELEGRAM_ADMIN_ID`). Lệnh duy nhất trả lời cả người lạ. |
 | `/help` | Danh sách lệnh. |
@@ -260,6 +261,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 - Tin nháp gồm **ảnh xem trước** đúng như bài sẽ đăng, caption, và 3 nút **✅ Đăng / ❌ Bỏ / ✏️ Sửa**.
 - **Sửa:** bấm ✏️ Sửa hoặc trả lời (reply) vào tin nháp bằng nội dung mới. Nội dung mới thay **chữ trên ảnh** và **dòng đầu của caption** (hashtag giữ nguyên). Bot vẽ lại ảnh và gửi bản xem trước mới kèm 3 nút. Sửa không gia hạn thời gian.
 - Không có bản nào được duyệt thì không đăng gì.
+- **Autopilot** (`/autopilot`): bản nháp được đăng lên Fanpage ngay khi tới lượt, không chờ duyệt. Bot gửi về Telegram ảnh, caption và link bài, không kèm nút. Bật lúc đang có bản chờ duyệt thì bản đó được đăng luôn. Bản có cảnh báo VAR không tự đăng mà chờ chủ trang quyết. Đăng lỗi hoặc chưa cài Facebook thì bản đó chuyển sang chờ duyệt như thường. Cờ lưu theo trận trong `live.json` (giữ qua lượt chạy nối tiếp), tự tắt khi bỏ theo dõi hoặc theo dõi xong.
 
 ### 13.5 Nội dung bài đăng
 - **Chỉ tiếng Việt.** Tên đội lấy từ `clubs.json` như bài hằng ngày.
