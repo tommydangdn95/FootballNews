@@ -108,6 +108,59 @@ public class EspnParserTests
     }
 
     [Fact]
+    public void Reads_stage_from_scoreboard_but_not_from_summary()
+    {
+        Assert.All(EspnParser.ParseScoreboard(TestData.Fixture("eng1-20261101.json"), TestData.Competition("eng.1")),
+            m => Assert.Equal("2026-27-english-premier-league", m.Stage));
+        Assert.All(EspnParser.ParseScoreboard(TestData.Fixture("ucl-pre-20261104.json"), TestData.Competition("uefa.champions")),
+            m => Assert.Equal("league-phase", m.Stage));
+        Assert.Null(EspnParser.ParseSummary(TestData.Fixture("summary-401879246.json"), "401879246", TestData.Competition("eng.1")).Stage);
+    }
+
+    [Theory]
+    [InlineData("1st Leg", 1)]
+    [InlineData("2nd Leg - Paris Saint-Germain advance 6-5 on aggregate", 2)]
+    [InlineData("Paris Saint-Germain win 4-3 on penalties", null)]
+    public void Reads_leg_from_notes(string headline, int? expected)
+    {
+        var json = $$"""
+            { "events": [ { "id": "1", "season": { "year": 2025, "slug": "semifinals" }, "competitions": [ {
+              "date": "2026-05-06T19:00Z",
+              "notes": [ { "type": "event", "headline": "{{headline}}" } ],
+              "status": { "type": { "name": "STATUS_SCHEDULED", "state": "pre", "completed": false } },
+              "competitors": [
+                { "homeAway": "home", "team": { "id": "1", "displayName": "A" } },
+                { "homeAway": "away", "team": { "id": "2", "displayName": "B" } }
+              ] } ] } ] }
+            """;
+
+        var match = Assert.Single(EspnParser.ParseScoreboard(json, TestData.Competition("uefa.champions")));
+
+        Assert.Equal("semifinals", match.Stage);
+        Assert.Equal(expected, match.Leg);
+    }
+
+    [Fact]
+    public void Reads_games_played_from_every_standings_table()
+    {
+        var json = """
+            { "children": [
+              { "standings": { "entries": [
+                { "team": { "id": "359" }, "stats": [ { "name": "wins", "value": 7 }, { "name": "gamesPlayed", "value": 10.0 } ] },
+                { "team": { "id": "364" }, "stats": [ { "name": "gamesPlayed", "value": 9.0 } ] } ] } },
+              { "standings": { "entries": [
+                { "team": { "id": "1" }, "stats": [ { "name": "points", "value": 3 } ] } ] } }
+            ] }
+            """;
+
+        var played = EspnParser.ParseGamesPlayed(json);
+
+        Assert.Equal(10, played["359"]);
+        Assert.Equal(9, played["364"]);
+        Assert.False(played.ContainsKey("1"));
+    }
+
+    [Fact]
     public void Shootout_kicks_are_not_goals()
     {
         var json = """

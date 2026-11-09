@@ -21,6 +21,7 @@ internal sealed class DailyRunner(
 {
     private readonly Dictionary<(string Slug, DateOnly Date), IReadOnlyList<Match>> _cache = [];
     private readonly Dictionary<(string Slug, string TeamId, int? Season), IReadOnlyList<TeamResult>?> _teamResults = [];
+    private readonly Dictionary<string, IReadOnlyDictionary<string, int>> _gamesPlayed = [];
 
     public async Task RunAsync(IReadOnlyList<DigestKind> kinds, DateOnly vietnamDate, CancellationToken ct)
     {
@@ -59,7 +60,8 @@ internal sealed class DailyRunner(
     private async Task<Digest> BuildResultsAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
     {
         var window = ignoreAnnounced ? ReportWindow.AllRecentResults(reference) : ReportWindow.Results(reference);
-        return state.BuildResults(await FetchAsync(competitions, window, ct), window);
+        var digest = state.BuildResults(await FetchAsync(competitions, window, ct), window);
+        return digest with { Matches = await WithRoundsAsync(digest.Matches, ct) };
     }
 
     private async Task<Digest> BuildUpcomingAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
@@ -73,9 +75,35 @@ internal sealed class DailyRunner(
         var digest = state.BuildUpcoming(matches, rechecked, window, weekend);
         return digest with
         {
-            Matches = await WithFormAsync(digest.Matches, ct),
+            Matches = await WithRoundsAsync(await WithFormAsync(digest.Matches, ct), ct),
             Updates = await WithFormAsync(digest.Updates, ct),
         };
+    }
+
+    // Không lấy được bảng xếp hạng thì ảnh của giải đó chỉ không ghi vòng, bài vẫn gửi.
+    private async Task<IReadOnlyList<Match>> WithRoundsAsync(IReadOnlyList<Match> matches, CancellationToken ct)
+    {
+        var withRounds = new Dictionary<string, Match>();
+        foreach (var group in matches.Where(m => Matchday.IsNumbered(m.Stage)).GroupBy(m => m.Competition.Slug))
+        {
+            var competition = group.First().Competition;
+            if (!_gamesPlayed.TryGetValue(competition.Slug, out var played))
+            {
+                try
+                {
+                    played = await source.GetGamesPlayedAsync(competition, ct);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    Console.WriteLine($"Không lấy được bảng xếp hạng {competition.Slug}: {ex.Message}");
+                    played = new Dictionary<string, int>();
+                }
+                _gamesPlayed[competition.Slug] = played;
+            }
+            foreach (var m in Matchday.Assign(group.ToList(), played))
+                withRounds[m.Id] = m;
+        }
+        return matches.Select(m => withRounds.GetValueOrDefault(m.Id, m)).ToList();
     }
 
     private async Task<IReadOnlyList<Match>> WithFormAsync(IReadOnlyList<Match> matches, CancellationToken ct)

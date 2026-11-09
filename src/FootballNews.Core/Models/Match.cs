@@ -7,6 +7,10 @@ public sealed record MatchSide(Team Team, int? Score, int? ShootoutScore, string
 
 /// <param name="StatusName">Tên trạng thái gốc của ESPN, vd <c>STATUS_HALFTIME</c>. Dùng cho phần live.</param>
 /// <param name="Period">Hiệp đang đá theo ESPN: 1–2 chính thức, 3–4 hiệp phụ, 5 luân lưu.</param>
+/// <param name="Stage">Giai đoạn theo ESPN (<c>season.slug</c>): giải VĐQG là tên mùa, vd <c>2026-27-english-premier-league</c>;
+/// cúp châu Âu là <c>league-phase</c>, <c>round-of-16</c>, <c>quarterfinals</c>... Chỉ có ở scoreboard.</param>
+/// <param name="Leg">Lượt đi (1) hoặc lượt về (2) của trận đấu loại trực tiếp hai lượt.</param>
+/// <param name="Round">Vòng đấu, do <see cref="Matchday"/> tính từ bảng xếp hạng. Chỉ có ở bài hằng ngày.</param>
 public sealed record Match(
     string Id,
     Competition Competition,
@@ -18,4 +22,7 @@ public sealed record Match(
     string? Venue = null,
     int? Season = null,
     string? StatusName = null,
-    int? Period = null);
+    int? Period = null,
+    string? Stage = null,
+    int? Leg = null,
+    int? Round = null);

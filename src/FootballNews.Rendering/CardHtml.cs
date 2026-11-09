@@ -10,7 +10,7 @@ namespace FootballNews.Rendering;
 public sealed record CardPageSection(IReadOnlyList<Match> Updates, IReadOnlyList<Match> Matches, IReadOnlyList<string> Pages);
 
 /// <summary>Dựng HTML của ảnh bảng tỉ số. Ảnh dùng chữ và CSS, không dùng emoji để không phụ thuộc font của máy chạy.</summary>
-public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFontBase64, string mediumFontBase64, string pageLogoBase64 = "")
+public sealed class CardHtml(ClubCatalog clubs, CardTheme baseTheme, string boldFontBase64, string mediumFontBase64, string pageLogoBase64 = "")
 {
     public IReadOnlyList<string> BuildPages(Digest digest, CardLocale locale) =>
         BuildSections(digest, locale).SelectMany(s => s.Pages).ToList();
@@ -26,12 +26,6 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
                 .Select(m => (Match: m, IsUpdate: false)))
             .ToList();
 
-        var dates = (digest.Matches.Count > 0 ? digest.Matches : digest.Updates)
-            .Select(m => LocalDate(locale, m))
-            .Distinct()
-            .Order()
-            .ToList();
-
         var sections = CardPaging.PaginateSections(entries.GroupBy(e => e.IsUpdate ? null : e.Match.Competition.Slug).Select(g => g.ToList()));
         return sections.Select(section =>
         {
@@ -39,41 +33,77 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
             return new CardPageSection(
                 all.Where(e => e.IsUpdate).Select(e => e.Match).ToList(),
                 all.Where(e => !e.IsUpdate).Select(e => e.Match).ToList(),
-                section.Select(page => BuildPage(digest.Kind, locale, dates, page)).ToList());
+                section.Select(page => BuildPage(digest.Kind, locale, page)).ToList());
         }).ToList();
     }
 
-    private string BuildPage(DigestKind kind, CardLocale locale, List<DateOnly> dates, (Match Match, bool IsUpdate)[] entries)
+    private string BuildPage(DigestKind kind, CardLocale locale, (Match Match, bool IsUpdate)[] entries)
     {
         var isResults = kind == DigestKind.Results;
-
-        // Bài kết quả hằng ngày chỉ có đêm qua và rạng sáng nay, tức tối đa 2 ngày; nhiều hơn là bài force.
-        var isDailyResults = isResults && dates.Count <= 2;
+        var main = entries.Where(e => !e.IsUpdate).ToList();
+        // Mỗi giải một bộ màu; ảnh ghép lấy màu của giải đầu tiên, ảnh chỉ có trận cập nhật dùng màu mặc định.
+        var theme = baseTheme.For(main.Count > 0 ? main[0].Match.Competition.Slug : null);
         var sb = new StringBuilder();
-        sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css()).Append("</style></head><body><div class=\"card\">");
+        sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css(theme)).Append("</style></head><body><div class=\"card\">");
         sb.Append($"<header><div class=\"heading\"><h1>{E(isResults ? locale.ResultsTitle : locale.UpcomingTitle)}</h1>");
-        // Ảnh ghi ngày dưới từng trận; khoảng ngày nằm trong tin Telegram.
-        var subtitle = !isResults ? locale.UpcomingSubtitle(entries.Select(e => e.Match.Competition).Distinct().ToList()) : isDailyResults ? locale.ResultsSubtitle : locale.RecentResultsSubtitle;
-        sb.Append($"<p>{E(subtitle)}</p></div>");
+
+        // Tên giải nằm dưới tiêu đề; ảnh ghép (giải chỉ có 1 trận đi chung giải khác) ghi các giải nối nhau.
+        var named = (main.Count > 0 ? main : [.. entries]).Select(e => e.Match.Competition).DistinctBy(c => c.Slug).ToList();
+        sb.Append($"<p class=\"competition\">{E(string.Join(" · ", named.Select(locale.CompetitionName)))}</p>");
+        // Ảnh ghi ngày dưới từng trận; khoảng ngày nằm trong tin Telegram. Ảnh tiếng Anh ghi thêm múi giờ của lịch đấu.
+        if (!isResults && locale.TimeZoneNote(entries.Select(e => e.Match.Competition).Distinct().ToList()) is { } note)
+            sb.Append($"<p>{E(note)}</p>");
+        sb.Append("</div>");
         if (pageLogoBase64.Length > 0)
             sb.Append($"<img class=\"page-logo\" src=\"data:image/png;base64,{pageLogoBase64}\" alt=\"\">");
         sb.Append("</header>");
 
+        var mixed = main.Select(e => e.Match.Competition.Slug).Distinct().Count() > 1;
         foreach (var group in entries.GroupBy(e => e.IsUpdate ? null : e.Match.Competition.Slug))
         {
             var competition = group.Key is null ? null : group.First().Match.Competition;
-            sb.Append($"<section><h2>{E(competition is null ? locale.UpdatesHeading : locale.CompetitionName(competition))}</h2>");
-            // Phong độ chỉ hiện ở lịch đấu và trận cập nhật; ghi rõ nó tính trên giải nào.
-            if (!isResults && group.Any(e => !string.IsNullOrEmpty(e.Match.Home.Form) || !string.IsNullOrEmpty(e.Match.Away.Form)))
-                sb.Append($"<p class=\"note\">{E(locale.FormNote(competition))}</p>");
-            foreach (var (match, isUpdate) in group)
-                sb.Append(MatchRow(kind, locale, match, isUpdate));
-            sb.Append("</section>");
+            // Phong độ chỉ hiện ở lịch đấu và trận cập nhật; ghi rõ nó tính trên giải nào, một lần cho mỗi giải.
+            var showFormNote = !isResults && group.Any(e => !string.IsNullOrEmpty(e.Match.Home.Form) || !string.IsNullOrEmpty(e.Match.Away.Form));
+
+            // Mỗi vòng một mục riêng, vòng trước lên trên; ảnh ghép thì ghi thêm tên giải để biết trận nào của giải nào.
+            var parts = competition is null
+                ? [group.ToList()]
+                : group.GroupBy(e => (e.Match.Round, e.Match.Stage, e.Match.Leg))
+                    .OrderBy(g => g.Key.Round ?? int.MaxValue)
+                    .Select(g => g.ToList())
+                    .ToList();
+            foreach (var part in parts)
+            {
+                sb.Append("<section>");
+                var round = competition is null ? null : RoundLabel(locale, part[0].Match);
+                var heading = competition is null ? locale.UpdatesHeading
+                    : !mixed ? round
+                    : round is null ? locale.CompetitionName(competition)
+                    : $"{locale.CompetitionName(competition)} · {round}";
+                if (heading is not null)
+                    sb.Append($"<h2>{E(heading)}</h2>");
+                if (showFormNote)
+                    sb.Append($"<p class=\"note\">{E(locale.FormNote(competition))}</p>");
+                showFormNote = false;
+                foreach (var (match, isUpdate) in part)
+                    sb.Append(MatchRow(kind, locale, match, isUpdate));
+                sb.Append("</section>");
+            }
         }
 
         sb.Append($"<footer><span>{E(theme.PageName)}</span></footer>");
         sb.Append("</div></body></html>");
         return sb.ToString();
+    }
+
+    // Các trận trong một mục cùng vòng, cùng giai đoạn và cùng lượt nên chỉ cần xem một trận.
+    private static string? RoundLabel(CardLocale locale, Match m)
+    {
+        if (m.Round is { } round)
+            return locale.Round(round, m.Competition.Rounds);
+        if (m.Stage is null || locale.Stage(m.Stage) is not { } name)
+            return null;
+        return m.Leg is { } leg ? $"{name} · {locale.Leg(leg)}" : name;
     }
 
     private string MatchRow(DigestKind kind, CardLocale locale, Match m, bool isUpdate)
@@ -160,7 +190,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
 
     private static string E(string text) => WebUtility.HtmlEncode(text);
 
-    private string Css() => $$"""
+    private string Css(CardTheme theme) => $$"""
         @font-face { font-family: BVP; font-weight: 700; src: url(data:font/ttf;base64,{{boldFontBase64}}); }
         @font-face { font-family: BVP; font-weight: 500; src: url(data:font/ttf;base64,{{mediumFontBase64}}); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -171,6 +201,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         .page-logo { height: 170px; }
         h1 { font-size: 64px; font-weight: 700; line-height: 1.15; }
         header p { font-size: 28px; color: {{theme.Muted}}; margin-top: 2px; }
+        header p.competition { font-size: 34px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-top: 4px; }
         section { margin-bottom: 28px; }
         h2 { font-size: 26px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-bottom: 14px; }
         .note { font-size: 21px; color: {{theme.Muted}}; margin: -8px 0 14px; }
@@ -193,7 +224,7 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme theme, string boldFont
         .form { display: inline-flex; gap: 6px; }
         .form b { width: 30px; height: 30px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff; }
         .form .w { background: #1E9E5A; } .form .d { background: #75807B; } .form .l { background: #D2433D; }
-        .red { display: inline-block; width: 14px; height: 20px; border-radius: 3px; background: #E5383B; margin-right: 8px; vertical-align: -3px; }
+        .red { display: inline-block; width: 14px; height: 20px; border-radius: 3px; background: #E5383B; box-shadow: 0 0 0 2px #FFFFFF; margin-right: 8px; vertical-align: -3px; }
         footer { display: flex; justify-content: space-between; font-size: 26px; font-weight: 700; color: {{theme.Muted}}; margin-top: 8px; }
         """;
 }

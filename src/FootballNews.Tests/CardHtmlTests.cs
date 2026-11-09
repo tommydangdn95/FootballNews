@@ -233,12 +233,80 @@ public class CardHtmlTests
         []);
 
     [Fact]
-    public void Daily_results_have_no_date_heading_and_say_last_night()
+    public void Competition_name_sits_under_the_title_without_a_subtitle()
     {
         var page = SinglePage(Results(DayBeforeEvening, Night), CardLocale.Vietnamese);
 
+        Assert.Contains($"<h1>{WebUtility.HtmlEncode("KẾT QUẢ")}</h1><p class=\"competition\">{WebUtility.HtmlEncode("NGOẠI HẠNG ANH")}</p></div>", page);
         Assert.DoesNotContain("<div class=\"date\">", page);
-        Assert.Contains(WebUtility.HtmlEncode("Đêm qua & rạng sáng nay"), page);
+        Assert.DoesNotContain(WebUtility.HtmlEncode("Đêm qua"), page);
+        Assert.DoesNotContain("<h2>", page);
+    }
+
+    [Fact]
+    public void Section_heading_shows_the_round()
+    {
+        var digest = Results(Night, Night);
+        digest = digest with { Matches = digest.Matches.Select(m => m with { Round = 11 }).ToList() };
+
+        var vi = SinglePage(digest, CardLocale.Vietnamese);
+        Assert.Contains($"<h2>{WebUtility.HtmlEncode("LƯỢT TRẬN 11/38")}</h2>", vi);
+        Assert.Equal(1, vi.Split(WebUtility.HtmlEncode("NGOẠI HẠNG ANH")).Length - 1);
+
+        Assert.Contains("<h2>MATCHDAY 11 OF 38</h2>", SinglePage(digest, CardLocale.English));
+
+        var unknownTotal = digest with { Matches = digest.Matches.Select(m => m with { Competition = m.Competition with { Rounds = null } }).ToList() };
+        Assert.Contains($"<h2>{WebUtility.HtmlEncode("LƯỢT TRẬN 11")}</h2>", SinglePage(unknownTotal, CardLocale.Vietnamese));
+    }
+
+    [Fact]
+    public void Each_round_has_its_own_section_earlier_round_first()
+    {
+        var digest = Results(Night, Night, Night);
+        digest = digest with { Matches = [digest.Matches[0] with { Round = 10 }, digest.Matches[1] with { Round = 9 }, digest.Matches[2] with { Round = 10 }] };
+
+        var page = SinglePage(digest, CardLocale.Vietnamese);
+
+        var nine = page.IndexOf($"<h2>{WebUtility.HtmlEncode("LƯỢT TRẬN 9/38")}</h2>");
+        var ten = page.IndexOf($"<h2>{WebUtility.HtmlEncode("LƯỢT TRẬN 10/38")}</h2>");
+        Assert.True(nine >= 0 && ten > nine);
+        Assert.Equal(1, page[nine..ten].Split("<article>").Length - 1);
+        Assert.Equal(2, page[ten..].Split("<article>").Length - 1);
+    }
+
+    [Fact]
+    public void Form_note_appears_once_per_competition()
+    {
+        var digest = Upcoming(Night, Night);
+        digest = digest with { Matches = digest.Matches.Select((m, i) => m with { Round = 11 + i, Home = m.Home with { Form = "W" } }).ToList() };
+
+        Assert.Equal(1, SinglePage(digest, CardLocale.Vietnamese).Split("class=\"note\"").Length - 1);
+    }
+
+    [Fact]
+    public void Knockout_section_shows_stage_and_leg()
+    {
+        var digest = Upcoming(Night, Night);
+        digest = digest with { Matches = digest.Matches.Select(m => m with { Stage = "round-of-16", Leg = 1 }).ToList() };
+
+        Assert.Contains($"<h2>{WebUtility.HtmlEncode("VÒNG 1/8 · LƯỢT ĐI")}</h2>", SinglePage(digest, CardLocale.Vietnamese));
+        Assert.Contains($"<h2>{WebUtility.HtmlEncode("ROUND OF 16 · 1ST LEG")}</h2>", SinglePage(digest, CardLocale.English));
+    }
+
+    [Fact]
+    public void Merged_page_lists_every_competition_and_names_each_section()
+    {
+        var digest = new Digest(DigestKind.Results, [
+            TestData.Match("1", Night, MatchStatus.Finished, homeScore: 1, awayScore: 0) with { Round = 11 },
+            TestData.Match("2", Night, MatchStatus.Finished, homeScore: 1, awayScore: 0) with { Round = 11 },
+            TestData.Match("3", Night, MatchStatus.Finished, homeScore: 1, awayScore: 0) with { Competition = TestData.Competition("ita.1"), Round = 10 },
+        ], []);
+
+        var page = SinglePage(digest, CardLocale.Vietnamese);
+
+        Assert.Contains($"<p class=\"competition\">{WebUtility.HtmlEncode("NGOẠI HẠNG ANH · SERIE A")}</p>", page);
+        Assert.Contains($"<h2>{WebUtility.HtmlEncode("NGOẠI HẠNG ANH · LƯỢT TRẬN 11/38")}</h2>", page);
+        Assert.Contains($"<h2>{WebUtility.HtmlEncode("SERIE A · LƯỢT TRẬN 10/38")}</h2>", page);
     }
 
     [Fact]
@@ -251,14 +319,12 @@ public class CardHtmlTests
     }
 
     [Fact]
-    public void Results_over_many_days_have_no_date_range_and_do_not_say_last_night()
+    public void Results_over_many_days_have_no_date_range()
     {
         var page = SinglePage(Results(Night.AddDays(-6), Night.AddDays(-3), Night), CardLocale.Vietnamese);
 
         Assert.DoesNotContain("<div class=\"date\">", page);
         Assert.DoesNotContain("30/10 –", page);
-        Assert.Contains(WebUtility.HtmlEncode("Các trận gần đây"), page);
-        Assert.DoesNotContain("Đêm qua", page);
     }
 
     [Fact]
@@ -332,6 +398,25 @@ public class CardHtmlTests
         var theme = CardTheme.Load(Path.Combine(FindConfigDirectory(), "card.json"));
 
         Assert.All(new[] { theme.Surface, theme.SurfaceEnd, theme.SurfaceText, theme.SurfaceMuted }, Assert.NotEmpty);
+        Assert.All(TestData.Competitions, c => Assert.True(theme.Competitions?.ContainsKey(c.Slug), $"Thiếu màu riêng của {c.Slug}"));
+        Assert.Equal(theme.PageName, theme.For("eng.1").PageName);
+    }
+
+    [Fact]
+    public void Each_competition_uses_its_own_colours_and_falls_back_to_the_default()
+    {
+        var theme = Theme with { Competitions = new Dictionary<string, ThemeColors> { ["ita.1"] = new(Background: "#0E1B3D", Accent: "#7CC8FF") } };
+        var html = new CardHtml(TestData.Clubs, theme, "", "");
+        Match Serie(string id) => TestData.Match(id, Night) with { Competition = TestData.Competition("ita.1") };
+
+        var serie = html.BuildPages(new Digest(DigestKind.Upcoming, [Serie("1"), Serie("2")], []), CardLocale.Vietnamese).Single();
+        Assert.Contains("background: #0E1B3D", serie);
+        Assert.Contains("color: #7CC8FF", serie);
+        Assert.Contains("linear-gradient(90deg, #111, #222)", serie);
+
+        var english = html.BuildPages(Upcoming(Night, Night), CardLocale.Vietnamese).Single();
+        Assert.DoesNotContain("#0E1B3D", english);
+        Assert.Contains("background: #000", english);
     }
 
     private static string FindConfigDirectory()

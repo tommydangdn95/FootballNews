@@ -14,4 +14,7 @@ public interface IMatchSource
     /// không có thì lấy mùa hiện tại.
     /// </summary>
     Task<IReadOnlyList<TeamResult>> GetTeamResultsAsync(Competition competition, string teamId, int? season, CancellationToken ct);
+
+    /// <summary>Số trận đã đá của từng đội (id đội → số trận) theo bảng xếp hạng hiện tại của giải.</summary>
+    Task<IReadOnlyDictionary<string, int>> GetGamesPlayedAsync(Competition competition, CancellationToken ct);
 }

@@ -7,6 +7,7 @@ namespace FootballNews.Sources.Espn;
 public sealed class EspnMatchSource(HttpClient http) : IMatchSource
 {
     private const string BaseUrl = "https://site.api.espn.com/apis/site/v2/sports/soccer";
+    private const string StandingsUrl = "https://site.api.espn.com/apis/v2/sports/soccer";
     private const int MaxAttempts = 3;
 
     public async Task<IReadOnlyList<Match>> GetMatchesAsync(Competition competition, DateOnly date, CancellationToken ct)
@@ -26,6 +27,12 @@ public sealed class EspnMatchSource(HttpClient http) : IMatchSource
         var query = season is { } year ? $"?season={year}" : "";
         var json = await GetAsync($"{BaseUrl}/{competition.Slug}/teams/{teamId}/schedule{query}", ct);
         return EspnParser.ParseTeamSchedule(json, teamId, season);
+    }
+
+    public async Task<IReadOnlyDictionary<string, int>> GetGamesPlayedAsync(Competition competition, CancellationToken ct)
+    {
+        var json = await GetAsync($"{StandingsUrl}/{competition.Slug}/standings", ct);
+        return EspnParser.ParseGamesPlayed(json);
     }
 
     private async Task<string> GetAsync(string url, CancellationToken ct)

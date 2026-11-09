@@ -7,5 +7,15 @@
   "surfaceMuted": "#1D3A5F",
   "accent": "#A4F81C",
   "text": "#F8F8F8",
-  "muted": "#AFC0D6"
+  "muted": "#AFC0D6",
+  "competitions": {
+    "uefa.champions":   { "background": "#0A1640", "surface": "#5ED6FF", "surfaceEnd": "#B784FF", "surfaceText": "#0A1640", "surfaceMuted": "#2A2F6B", "accent": "#3CC8FF", "muted": "#A9B8D9" },
+    "uefa.europa":      { "background": "#1A1310", "surface": "#FF6A13", "surfaceEnd": "#FFB33F", "surfaceText": "#1A1310", "surfaceMuted": "#4A2A12", "accent": "#FF7A1A", "muted": "#D6BFAE" },
+    "uefa.europa.conf": { "background": "#0B0B0B", "surface": "#19E07A", "surfaceEnd": "#3FE0C5", "surfaceText": "#0B0B0B", "surfaceMuted": "#144232", "accent": "#19E07A", "muted": "#B5C9BF" },
+    "eng.1":            { "background": "#37003C", "surface": "#04F5FF", "surfaceEnd": "#00FF85", "surfaceText": "#37003C", "surfaceMuted": "#5A1F63", "accent": "#00FF85", "muted": "#D9B8DD" },
+    "esp.1":            { "background": "#00001B", "surface": "#FF4B44", "surfaceEnd": "#FF9A76", "surfaceText": "#00001B", "surfaceMuted": "#4A1414", "accent": "#FF4B44", "muted": "#B8B8D1" },
+    "ger.1":            { "background": "#2B2B30", "surface": "#FF2D45", "surfaceEnd": "#6E0016", "surfaceText": "#FFFFFF", "surfaceMuted": "#FFD6DA", "accent": "#FF5A66", "muted": "#D2C4C6" },
+    "ita.1":            { "background": "#0E1B3D", "surface": "#3D8BFF", "surfaceEnd": "#7CC8FF", "surfaceText": "#0E1B3D", "surfaceMuted": "#13306B", "accent": "#7CC8FF", "muted": "#A9BCE0" },
+    "fra.1":            { "background": "#1C1C1E", "surface": "#FF4FAD", "surfaceEnd": "#6F86FF", "surfaceText": "#FFFFFF", "surfaceMuted": "#F6E9FF", "accent": "#FF4FAD", "muted": "#C9C9D1" }
+  }
 }

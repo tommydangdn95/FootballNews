@@ -20,15 +20,44 @@ public static partial class EspnParser
                 Required(e, "id").GetString()!,
                 Required(e, "competitions")[0],
                 competition,
-                SeasonYear(e)))
+                SeasonYear(e),
+                SeasonSlug(e)))
             .ToList();
+    }
+
+    /// <summary>
+    /// Bảng xếp hạng (<c>apis/v2/.../standings</c>): id đội → số trận đã đá. Giải có nhiều bảng thì gộp tất cả.
+    /// </summary>
+    public static IReadOnlyDictionary<string, int> ParseGamesPlayed(string json)
+    {
+        using var doc = JsonDocument.Parse(json);
+        var result = new Dictionary<string, int>();
+        if (!doc.RootElement.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
+            return result;
+        foreach (var child in children.EnumerateArray())
+        {
+            if (!child.TryGetProperty("standings", out var standings) || !standings.TryGetProperty("entries", out var entries))
+                continue;
+            foreach (var entry in entries.EnumerateArray())
+            {
+                var teamId = Required(Required(entry, "team"), "id").GetString()!;
+                var played = Required(entry, "stats").EnumerateArray()
+                    .Where(st => st.TryGetProperty("name", out var n) && n.GetString() == "gamesPlayed")
+                    .Select(st => st.TryGetProperty("value", out var v) && v.ValueKind == JsonValueKind.Number ? (int?)v.GetDouble() : null)
+                    .FirstOrDefault();
+                if (played is { } count)
+                    result[teamId] = count;
+            }
+        }
+        return result;
     }
 
     public static Match ParseSummary(string json, string matchId, Competition competition)
     {
         using var doc = JsonDocument.Parse(json);
         var header = Required(doc.RootElement, "header");
-        return ParseCompetition(matchId, Required(header, "competitions")[0], competition, SeasonYear(header));
+        // Summary không có slug giai đoạn, nên trận lấy từ đây không có Stage.
+        return ParseCompetition(matchId, Required(header, "competitions")[0], competition, SeasonYear(header), null);
     }
 
     /// <summary>
@@ -91,13 +120,35 @@ public static partial class EspnParser
             ? y.GetInt32()
             : null;
 
+    private static string? SeasonSlug(JsonElement e) =>
+        e.TryGetProperty("season", out var s) && s.ValueKind == JsonValueKind.Object
+            && s.TryGetProperty("slug", out var slug) && slug.ValueKind == JsonValueKind.String
+            ? slug.GetString()
+            : null;
+
+    // Ghi chú trận hai lượt bắt đầu bằng "1st Leg" hoặc "2nd Leg", vd "2nd Leg - PSG advance 6-5 on aggregate".
+    private static int? ParseLeg(JsonElement c)
+    {
+        if (!c.TryGetProperty("notes", out var notes) || notes.ValueKind != JsonValueKind.Array)
+            return null;
+        foreach (var note in notes.EnumerateArray())
+        {
+            var headline = note.TryGetProperty("headline", out var h) && h.ValueKind == JsonValueKind.String ? h.GetString() ?? "" : "";
+            if (headline.StartsWith("1st Leg", StringComparison.OrdinalIgnoreCase))
+                return 1;
+            if (headline.StartsWith("2nd Leg", StringComparison.OrdinalIgnoreCase))
+                return 2;
+        }
+        return null;
+    }
+
     // Lịch đội trả score dạng object { value, displayValue }; scoreboard trả chuỗi.
     private static int? ReadScore(JsonElement competitor) =>
         competitor.TryGetProperty("score", out var score) && score.ValueKind == JsonValueKind.Object
             ? ReadInt(score, "value")
             : ReadInt(competitor, "score");
 
-    private static Match ParseCompetition(string id, JsonElement c, Competition competition, int? season)
+    private static Match ParseCompetition(string id, JsonElement c, Competition competition, int? season, string? stage)
     {
         var statusElement = Required(c, "status");
         var statusType = Required(statusElement, "type");
@@ -119,7 +170,7 @@ public static partial class EspnParser
 
         var statusName = statusType.TryGetProperty("name", out var n) ? n.GetString() : null;
         return new Match(id, competition, kickoff, status, ParseSide(home, status), ParseSide(away, status), events, ParseVenue(c), season,
-            statusName, ReadInt(statusElement, "period"));
+            statusName, ReadInt(statusElement, "period"), stage, ParseLeg(c));
     }
 
     // Không bắt buộc: thiếu tên sân thì ảnh chỉ không ghi sân.
