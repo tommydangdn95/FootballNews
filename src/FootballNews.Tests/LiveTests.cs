@@ -395,12 +395,12 @@ public class LiveSupportTests
         var home = new Team("359", "Arsenal", null);
         var away = new Team("306", "Hull City", null);
 
-        var normal = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull <City>", 1, 0, "BÀN THẮNG!", "Rice 23'", null, "#111", "#222"));
+        var normal = html.Build(new LiveCard(home, away, "Arsenal", "Hull <City>", 1, 0, "BÀN THẮNG!", "Rice 23'", null, "#111", "#222"));
         Assert.Contains("Hull &lt;City&gt;", normal);
         Assert.Contains(System.Net.WebUtility.HtmlEncode("BÀN THẮNG!"), normal);
         Assert.Contains("linear-gradient(135deg, #111 0%, #222 100%)", normal);
 
-        var custom = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 1, 0, "BÀN THẮNG!", null, ["VÀOOO!"], "#111", "#222"));
+        var custom = html.Build(new LiveCard(home, away, "Arsenal", "Hull City", 1, 0, "BÀN THẮNG!", null, ["VÀOOO!"], "#111", "#222"));
         Assert.Contains(System.Net.WebUtility.HtmlEncode("VÀOOO!"), custom);
         Assert.DoesNotContain(System.Net.WebUtility.HtmlEncode("BÀN THẮNG!"), custom);
     }
@@ -412,18 +412,18 @@ public class LiveSupportTests
         var home = new Team("359", "Arsenal", null);
         var away = new Team("306", "Hull City", null);
 
-        var page = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 1, 0, "KẾT THÚC", null, null, "#111", "#222",
+        var page = html.Build(new LiveCard(home, away, "Arsenal", "Hull City", 1, 0, "KẾT THÚC", null, null, "#111", "#222",
             ["Martin Ødegaard 90'+6' (pen)"], null));
 
         Assert.Contains("<span class=\"player\" data-short=\"M. &#216;degaard|&#216;degaard\">Martin &#216;degaard</span> 90&#39;+6&#39; (pen)", page);
         Assert.Equal(1, page.Split("class=\"events\"").Length - 1);
 
-        var card = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 1, 0, "KẾT THÚC", null, null, "#111", "#222",
+        var card = html.Build(new LiveCard(home, away, "Arsenal", "Hull City", 1, 0, "KẾT THÚC", null, null, "#111", "#222",
             null, [$"Smith 61' {Draft.RedCardMark}"]));
         Assert.Contains("61&#39;<i class=\"red-card\"></i></p>", card);
         Assert.DoesNotContain(Draft.RedCardMark, card);
 
-        var red = html.Build(new LiveCard("NGOẠI HẠNG ANH", home, away, "Arsenal", "Hull City", 0, 0, "THẺ ĐỎ", "Smith 61'", null, "#111", "#222",
+        var red = html.Build(new LiveCard(home, away, "Arsenal", "Hull City", 0, 0, "THẺ ĐỎ", "Smith 61'", null, "#111", "#222",
             RedCardIcon: true, TeamId: "306"));
         Assert.Contains("<i class=\"red-card big\"></i>", red);
         Assert.Contains("<div class=\"solo\"><div class=\"name\">Hull City</div></div>", red);

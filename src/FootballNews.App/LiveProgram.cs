@@ -119,7 +119,7 @@ internal static class LiveProgram
             if (name == "custom")
                 LiveSession.ApplyEdit(draft, "VÀOOOO!!!\nSiêu phẩm sút xa của Declan Rice\nArsenal 1-0 Hull City");
             var (from, to) = config.Gradient(draft.Kind);
-            var png = await renderer.RenderAsync(new LiveCard(competition.Name, home, away, clubs.DisplayName(home), clubs.DisplayName(away),
+            var png = await renderer.RenderAsync(new LiveCard(home, away, clubs.DisplayName(home), clubs.DisplayName(away),
                 draft.HomeScore, draft.AwayScore, draft.Title, draft.Detail, draft.CustomLines, from, to, draft.HomeLines, draft.AwayLines,
                 RedCardIcon: draft.Kind == LiveEventKind.RedCard, TeamId: draft.TeamId));
             await File.WriteAllBytesAsync(Path.Combine(dir, $"{name}.png"), png);

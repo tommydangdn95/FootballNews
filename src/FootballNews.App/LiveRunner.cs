@@ -401,7 +401,6 @@ internal sealed class LiveRunner(
             return null;
         var (from, to) = config.Gradient(draft.Kind);
         var card = new LiveCard(
-            FindCompetition(watch.Competition).Name,
             watch.Home,
             watch.Away,
             clubs.DisplayName(watch.Home),

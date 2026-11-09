@@ -12,7 +12,6 @@ namespace FootballNews.Rendering;
 /// <see cref="TeamId"/> cùng dòng chi tiết (cầu thủ, phút).
 /// </summary>
 public sealed record LiveCard(
-    string Competition,
     Team Home,
     Team Away,
     string HomeName,
@@ -40,7 +39,6 @@ public sealed class LiveCardHtml(string pageName, string boldFontBase64, string 
         var sb = new StringBuilder();
         sb.Append("<!DOCTYPE html><html lang=\"vi\"><head><meta charset=\"utf-8\"><style>").Append(Css(card)).Append("</style></head><body>");
         sb.Append("<div class=\"card\">");
-        sb.Append($"<div class=\"competition\">{E(card.Competition)}</div>");
         sb.Append("<main>");
 
         if (card.CustomLines is { Count: > 0 } lines)
@@ -177,7 +175,6 @@ public sealed class LiveCardHtml(string pageName, string boldFontBase64, string 
         body { width: 1080px; height: 1080px; font-family: BVP, sans-serif; font-weight: 700; color: #FFFFFF; }
         .card { width: 1080px; height: 1080px; padding: 64px 56px 48px; display: flex; flex-direction: column;
                 background: linear-gradient(135deg, {{card.GradientFrom}} 0%, {{card.GradientTo}} 100%); }
-        .competition { font-size: 30px; letter-spacing: 4px; text-align: center; opacity: .85; }
         main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 44px; text-align: center; }
         .title { font-size: 92px; line-height: 1.1; letter-spacing: 2px; text-shadow: 0 6px 24px rgba(0,0,0,.25); }
         .teams { width: 100%; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 24px; }

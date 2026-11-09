@@ -265,7 +265,7 @@ Chủ trang chọn **một trận** để theo dõi. Khi trận đấu có sự 
 
 ### 13.5 Nội dung bài đăng
 - **Chỉ tiếng Việt.** Tên đội lấy từ `clubs.json` như bài hằng ngày.
-- **Ảnh vuông 1080×1080** (`LiveCardHtml`), nền chuyển màu (giống kiểu bài chữ nền màu của Facebook, vì Graph API không hỗ trợ chính thức kiểu bài đó), chữ trắng đậm ở giữa: tên giải, tiêu đề, logo và tên hai đội, tỉ số, dòng chi tiết, chân ảnh có logo và tên trang. Không dùng emoji trên ảnh. Mỗi loại sự kiện một bộ màu, sửa trong `config/live.json` (`gradients`). Bản nháp đã sửa thì ảnh chỉ vẽ các dòng chủ trang gõ, cỡ chữ tự nhỏ lại theo độ dài.
+- **Ảnh vuông**, bố cục theo khung 1080×1080 và chụp ra 2048×2048 cho nét (`LiveCardHtml`), nền chuyển màu (giống kiểu bài chữ nền màu của Facebook, vì Graph API không hỗ trợ chính thức kiểu bài đó), chữ trắng đậm ở giữa: tiêu đề (không ghi tên giải), logo và tên hai đội, tỉ số, dòng chi tiết, chân ảnh có logo và tên trang. Không dùng emoji trên ảnh. Mỗi loại sự kiện một bộ màu, sửa trong `config/live.json` (`gradients`). Bản nháp đã sửa thì ảnh chỉ vẽ các dòng chủ trang gõ, cỡ chữ tự nhỏ lại theo độ dài.
 - Xem trước ảnh mọi loại sự kiện: `dotnet run --project src/FootballNews.App -- live --preview`, ảnh và caption nằm trong `output/live-preview/`.
 - Không vẽ được ảnh thì bản nháp gửi dạng chữ và bài đăng dạng chữ (`/feed`).
 - Mẫu chữ trên ảnh:
