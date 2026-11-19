@@ -617,6 +617,30 @@
       "status": "scheduled",
       "competition": "esp.1",
       "announcedAt": "2026-11-18T00:01:40.8286273+00:00"
+    },
+    "401874989": {
+      "kickoffUtc": "2026-11-22T17:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-19T00:01:06.893634+00:00"
+    },
+    "401875001": {
+      "kickoffUtc": "2026-11-22T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-19T00:01:06.893634+00:00"
+    },
+    "401875009": {
+      "kickoffUtc": "2026-11-23T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-19T00:01:06.893634+00:00"
+    },
+    "401876400": {
+      "kickoffUtc": "2026-11-22T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-19T00:01:06.893634+00:00"
     }
   },
   "results": {
