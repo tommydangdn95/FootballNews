@@ -15,6 +15,12 @@ public sealed record ReportWindow(DateTimeOffset Start, DateTimeOffset End)
     public const int UpcomingDays = 5;
 
     /// <summary>
+    /// Bài lịch lấy thêm chừng này ngày sau khung để có đủ vòng đấu của các trận trong khung.
+    /// Một vòng VĐQG kéo dài từ thứ Sáu đến thứ Hai, một lượt cúp châu Âu hai ngày, nên một tuần là đủ.
+    /// </summary>
+    public const int RoundCompletionDays = 7;
+
+    /// <summary>
     /// Chạy force lấy kết quả 7 ngày: giải quốc nội đá hằng tuần nên có vòng gần nhất.
     /// Cúp châu Âu không đá mỗi tuần nên có thể không có trận nào trong khung này.
     /// </summary>

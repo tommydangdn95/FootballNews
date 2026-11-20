@@ -82,7 +82,10 @@ try
     var competitions = CompetitionCatalog.Load(Path.Combine(root, "config", "competitions.json"));
     var theme = CardTheme.Load(Path.Combine(root, "config", "card.json"));
     var pageLogo = Convert.ToBase64String(File.ReadAllBytes(Path.Combine(root, "assets", "logo.png")));
-    var renderer = new CardRenderer(new CardHtml(clubs, theme, LoadFont("Bold"), LoadFont("Medium"), pageLogo));
+    var (bold, medium) = (LoadFont("Bold"), LoadFont("Medium"));
+    var renderer = new CardRenderer(
+        new CardHtml(clubs, theme, bold, medium, pageLogo),
+        new StandingsHtml(clubs, theme, bold, medium, pageLogo));
 
     // Job daily gửi lịch theo nhóm giải của từng thứ. Chạy force hoặc chạy tay upcoming thì gửi đủ mọi giải.
     var scheduled = args[0] == "daily" && !force;
@@ -105,7 +108,7 @@ try
         saveState: !dryRun && !force);
 
     if (force)
-        await publisher.NotifyAsync($"🧪 Chạy force ({args[0]}, {date:yyyy-MM-dd}): gửi đầy đủ mọi giải (kết quả {ReportWindow.AllRecentResultsDays} ngày qua, lịch {ReportWindow.UpcomingDays} ngày tới), không lưu trạng thái.", cts.Token);
+        await publisher.NotifyAsync($"🧪 Chạy force ({args[0]}, {date:yyyy-MM-dd}): gửi đầy đủ mọi giải (kết quả {ReportWindow.AllRecentResultsDays} ngày qua, lịch {ReportWindow.UpcomingDays} ngày tới, đủ cả vòng), không lưu trạng thái.", cts.Token);
 
     await runner.RunAsync(kinds, date, cts.Token);
     return 0;

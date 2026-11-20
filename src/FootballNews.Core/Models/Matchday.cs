@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FootballNews.Core.Filtering;
 
 namespace FootballNews.Core.Models;
 
@@ -62,6 +63,30 @@ public static partial class Matchday
             .Where(m => m.Round is null || m.Round == latest[(m.Competition.Slug, m.Stage)])
             .ToList();
     }
+
+    /// <summary>
+    /// Giữ các trận trong <paramref name="window"/>, thêm các trận sau khung cùng vòng với một trận trong khung,
+    /// để bài lịch có đủ cả vòng (vd vòng kéo sang thứ Hai, hay ngày thứ hai của lượt cúp châu Âu).
+    /// Vòng: giải đánh số theo <see cref="Match.Round"/>, vòng loại trực tiếp theo giai đoạn và lượt.
+    /// Trận không xác định được vòng chỉ được giữ khi nằm trong khung.
+    /// </summary>
+    public static IReadOnlyList<Match> CompleteRounds(IReadOnlyList<Match> matches, ReportWindow window)
+    {
+        var rounds = matches
+            .Where(m => window.Contains(m.KickoffUtc))
+            .Select(RoundKey)
+            .OfType<(string, string, int?, int?)>()
+            .ToHashSet();
+        return matches
+            .Where(m => window.Contains(m.KickoffUtc)
+                || (m.KickoffUtc >= window.End && RoundKey(m) is { } key && rounds.Contains(key)))
+            .ToList();
+    }
+
+    private static (string Slug, string Stage, int? Round, int? Leg)? RoundKey(Match m) =>
+        m.Stage is null || (IsNumbered(m.Stage) && m.Round is null)
+            ? null
+            : (m.Competition.Slug, m.Stage, m.Round, m.Leg);
 
     [GeneratedRegex(@"^\d{4}-\d{2}-")]
     private static partial Regex LeagueSeason();

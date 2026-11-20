@@ -63,6 +63,30 @@ public static class DigestText
         return $"{string.Join(" + ", titles)}\n{string.Join(" + ", counts)} trận · {DateRange([.. updates, .. matches])} · {pageCount} ảnh\n{LightRule}";
     }
 
+    /// <summary>Tin mở đầu bài bảng xếp hạng, gửi sau bài kết quả.</summary>
+    public static string StandingsHeader(IReadOnlyList<Standings> tables, DateOnly vietnamDate)
+    {
+        var lines = new List<string>
+        {
+            HeavyRule,
+            "📊 BẢNG XẾP HẠNG",
+            $"Gửi lúc: {VietnameseCalendar.Weekday(vietnamDate)}, {vietnamDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}",
+            $"Cập nhật sau kết quả: {tables.Count} giải",
+            "",
+        };
+        lines.AddRange(tables.Select(t => $"{t.Competition.Emoji} {TitleCase(t.Competition.Name)}{RoundText(t, " · ")}"));
+        lines.Add(HeavyRule);
+        return string.Join('\n', lines);
+    }
+
+    /// <param name="pageCount">Số ảnh của mỗi bản ngôn ngữ.</param>
+    public static string StandingsSection(Standings table, int pageCount) =>
+        $"{table.Competition.Emoji} {table.Competition.Name}\n{RoundText(table, "", " · ")}{table.Rows.Count} đội · {pageCount} ảnh\n{LightRule}";
+
+    private static string RoundText(Standings table, string before, string after = "") => table.Round is { } round
+        ? $"{before}Vòng {round}{after}"
+        : "";
+
     private static List<List<Match>> ByCompetition(IEnumerable<Match> matches) => matches
         .GroupBy(m => m.Competition.Slug)
         .Select(g => g.ToList())

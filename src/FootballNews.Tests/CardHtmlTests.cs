@@ -119,9 +119,10 @@ public class CardHtmlTests
     [InlineData("esp.1", "Spanish time")]
     [InlineData("ger.1", "German time")]
     [InlineData("fra.1", "French time")]
-    public void English_page_uses_the_home_country_time_for_spain_germany_and_france(string slug, string label)
+    [InlineData("ita.1", "Italian time")]
+    public void English_page_uses_the_home_country_time_for_spain_germany_france_and_italy(string slug, string label)
     {
-        // 20:00 UTC ngày 04/11 là 21:00 giờ Tây Ban Nha/Đức/Pháp (CET).
+        // 20:00 UTC ngày 04/11 là 21:00 giờ Tây Ban Nha/Đức/Pháp/Ý (CET).
         var match = TestData.Match("1", Night) with { Competition = TestData.Competition(slug) };
         var digest = new Digest(DigestKind.Upcoming, [match], []);
 
