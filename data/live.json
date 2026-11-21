@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png"
     },
     "homeScore": 1,
-    "awayScore": 3,
+    "awayScore": 4,
     "goals": [
       {
         "id": "g1",
@@ -47,6 +47,14 @@
         "minute": "58'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g5",
+        "teamId": "357",
+        "player": "Aaronson",
+        "minute": "90'+1'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -54,7 +62,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 5,
+    "nextGoalId": 6,
     "autopilot": true
   },
   "drafts": [
@@ -163,11 +171,32 @@
       "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g4",
       "varWarning": false,
+      "telegramMessageId": 83,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114096631539980"
+    },
+    {
+      "id": 22,
+      "kind": "goal",
+      "createdAt": "2026-11-21T16:55:16.2665416+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 4,
+      "title": "VÀOOOOO",
+      "detail": "Aaronson 90'+1'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Aaronson 90'+1' ghi bàn cho Leeds United! Chelsea 1-4 Leeds United",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g5",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114096631539980"
+      "facebookPostId": "1302280479644878_122114105691539980"
     }
   ],
-  "nextDraftId": 22,
+  "nextDraftId": 23,
   "editingDraftId": null
 }
