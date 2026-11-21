@@ -34,7 +34,7 @@
       }
     ],
     "redCards": [],
-    "halfTimeDone": false,
+    "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
@@ -80,11 +80,36 @@
       "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g2",
       "varWarning": false,
+      "telegramMessageId": 80,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114080293539980"
+    },
+    {
+      "id": 19,
+      "kind": "halfTime",
+      "createdAt": "2026-11-21T15:51:57.7082551+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 1,
+      "title": "HẾT HIỆP 1",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Emegha 25'"
+      ],
+      "awayLines": [
+        "Okafor 28'"
+      ],
+      "customLines": null,
+      "text": "⏸️ Hết hiệp 1: Chelsea 1-1 Leeds United\n⚽ Chelsea: Emegha 25'\n⚽ Leeds United: Okafor 28'",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114080293539980"
+      "facebookPostId": "1302280479644878_122114086863539980"
     }
   ],
-  "nextDraftId": 19,
+  "nextDraftId": 20,
   "editingDraftId": null
 }
