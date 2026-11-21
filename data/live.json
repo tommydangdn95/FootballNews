@@ -14,13 +14,21 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png"
     },
     "homeScore": 1,
-    "awayScore": 0,
+    "awayScore": 1,
     "goals": [
       {
         "id": "g1",
         "teamId": "363",
         "player": "Emegha",
         "minute": "25'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "357",
+        "player": "Okafor",
+        "minute": "28'",
         "type": "goal",
         "cancelled": false
       }
@@ -30,7 +38,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 2,
+    "nextGoalId": 3,
     "autopilot": true
   },
   "drafts": [
@@ -51,11 +59,32 @@
       "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g1",
       "varWarning": false,
+      "telegramMessageId": 79,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114079435539980"
+    },
+    {
+      "id": 18,
+      "kind": "goal",
+      "createdAt": "2026-11-21T15:30:50.936766+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 1,
+      "title": "VÀOOOOO",
+      "detail": "Okafor 28'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Okafor 28' ghi bàn cho Leeds United! Chelsea 1-1 Leeds United",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g2",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114079435539980"
+      "facebookPostId": "1302280479644878_122114080293539980"
     }
   ],
-  "nextDraftId": 18,
+  "nextDraftId": 19,
   "editingDraftId": null
 }
