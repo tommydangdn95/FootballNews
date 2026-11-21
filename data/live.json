@@ -1,5 +1,38 @@
 {
-  "watch": null,
+  "watch": {
+    "matchId": "401879233",
+    "competition": "eng.1",
+    "kickoffUtc": "2026-11-21T12:30:00+00:00",
+    "home": {
+      "id": "382",
+      "name": "Manchester City",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/382.png"
+    },
+    "away": {
+      "id": "370",
+      "name": "Fulham",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/370.png"
+    },
+    "homeScore": 0,
+    "awayScore": 1,
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "370",
+        "player": "Muniz",
+        "minute": "16'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
+    "redCards": [],
+    "halfTimeDone": false,
+    "endOfRegulationDone": false,
+    "hadExtraTime": false,
+    "fullTimeDone": false,
+    "nextGoalId": 2,
+    "autopilot": false
+  },
   "drafts": [],
   "nextDraftId": 14,
   "editingDraftId": null
