@@ -26,14 +26,38 @@
       }
     ],
     "redCards": [],
-    "halfTimeDone": false,
+    "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
     "nextGoalId": 2,
     "autopilot": false
   },
-  "drafts": [],
-  "nextDraftId": 14,
+  "drafts": [
+    {
+      "id": 14,
+      "kind": "halfTime",
+      "createdAt": "2026-11-21T13:20:29.4705669+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 1,
+      "title": "HẾT HIỆP 1",
+      "detail": null,
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": [
+        "Muniz 16'"
+      ],
+      "customLines": null,
+      "text": "⏸️ Hết hiệp 1: Man City 0-1 Fulham\n⚽ Fulham: Muniz 16'",
+      "hashtags": "#ManCity #Fulham #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": 66,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114043825539980"
+    }
+  ],
+  "nextDraftId": 15,
   "editingDraftId": null
 }
