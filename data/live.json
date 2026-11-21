@@ -13,7 +13,7 @@
       "name": "Arsenal",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
     },
-    "homeScore": 0,
+    "homeScore": 1,
     "awayScore": 1,
     "goals": [
       {
@@ -23,6 +23,14 @@
         "minute": "33'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "361",
+        "player": "Barnes",
+        "minute": "49'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -30,7 +38,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 2,
+    "nextGoalId": 3,
     "autopilot": true
   },
   "drafts": [
@@ -74,11 +82,32 @@
       "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
       "goalId": null,
       "varWarning": false,
+      "telegramMessageId": 97,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114132397539980"
+    },
+    {
+      "id": 26,
+      "kind": "goal",
+      "createdAt": "2026-11-21T18:38:52.6551569+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 1,
+      "title": "VÀOOOOO",
+      "detail": "Barnes 49'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Barnes 49' ghi bàn cho Newcastle! Newcastle 1-1 Arsenal",
+      "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g2",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114132397539980"
+      "facebookPostId": "1302280479644878_122114140521539980"
     }
   ],
-  "nextDraftId": 26,
+  "nextDraftId": 27,
   "editingDraftId": null
 }
