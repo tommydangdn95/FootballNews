@@ -14,17 +14,48 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
     },
     "homeScore": 0,
-    "awayScore": 0,
-    "goals": [],
+    "awayScore": 1,
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "359",
+        "player": "Eze",
+        "minute": "33'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
     "redCards": [],
     "halfTimeDone": false,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 1,
+    "nextGoalId": 2,
     "autopilot": true
   },
-  "drafts": [],
-  "nextDraftId": 24,
+  "drafts": [
+    {
+      "id": 24,
+      "kind": "goal",
+      "createdAt": "2026-11-21T18:07:19.1968058+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 1,
+      "title": "VÀOOOOO",
+      "detail": "Eze 33'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Eze 33' mở tỉ số cho Arsenal! Newcastle 0-1 Arsenal",
+      "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g1",
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": "1302280479644878_122114127819539980"
+    }
+  ],
+  "nextDraftId": 25,
   "editingDraftId": null
 }
