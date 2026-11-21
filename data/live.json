@@ -26,7 +26,7 @@
       }
     ],
     "redCards": [],
-    "halfTimeDone": false,
+    "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
@@ -51,11 +51,34 @@
       "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g1",
       "varWarning": false,
+      "telegramMessageId": 96,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114127819539980"
+    },
+    {
+      "id": 25,
+      "kind": "halfTime",
+      "createdAt": "2026-11-21T18:17:50.1281763+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 1,
+      "title": "HẾT HIỆP 1",
+      "detail": null,
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": [
+        "Eze 33'"
+      ],
+      "customLines": null,
+      "text": "⏸️ Hết hiệp 1: Newcastle 0-1 Arsenal\n⚽ Arsenal: Eze 33'",
+      "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114127819539980"
+      "facebookPostId": "1302280479644878_122114132397539980"
     }
   ],
-  "nextDraftId": 25,
+  "nextDraftId": 26,
   "editingDraftId": null
 }
