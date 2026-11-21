@@ -13,7 +13,7 @@
       "name": "Fulham",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/370.png"
     },
-    "homeScore": 0,
+    "homeScore": 1,
     "awayScore": 1,
     "goals": [
       {
@@ -23,14 +23,22 @@
         "minute": "16'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "382",
+        "player": "Anderson",
+        "minute": "57'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
-    "nextGoalId": 2,
+    "fullTimeDone": true,
+    "nextGoalId": 3,
     "autopilot": false
   },
   "drafts": [
@@ -56,8 +64,54 @@
       "telegramMessageId": 66,
       "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122114043825539980"
+    },
+    {
+      "id": 15,
+      "kind": "goal",
+      "createdAt": "2026-11-21T13:48:37.7057394+00:00",
+      "status": "expired",
+      "homeScore": 1,
+      "awayScore": 1,
+      "title": "VÀOOOOO",
+      "detail": "Anderson 57'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Anderson 57' ghi bàn cho Man City! Man City 1-1 Fulham",
+      "hashtags": "#ManCity #Fulham #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g2",
+      "varWarning": false,
+      "telegramMessageId": 67,
+      "telegramIsPhoto": true,
+      "facebookPostId": null
+    },
+    {
+      "id": 16,
+      "kind": "fullTime",
+      "createdAt": "2026-11-21T14:23:48.7711077+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 1,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Anderson 57'"
+      ],
+      "awayLines": [
+        "Muniz 16'"
+      ],
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Man City 1-1 Fulham\n⚽ Man City: Anderson 57'\n⚽ Fulham: Muniz 16'",
+      "hashtags": "#ManCity #Fulham #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": 68,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114063055539980"
     }
   ],
-  "nextDraftId": 15,
+  "nextDraftId": 17,
   "editingDraftId": null
 }
