@@ -13,7 +13,7 @@
       "name": "Arsenal",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
     },
-    "homeScore": 1,
+    "homeScore": 2,
     "awayScore": 1,
     "goals": [
       {
@@ -31,6 +31,14 @@
         "minute": "49'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g3",
+        "teamId": "361",
+        "player": "Thiaw",
+        "minute": "62'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -38,7 +46,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 3,
+    "nextGoalId": 4,
     "autopilot": true
   },
   "drafts": [
@@ -103,11 +111,32 @@
       "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g2",
       "varWarning": false,
+      "telegramMessageId": 98,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114140521539980"
+    },
+    {
+      "id": 27,
+      "kind": "goal",
+      "createdAt": "2026-11-21T18:52:54.1066517+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 1,
+      "title": "VÀOOOOO",
+      "detail": "Thiaw 62'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Thiaw 62' ghi bàn cho Newcastle! Newcastle 2-1 Arsenal",
+      "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g3",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114140521539980"
+      "facebookPostId": "1302280479644878_122114145111539980"
     }
   ],
-  "nextDraftId": 27,
+  "nextDraftId": 28,
   "editingDraftId": null
 }
