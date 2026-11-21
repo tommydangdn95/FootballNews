@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
     },
     "homeScore": 2,
-    "awayScore": 1,
+    "awayScore": 2,
     "goals": [
       {
         "id": "g1",
@@ -39,6 +39,14 @@
         "minute": "62'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g4",
+        "teamId": "359",
+        "player": "Madueke",
+        "minute": "78'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -46,7 +54,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 4,
+    "nextGoalId": 5,
     "autopilot": true
   },
   "drafts": [
@@ -132,11 +140,32 @@
       "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g3",
       "varWarning": false,
+      "telegramMessageId": 99,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114145111539980"
+    },
+    {
+      "id": 28,
+      "kind": "goal",
+      "createdAt": "2026-11-21T19:06:56.0112084+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 2,
+      "title": "VÀOOOOO",
+      "detail": "Madueke 78'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Madueke 78' ghi bàn cho Arsenal! Newcastle 2-2 Arsenal",
+      "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g4",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114145111539980"
+      "facebookPostId": "1302280479644878_122114148675539980"
     }
   ],
-  "nextDraftId": 28,
+  "nextDraftId": 29,
   "editingDraftId": null
 }
