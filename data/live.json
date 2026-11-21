@@ -61,7 +61,7 @@
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
+    "fullTimeDone": true,
     "nextGoalId": 6,
     "autopilot": true
   },
@@ -192,11 +192,39 @@
       "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g5",
       "varWarning": false,
+      "telegramMessageId": 84,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114105691539980"
+    },
+    {
+      "id": 23,
+      "kind": "fullTime",
+      "createdAt": "2026-11-21T17:02:16.9702427+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 4,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Emegha 25'"
+      ],
+      "awayLines": [
+        "Okafor 28'",
+        "Calvert-Lewin 53' (pen)",
+        "Okafor 58'",
+        "Aaronson 90'+1'"
+      ],
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Chelsea 1-4 Leeds United\n⚽ Chelsea: Emegha 25'\n⚽ Leeds United: Okafor 28', Calvert-Lewin 53' (pen), Okafor 58', Aaronson 90'+1'",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114105691539980"
+      "facebookPostId": "1302280479644878_122114107635539980"
     }
   ],
-  "nextDraftId": 23,
+  "nextDraftId": 24,
   "editingDraftId": null
 }
