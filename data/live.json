@@ -53,7 +53,7 @@
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
+    "fullTimeDone": true,
     "nextGoalId": 5,
     "autopilot": true
   },
@@ -161,11 +161,38 @@
       "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g4",
       "varWarning": false,
+      "telegramMessageId": 100,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114148675539980"
+    },
+    {
+      "id": 29,
+      "kind": "fullTime",
+      "createdAt": "2026-11-21T19:27:58.8544997+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 2,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Barnes 49'",
+        "Thiaw 62'"
+      ],
+      "awayLines": [
+        "Eze 33'",
+        "Madueke 78'"
+      ],
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Newcastle 2-2 Arsenal\n⚽ Newcastle: Barnes 49', Thiaw 62'\n⚽ Arsenal: Eze 33', Madueke 78'",
+      "hashtags": "#Newcastle #Arsenal #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114148675539980"
+      "facebookPostId": "1302280479644878_122114155203539980"
     }
   ],
-  "nextDraftId": 29,
+  "nextDraftId": 30,
   "editingDraftId": null
 }
