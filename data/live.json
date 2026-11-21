@@ -1,5 +1,29 @@
 {
-  "watch": null,
+  "watch": {
+    "matchId": "401879232",
+    "competition": "eng.1",
+    "kickoffUtc": "2026-11-21T17:30:00+00:00",
+    "home": {
+      "id": "361",
+      "name": "Newcastle United",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/361.png"
+    },
+    "away": {
+      "id": "359",
+      "name": "Arsenal",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
+    },
+    "homeScore": 0,
+    "awayScore": 0,
+    "goals": [],
+    "redCards": [],
+    "halfTimeDone": false,
+    "endOfRegulationDone": false,
+    "hadExtraTime": false,
+    "fullTimeDone": false,
+    "nextGoalId": 1,
+    "autopilot": false
+  },
   "drafts": [],
   "nextDraftId": 24,
   "editingDraftId": null
