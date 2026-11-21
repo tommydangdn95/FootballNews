@@ -1,3 +1,4 @@
+using FootballNews.Core.Filtering;
 using FootballNews.Core.Models;
 
 namespace FootballNews.Tests;
@@ -83,5 +84,60 @@ public class MatchdayTests
         ], new Dictionary<string, int> { ["a"] = 4, ["b"] = 4 });
 
         Assert.All(matches, m => Assert.Null(m.Round));
+    }
+
+    // Khung từ thứ Năm đến hết Chủ nhật 08/11 (UTC) cho các test đủ vòng.
+    private static readonly ReportWindow ThroughSunday = new(Saturday.AddDays(-2), new DateTimeOffset(2026, 11, 9, 0, 0, 0, TimeSpan.Zero));
+
+    [Fact]
+    public void Complete_rounds_adds_later_matches_of_a_round_started_in_the_window()
+    {
+        var ids = Matchday.CompleteRounds([
+            Game("1", "a", "b", Saturday) with { Round = 12 },
+            Game("2", "c", "d", Saturday.AddDays(2)) with { Round = 12 },
+            Game("3", "a", "c", Saturday.AddDays(7)) with { Round = 13 },
+        ], ThroughSunday).Select(m => m.Id);
+
+        Assert.Equal(["1", "2"], ids);
+    }
+
+    [Fact]
+    public void Complete_rounds_keeps_rounds_apart_per_competition()
+    {
+        var serieA = TestData.Competition("ita.1");
+        var ids = Matchday.CompleteRounds([
+            Game("1", "a", "b", Saturday) with { Round = 12 },
+            Game("2", "c", "d", Saturday.AddDays(2), stage: "2026-27-italian-serie-a") with { Competition = serieA, Round = 12 },
+        ], ThroughSunday).Select(m => m.Id);
+
+        Assert.Equal(["1"], ids);
+    }
+
+    [Fact]
+    public void Complete_rounds_matches_knockout_ties_by_stage_and_leg()
+    {
+        var ucl = TestData.Competition("uefa.champions");
+        Match Tie(string id, DateTimeOffset kickoff, int leg) =>
+            Game(id, id + "h", id + "a", kickoff, stage: "round-of-16") with { Competition = ucl, Leg = leg };
+
+        var ids = Matchday.CompleteRounds([
+            Tie("1", Saturday, 1),
+            Tie("2", Saturday.AddDays(2), 1),
+            Tie("3", Saturday.AddDays(5), 2),
+        ], ThroughSunday).Select(m => m.Id);
+
+        Assert.Equal(["1", "2"], ids);
+    }
+
+    [Fact]
+    public void Complete_rounds_keeps_matches_without_a_round_only_inside_the_window()
+    {
+        var ids = Matchday.CompleteRounds([
+            Game("1", "a", "b", Saturday),
+            Game("2", "c", "d", Saturday.AddDays(2)),
+            Game("3", "e", "f", Saturday.AddDays(2), stage: null),
+        ], ThroughSunday).Select(m => m.Id);
+
+        Assert.Equal(["1"], ids);
     }
 }

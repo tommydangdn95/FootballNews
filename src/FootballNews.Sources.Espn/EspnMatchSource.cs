@@ -29,10 +29,10 @@ public sealed class EspnMatchSource(HttpClient http) : IMatchSource
         return EspnParser.ParseTeamSchedule(json, teamId, season);
     }
 
-    public async Task<IReadOnlyDictionary<string, int>> GetGamesPlayedAsync(Competition competition, CancellationToken ct)
+    public async Task<Standings> GetStandingsAsync(Competition competition, CancellationToken ct)
     {
         var json = await GetAsync($"{StandingsUrl}/{competition.Slug}/standings", ct);
-        return EspnParser.ParseGamesPlayed(json);
+        return EspnParser.ParseStandings(json, competition);
     }
 
     private async Task<string> GetAsync(string url, CancellationToken ct)

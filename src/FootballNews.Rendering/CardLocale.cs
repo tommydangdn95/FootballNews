@@ -21,17 +21,22 @@ public sealed record CardLocale(
     string OwnGoal,
     Func<Competition, string> CompetitionName,
     Func<DateOnly, string> ShortDate,
-    Func<Competition?, string> FormNote)
+    Func<Competition?, string> FormNote,
+    string StandingsTitle,
+    IReadOnlyList<string> StandingsColumns,
+    Func<int, string> StandingsRound,
+    Func<string, string> Zone)
 {
     // Giờ châu Âu đổi theo mùa nên phải dùng múi giờ thật, không dùng độ lệch cố định.
     private static readonly (TimeZoneInfo Zone, string Label) UkTime = (TimeZoneInfo.FindSystemTimeZoneById("Europe/London"), "UK time");
 
-    // Ảnh tiếng Anh ghi giờ của nước chủ nhà với giải quốc nội; giải khác (Anh, cúp châu Âu, Ý) dùng giờ Anh.
+    // Ảnh tiếng Anh ghi giờ của nước chủ nhà với giải quốc nội; giải khác (Anh, cúp châu Âu) dùng giờ Anh.
     private static readonly Dictionary<string, (TimeZoneInfo Zone, string Label)> LeagueTime = new()
     {
         ["esp.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid"), "Spanish time"),
         ["ger.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"), "German time"),
         ["fra.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris"), "French time"),
+        ["ita.1"] = (TimeZoneInfo.FindSystemTimeZoneById("Europe/Rome"), "Italian time"),
     };
 
     private static (TimeZoneInfo Zone, string Label) EnglishTime(Competition c) =>
@@ -61,7 +66,28 @@ public sealed record CardLocale(
         OwnGoal: "phản lưới",
         CompetitionName: c => c.Name,
         ShortDate: d => d.ToString("dd/MM", CultureInfo.InvariantCulture),
-        FormNote: c => $"Phong độ {TeamForm.MaxMatches} trận gần nhất tại {(c is null ? "giải của từng trận" : TitleCase(c.Name))} mùa này, trận mới nhất bên phải");
+        FormNote: c => $"Phong độ {TeamForm.MaxMatches} trận gần nhất tại {(c is null ? "giải của từng trận" : TitleCase(c.Name))} mùa này, trận mới nhất bên phải",
+        StandingsTitle: "BẢNG XẾP HẠNG",
+        // Hạng, đội, trận, thắng, hoà, bại, hiệu số, điểm, phong độ.
+        StandingsColumns: ["HẠNG", "ĐỘI", "TR", "T", "H", "B", "HS", "Đ", "PHONG ĐỘ"],
+        StandingsRound: n => $"VÒNG {n}",
+        Zone: zone => zone.ToLowerInvariant() switch
+        {
+            "champions league" => "Champions League",
+            "champions league qualifying" => "Vòng loại Champions League",
+            "europa league" => "Europa League",
+            "europa league qualifying" => "Vòng loại Europa League",
+            "conference league" => "Conference League",
+            "conference league qualifying" => "Vòng loại Conference League",
+            "relegation" or "relegated" => "Xuống hạng",
+            "relegation playoff" => "Play-off trụ hạng",
+            "promotion" => "Lên hạng",
+            "qualifies for round of 16" => "Vào thẳng vòng 1/8",
+            "knockout phase playoffs - seeded" => "Play-off (nhóm hạt giống)",
+            "knockout phase playoffs - unseeded" => "Play-off (nhóm không hạt giống)",
+            "eliminated" => "Bị loại",
+            _ => zone,
+        });
 
     public static readonly CardLocale English = new(
         Code: "en",
@@ -91,7 +117,18 @@ public sealed record CardLocale(
         ShortDate: d => d.ToString("d MMM", CultureInfo.InvariantCulture),
         FormNote: c => c is null
             ? $"Form: last {TeamForm.MaxMatches} matches in each fixture's competition this season, most recent on the right"
-            : $"Form: last {TeamForm.MaxMatches} {TitleCase(c.EnglishName)} matches this season, most recent on the right");
+            : $"Form: last {TeamForm.MaxMatches} {TitleCase(c.EnglishName)} matches this season, most recent on the right",
+        StandingsTitle: "STANDINGS",
+        StandingsColumns: ["RANK", "TEAMS", "PLD", "WON", "DRA", "LOS", "GD", "PTS", "FORM"],
+        StandingsRound: n => $"MATCHDAY {n}",
+        Zone: zone => zone.ToLowerInvariant() switch
+        {
+            "relegated" => "Relegation",
+            "knockout phase playoffs - seeded" => "Knockout play-offs (seeded)",
+            "knockout phase playoffs - unseeded" => "Knockout play-offs (unseeded)",
+            "qualifies for round of 16" => "Round of 16",
+            _ => zone.Length > 0 ? char.ToUpperInvariant(zone[0]) + zone[1..] : zone,
+        });
 
     // Tên giải trong config viết hoa (dùng cho tiêu đề); câu chú thích cần viết thường.
     private static string TitleCase(string name) =>

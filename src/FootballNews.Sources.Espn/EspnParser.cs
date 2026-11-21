@@ -26,30 +26,50 @@ public static partial class EspnParser
     }
 
     /// <summary>
-    /// Bảng xếp hạng (<c>apis/v2/.../standings</c>): id đội → số trận đã đá. Giải có nhiều bảng thì gộp tất cả.
+    /// Bảng xếp hạng (<c>apis/v2/.../standings</c>), xếp theo thứ hạng. Giải có nhiều bảng thì gộp tất cả.
+    /// Đội thiếu số trận đã đá bị bỏ qua: không có số đó thì không đánh số vòng và không vẽ được hàng.
     /// </summary>
-    public static IReadOnlyDictionary<string, int> ParseGamesPlayed(string json)
+    public static Standings ParseStandings(string json, Competition competition)
     {
         using var doc = JsonDocument.Parse(json);
-        var result = new Dictionary<string, int>();
+        var rows = new List<StandingRow>();
         if (!doc.RootElement.TryGetProperty("children", out var children) || children.ValueKind != JsonValueKind.Array)
-            return result;
+            return new Standings(competition, rows);
         foreach (var child in children.EnumerateArray())
         {
             if (!child.TryGetProperty("standings", out var standings) || !standings.TryGetProperty("entries", out var entries))
                 continue;
             foreach (var entry in entries.EnumerateArray())
             {
-                var teamId = Required(Required(entry, "team"), "id").GetString()!;
-                var played = Required(entry, "stats").EnumerateArray()
-                    .Where(st => st.TryGetProperty("name", out var n) && n.GetString() == "gamesPlayed")
-                    .Select(st => st.TryGetProperty("value", out var v) && v.ValueKind == JsonValueKind.Number ? (int?)v.GetDouble() : null)
-                    .FirstOrDefault();
-                if (played is { } count)
-                    result[teamId] = count;
+                var stats = Required(entry, "stats").EnumerateArray()
+                    .Where(st => st.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String
+                        && st.TryGetProperty("value", out var v) && v.ValueKind == JsonValueKind.Number)
+                    .GroupBy(st => st.GetProperty("name").GetString()!)
+                    .ToDictionary(g => g.Key, g => (int)g.First().GetProperty("value").GetDouble());
+                if (!stats.TryGetValue("gamesPlayed", out var played))
+                    continue;
+
+                var team = Required(entry, "team");
+                var logo = team.TryGetProperty("logos", out var logos) && logos.ValueKind == JsonValueKind.Array && logos.GetArrayLength() > 0
+                    ? logos[0].GetProperty("href").GetString()
+                    : null;
+                var zone = entry.TryGetProperty("note", out var note) && note.TryGetProperty("description", out var d)
+                    ? d.GetString()
+                    : null;
+                rows.Add(new StandingRow(
+                    stats.GetValueOrDefault("rank", rows.Count + 1),
+                    new Team(Required(team, "id").GetString()!, Required(team, "displayName").GetString()!, logo),
+                    played,
+                    stats.GetValueOrDefault("wins"),
+                    stats.GetValueOrDefault("ties"),
+                    stats.GetValueOrDefault("losses"),
+                    stats.GetValueOrDefault("pointsFor"),
+                    stats.GetValueOrDefault("pointsAgainst"),
+                    stats.GetValueOrDefault("points"),
+                    string.IsNullOrWhiteSpace(zone) ? null : zone));
             }
         }
-        return result;
+        return new Standings(competition, Standings.PositionalZones(rows.OrderBy(r => r.Rank).ToList()));
     }
 
     public static Match ParseSummary(string json, string matchId, Competition competition)

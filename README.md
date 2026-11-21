@@ -4,7 +4,7 @@ Bot bóng đá cho Fanpage **Matchday Challenge Việt Nam**, gồm hai phần c
 
 | | Bot hằng ngày | Bot live |
 |---|---|---|
-| Việc làm | Gửi kết quả và lịch đấu kèm ảnh về Telegram để duyệt và tự đăng | Theo dõi một trận, gửi bản nháp về Telegram, duyệt xong thì đăng lên Fanpage |
+| Việc làm | Gửi kết quả, bảng xếp hạng và lịch đấu kèm ảnh về Telegram để duyệt và tự đăng | Theo dõi một trận, gửi bản nháp về Telegram, duyệt xong thì đăng lên Fanpage |
 | Bot Telegram | `TELEGRAM_BOT_TOKEN` | Bot riêng, `LIVE_TELEGRAM_BOT_TOKEN` |
 | Workflow | `football-news.yml` | `football-live.yml` |
 | Cách chạy | cron-job.org gọi lúc 07:00 | Bấm **Run workflow** bằng tay |

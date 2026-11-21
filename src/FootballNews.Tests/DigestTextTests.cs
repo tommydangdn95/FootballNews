@@ -81,4 +81,27 @@ public class DigestTextTests
 
         Assert.StartsWith("⚠️ CẬP NHẬT + 🏴 NGOẠI HẠNG ANH\n1 + 1 trận", text);
     }
+
+    private static Standings Table(string slug, int teams, int? round) => new(
+        TestData.Competition(slug),
+        Enumerable.Range(1, teams).Select(i => new StandingRow(i, new Team(i.ToString(), $"Team {i}", null), 10, 5, 3, 2, 15, 10, 18, null)).ToList(),
+        round);
+
+    [Fact]
+    public void Standings_header_lists_each_competition_with_its_round()
+    {
+        var text = DigestText.StandingsHeader([Table("eng.1", 20, 12), Table("uefa.champions", 36, null)], new DateOnly(2026, 11, 6));
+
+        Assert.Contains("📊 BẢNG XẾP HẠNG", text);
+        Assert.Contains("Cập nhật sau kết quả: 2 giải", text);
+        Assert.Contains("🏴 Ngoại Hạng Anh · Vòng 12", text);
+        Assert.Contains("⭐ Champions League\n", text);
+    }
+
+    [Fact]
+    public void Standings_section_states_round_teams_and_pages()
+    {
+        Assert.StartsWith("🏴 NGOẠI HẠNG ANH\nVòng 12 · 20 đội · 1 ảnh\n", DigestText.StandingsSection(Table("eng.1", 20, 12), 1));
+        Assert.StartsWith("⭐ CHAMPIONS LEAGUE\n36 đội · 2 ảnh\n", DigestText.StandingsSection(Table("uefa.champions", 36, null), 2));
+    }
 }

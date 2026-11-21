@@ -146,18 +146,36 @@ public class EspnParserTests
         var json = """
             { "children": [
               { "standings": { "entries": [
-                { "team": { "id": "359" }, "stats": [ { "name": "wins", "value": 7 }, { "name": "gamesPlayed", "value": 10.0 } ] },
-                { "team": { "id": "364" }, "stats": [ { "name": "gamesPlayed", "value": 9.0 } ] } ] } },
+                { "team": { "id": "359", "displayName": "Arsenal" }, "stats": [ { "name": "wins", "value": 7 }, { "name": "gamesPlayed", "value": 10.0 } ] },
+                { "team": { "id": "364", "displayName": "Liverpool" }, "stats": [ { "name": "gamesPlayed", "value": 9.0 } ] } ] } },
               { "standings": { "entries": [
-                { "team": { "id": "1" }, "stats": [ { "name": "points", "value": 3 } ] } ] } }
+                { "team": { "id": "1", "displayName": "A" }, "stats": [ { "name": "points", "value": 3 } ] } ] } }
             ] }
             """;
 
-        var played = EspnParser.ParseGamesPlayed(json);
+        var played = EspnParser.ParseStandings(json, TestData.Competition("eng.1")).GamesPlayed();
 
         Assert.Equal(10, played["359"]);
         Assert.Equal(9, played["364"]);
         Assert.False(played.ContainsKey("1"));
+    }
+
+    [Fact]
+    public void Reads_the_full_standings_table_in_rank_order()
+    {
+        var table = EspnParser.ParseStandings(TestData.Fixture("standings-eng1.json"), TestData.Competition("eng.1"));
+
+        Assert.Equal(20, table.Rows.Count);
+        Assert.Equal(Enumerable.Range(1, 20), table.Rows.Select(r => r.Rank));
+
+        var arsenal = table.Rows[0];
+        Assert.Equal(("359", "Arsenal"), (arsenal.Team.Id, arsenal.Team.Name));
+        Assert.Equal((10, 9, 0, 1, 15, 5, 10, 27), (arsenal.Played, arsenal.Won, arsenal.Drawn, arsenal.Lost, arsenal.GoalsFor, arsenal.GoalsAgainst, arsenal.GoalDifference, arsenal.Points));
+        Assert.Equal("Champions League", arsenal.Zone);
+        Assert.EndsWith("359.png", arsenal.Team.LogoUrl);
+
+        Assert.Equal("Relegation", table.Rows[^1].Zone);
+        Assert.Null(table.Rows[5].Zone);
     }
 
     [Fact]

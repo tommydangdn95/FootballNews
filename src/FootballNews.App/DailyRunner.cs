@@ -21,7 +21,7 @@ internal sealed class DailyRunner(
 {
     private readonly Dictionary<(string Slug, DateOnly Date), IReadOnlyList<Match>> _cache = [];
     private readonly Dictionary<(string Slug, string TeamId, int? Season), IReadOnlyList<TeamResult>?> _teamResults = [];
-    private readonly Dictionary<string, IReadOnlyDictionary<string, int>> _gamesPlayed = [];
+    private readonly Dictionary<string, Standings?> _standings = [];
 
     public async Task RunAsync(IReadOnlyList<DigestKind> kinds, DateOnly vietnamDate, CancellationToken ct)
     {
@@ -43,6 +43,8 @@ internal sealed class DailyRunner(
 
             var sections = await RenderCardsAsync(digest, ct);
             await publisher.PublishAsync(kind, DigestText.Header(digest, vietnamDate), sections, ct);
+            if (kind == DigestKind.Results)
+                await PublishStandingsAsync(digest.Matches, vietnamDate, ct);
 
             // Gửi xong mới lưu: nếu gửi lỗi, lần chạy sau vẫn báo lại các trận này.
             state.MarkAnnounced(digest, DateTimeOffset.UtcNow);
@@ -71,15 +73,19 @@ internal sealed class DailyRunner(
     private async Task<Digest> BuildUpcomingAsync(AnnouncedState state, DateTimeOffset reference, CancellationToken ct)
     {
         var window = ReportWindow.Upcoming(reference);
-        var matches = await FetchAsync(upcomingCompetitions, window, ct);
+        // Lấy rộng hơn khung để bài có đủ cả vòng của các trận trong khung, kể cả trận đá sau khung.
+        var extended = window with { End = window.End.AddDays(ReportWindow.RoundCompletionDays) };
+        // Đánh số vòng trên mọi trận lấy được: nếu chỉ đánh trên trận mới, đội có trận trước đó đã báo sẽ bị lệch vòng.
+        var fetched = await WithRoundsAsync(await FetchAsync(upcomingCompetitions, extended, ct), ct);
+        var matches = Matchday.CompleteRounds(fetched, window);
         IReadOnlyList<Match> weekend = remindWeekend
-            ? (await FetchAsync(competitions, window, ct)).Where(m => ReportWindow.IsWeekend(m.KickoffUtc)).ToList()
+            ? (await WithRoundsAsync(await FetchAsync(competitions, window, ct), ct)).Where(m => ReportWindow.IsWeekend(m.KickoffUtc)).ToList()
             : [];
         var rechecked = await RecheckAsync(state, [.. matches, .. weekend], ct);
-        var digest = state.BuildUpcoming(matches, rechecked, window, weekend);
+        var digest = state.BuildUpcoming(matches, rechecked, extended, weekend);
         return digest with
         {
-            Matches = await WithRoundsAsync(await WithFormAsync(digest.Matches, ct), ct),
+            Matches = await WithFormAsync(digest.Matches, ct),
             Updates = await WithFormAsync(digest.Updates, ct),
         };
     }
@@ -90,24 +96,63 @@ internal sealed class DailyRunner(
         var withRounds = new Dictionary<string, Match>();
         foreach (var group in matches.Where(m => Matchday.IsNumbered(m.Stage)).GroupBy(m => m.Competition.Slug))
         {
-            var competition = group.First().Competition;
-            if (!_gamesPlayed.TryGetValue(competition.Slug, out var played))
-            {
-                try
-                {
-                    played = await source.GetGamesPlayedAsync(competition, ct);
-                }
-                catch (Exception ex) when (ex is not OperationCanceledException)
-                {
-                    Console.WriteLine($"Không lấy được bảng xếp hạng {competition.Slug}: {ex.Message}");
-                    played = new Dictionary<string, int>();
-                }
-                _gamesPlayed[competition.Slug] = played;
-            }
+            var played = (await StandingsAsync(group.First().Competition, ct))?.GamesPlayed() ?? new Dictionary<string, int>();
             foreach (var m in Matchday.Assign(group.ToList(), played))
                 withRounds[m.Id] = m;
         }
         return matches.Select(m => withRounds.GetValueOrDefault(m.Id, m)).ToList();
+    }
+
+    /// <summary>
+    /// Sau bài kết quả, gửi bảng xếp hạng của các giải có trận vừa đá (giải VĐQG, vòng phân hạng cúp châu Âu).
+    /// Lỗi ở đây chỉ báo cho chủ trang: bài kết quả đã gửi xong.
+    /// </summary>
+    private async Task PublishStandingsAsync(IReadOnlyList<Match> results, DateOnly vietnamDate, CancellationToken ct)
+    {
+        var tables = new List<Standings>();
+        foreach (var group in results.Where(m => Matchday.IsNumbered(m.Stage)).GroupBy(m => m.Competition.Slug).OrderBy(g => g.First().Competition.Order))
+        {
+            if (await StandingsAsync(group.First().Competition, ct) is not { Rows.Count: > 0 } table)
+                continue;
+            // Phong độ tính đến lúc chạy, cùng giải và cùng mùa với các trận vừa đá.
+            var season = group.Select(m => m.Season).FirstOrDefault(s => s is not null);
+            var rows = new List<StandingRow>(table.Rows.Count);
+            foreach (var row in table.Rows)
+                rows.Add(row with { Form = await FormAsync(table.Competition, row.Team, season, DateTimeOffset.UtcNow, ct) });
+            tables.Add(table with { Rows = rows, Round = group.Max(m => m.Round) });
+        }
+        Console.WriteLine($"Standings: {tables.Count} giải");
+        if (tables.Count == 0)
+            return;
+
+        try
+        {
+            var sections = await renderer.RenderStandingsAsync(tables);
+            await publisher.PublishStandingsAsync(DigestText.StandingsHeader(tables, vietnamDate), sections, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            await publisher.NotifyAsync($"⚠️ Không gửi được bảng xếp hạng: {ex.Message}", ct);
+        }
+    }
+
+    // Lấy một lần mỗi giải trong một lần chạy, dùng chung cho đánh số vòng và ảnh bảng xếp hạng.
+    private async Task<Standings?> StandingsAsync(Competition competition, CancellationToken ct)
+    {
+        if (_standings.TryGetValue(competition.Slug, out var cached))
+            return cached;
+        Standings? table;
+        try
+        {
+            table = await source.GetStandingsAsync(competition, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Console.WriteLine($"Không lấy được bảng xếp hạng {competition.Slug}: {ex.Message}");
+            table = null;
+        }
+        _standings[competition.Slug] = table;
+        return table;
     }
 
     private async Task<IReadOnlyList<Match>> WithFormAsync(IReadOnlyList<Match> matches, CancellationToken ct)
@@ -117,31 +162,32 @@ internal sealed class DailyRunner(
         {
             result.Add(m with
             {
-                Home = m.Home with { Form = await FormAsync(m, m.Home.Team, ct) },
-                Away = m.Away with { Form = await FormAsync(m, m.Away.Team, ct) },
+                Home = m.Home with { Form = await FormAsync(m.Competition, m.Home.Team, m.Season, m.KickoffUtc, ct) },
+                Away = m.Away with { Form = await FormAsync(m.Competition, m.Away.Team, m.Season, m.KickoffUtc, ct) },
             });
         }
         return result;
     }
 
     // Không lấy được lịch của một đội thì đội đó chỉ không có phong độ, bài vẫn gửi.
-    private async Task<string?> FormAsync(Match match, Team team, CancellationToken ct)
+    /// <param name="before">Chỉ tính các trận đá trước mốc này: giờ bóng lăn với lịch đấu, lúc chạy với bảng xếp hạng.</param>
+    private async Task<string?> FormAsync(Competition competition, Team team, int? season, DateTimeOffset before, CancellationToken ct)
     {
-        var key = (match.Competition.Slug, team.Id, match.Season);
+        var key = (competition.Slug, team.Id, season);
         if (!_teamResults.TryGetValue(key, out var results))
         {
             try
             {
-                results = await source.GetTeamResultsAsync(match.Competition, team.Id, match.Season, ct);
+                results = await source.GetTeamResultsAsync(competition, team.Id, season, ct);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                Console.WriteLine($"Không lấy được phong độ của {team.Name} ({match.Competition.Slug}): {ex.Message}");
+                Console.WriteLine($"Không lấy được phong độ của {team.Name} ({competition.Slug}): {ex.Message}");
                 results = null;
             }
             _teamResults[key] = results;
         }
-        return results is null ? null : TeamForm.Build(results, match.KickoffUtc);
+        return results is null ? null : TeamForm.Build(results, before);
     }
 
     private async Task<IReadOnlyList<Match>> FetchAsync(IReadOnlyList<Competition> from, ReportWindow window, CancellationToken ct)
