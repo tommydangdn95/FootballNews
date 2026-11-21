@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png"
     },
     "homeScore": 1,
-    "awayScore": 1,
+    "awayScore": 2,
     "goals": [
       {
         "id": "g1",
@@ -31,6 +31,14 @@
         "minute": "28'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g3",
+        "teamId": "357",
+        "player": "Calvert-Lewin",
+        "minute": "53'",
+        "type": "penaltyGoal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -38,7 +46,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 3,
+    "nextGoalId": 4,
     "autopilot": true
   },
   "drafts": [
@@ -105,11 +113,32 @@
       "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
       "goalId": null,
       "varWarning": false,
+      "telegramMessageId": 81,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114086863539980"
+    },
+    {
+      "id": 20,
+      "kind": "goal",
+      "createdAt": "2026-11-21T16:16:35.3702491+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 2,
+      "title": "VÀOOOOO",
+      "detail": "Calvert-Lewin 53' (phạt đền)",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Calvert-Lewin 53' (phạt đền) ghi bàn cho Leeds United! Chelsea 1-2 Leeds United",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g3",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114086863539980"
+      "facebookPostId": "1302280479644878_122114094609539980"
     }
   ],
-  "nextDraftId": 20,
+  "nextDraftId": 21,
   "editingDraftId": null
 }
