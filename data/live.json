@@ -13,18 +13,49 @@
       "name": "Leeds United",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png"
     },
-    "homeScore": 0,
+    "homeScore": 1,
     "awayScore": 0,
-    "goals": [],
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "363",
+        "player": "Emegha",
+        "minute": "25'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
     "redCards": [],
     "halfTimeDone": false,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 1,
+    "nextGoalId": 2,
     "autopilot": true
   },
-  "drafts": [],
-  "nextDraftId": 17,
+  "drafts": [
+    {
+      "id": 17,
+      "kind": "goal",
+      "createdAt": "2026-11-21T15:27:20.0870385+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 0,
+      "title": "VÀOOOOO",
+      "detail": "Emegha 25'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Emegha 25' mở tỉ số cho Chelsea! Chelsea 1-0 Leeds United",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g1",
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": "1302280479644878_122114079435539980"
+    }
+  ],
+  "nextDraftId": 18,
   "editingDraftId": null
 }
