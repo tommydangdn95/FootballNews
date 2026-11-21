@@ -14,7 +14,7 @@
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png"
     },
     "homeScore": 1,
-    "awayScore": 2,
+    "awayScore": 3,
     "goals": [
       {
         "id": "g1",
@@ -39,6 +39,14 @@
         "minute": "53'",
         "type": "penaltyGoal",
         "cancelled": false
+      },
+      {
+        "id": "g4",
+        "teamId": "357",
+        "player": "Okafor",
+        "minute": "58'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -46,7 +54,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 4,
+    "nextGoalId": 5,
     "autopilot": true
   },
   "drafts": [
@@ -134,11 +142,32 @@
       "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g3",
       "varWarning": false,
+      "telegramMessageId": 82,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114094609539980"
+    },
+    {
+      "id": 21,
+      "kind": "goal",
+      "createdAt": "2026-11-21T16:23:37.0959875+00:00",
+      "status": "posted",
+      "homeScore": 1,
+      "awayScore": 3,
+      "title": "VÀOOOOO",
+      "detail": "Okafor 58'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Okafor 58' ghi bàn cho Leeds United! Chelsea 1-3 Leeds United",
+      "hashtags": "#Chelsea #LeedsUnited #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g4",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114094609539980"
+      "facebookPostId": "1302280479644878_122114096631539980"
     }
   ],
-  "nextDraftId": 21,
+  "nextDraftId": 22,
   "editingDraftId": null
 }
