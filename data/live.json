@@ -106,15 +106,15 @@
       "hashtags": "#Barcelona #Villarreal #LaLiga #MatchdayChallenge",
       "goalId": null,
       "varWarning": false,
-      "telegramMessageId": null,
-      "telegramIsPhoto": false,
+      "telegramMessageId": 113,
+      "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122114511255539980"
     },
     {
       "id": 32,
       "kind": "fullTime",
       "createdAt": "2026-11-22T15:01:46.0874467+00:00",
-      "status": "queued",
+      "status": "posted",
       "homeScore": 3,
       "awayScore": 2,
       "title": "KẾT THÚC",
@@ -137,7 +137,7 @@
       "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": null
+      "facebookPostId": "1302280479644878_122114511423539980"
     }
   ],
   "nextDraftId": 33,
