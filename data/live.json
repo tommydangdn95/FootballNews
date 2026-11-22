@@ -13,7 +13,7 @@
       "name": "Manchester United",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png"
     },
-    "homeScore": 3,
+    "homeScore": 4,
     "awayScore": 0,
     "goals": [
       {
@@ -39,6 +39,14 @@
         "minute": "66'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g4",
+        "teamId": "364",
+        "player": "Muñoz",
+        "minute": "82'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [
@@ -48,7 +56,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 4,
+    "nextGoalId": 5,
     "autopilot": true
   },
   "drafts": [
@@ -158,11 +166,32 @@
       "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g3",
       "varWarning": false,
+      "telegramMessageId": 126,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114569779539980"
+    },
+    {
+      "id": 38,
+      "kind": "goal",
+      "createdAt": "2026-11-22T18:12:49.5300032+00:00",
+      "status": "posted",
+      "homeScore": 4,
+      "awayScore": 0,
+      "title": "VÀOOOOO",
+      "detail": "Muñoz 82'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Muñoz 82' ghi bàn cho Liverpool! Liverpool 4-0 Man Utd",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g4",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114569779539980"
+      "facebookPostId": "1302280479644878_122114574693539980"
     }
   ],
-  "nextDraftId": 38,
+  "nextDraftId": 39,
   "editingDraftId": null
 }
