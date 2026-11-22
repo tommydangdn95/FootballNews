@@ -53,15 +53,15 @@
       "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
       "goalId": null,
       "varWarning": false,
-      "telegramMessageId": null,
-      "telegramIsPhoto": false,
+      "telegramMessageId": 122,
+      "telegramIsPhoto": true,
       "facebookPostId": "1302280479644878_122114542887539980"
     },
     {
       "id": 34,
       "kind": "goal",
       "createdAt": "2026-11-22T16:41:31.5562124+00:00",
-      "status": "queued",
+      "status": "posted",
       "homeScore": 1,
       "awayScore": 0,
       "title": "VÀOOOOO",
@@ -76,7 +76,7 @@
       "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": null
+      "facebookPostId": "1302280479644878_122114542959539980"
     }
   ],
   "nextDraftId": 35,
