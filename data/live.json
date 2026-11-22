@@ -13,7 +13,7 @@
       "name": "Villarreal",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/102.png"
     },
-    "homeScore": 2,
+    "homeScore": 3,
     "awayScore": 2,
     "goals": [
       {
@@ -47,6 +47,14 @@
         "minute": "61'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g5",
+        "teamId": "83",
+        "player": "Navarro",
+        "minute": "67'",
+        "type": "ownGoal",
+        "cancelled": false
       }
     ],
     "redCards": [],
@@ -54,10 +62,32 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 5,
+    "nextGoalId": 6,
     "autopilot": true
   },
-  "drafts": [],
-  "nextDraftId": 30,
+  "drafts": [
+    {
+      "id": 30,
+      "kind": "goal",
+      "createdAt": "2026-11-22T14:33:38.5010086+00:00",
+      "status": "posted",
+      "homeScore": 3,
+      "awayScore": 2,
+      "title": "VÀOOOOO",
+      "detail": "Navarro 67' (phản lưới)",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Navarro phản lưới nhà, Barcelona có bàn thắng! Barcelona 3-2 Villarreal",
+      "hashtags": "#Barcelona #Villarreal #LaLiga #MatchdayChallenge",
+      "goalId": "g5",
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": "1302280479644878_122114502909539980"
+    }
+  ],
+  "nextDraftId": 31,
   "editingDraftId": null
 }
