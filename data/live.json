@@ -13,7 +13,7 @@
       "name": "Manchester United",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png"
     },
-    "homeScore": 1,
+    "homeScore": 2,
     "awayScore": 0,
     "goals": [
       {
@@ -21,6 +21,14 @@
         "teamId": "364",
         "player": "Szoboszlai",
         "minute": "10'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "364",
+        "player": "Wirtz",
+        "minute": "13'",
         "type": "goal",
         "cancelled": false
       }
@@ -32,7 +40,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 2,
+    "nextGoalId": 3,
     "autopilot": true
   },
   "drafts": [
@@ -74,11 +82,32 @@
       "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g1",
       "varWarning": false,
+      "telegramMessageId": 123,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114542959539980"
+    },
+    {
+      "id": 35,
+      "kind": "goal",
+      "createdAt": "2026-11-22T16:45:02.1761635+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 0,
+      "title": "VÀOOOOO",
+      "detail": "Wirtz 13'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Wirtz 13' ghi bàn cho Liverpool! Liverpool 2-0 Man Utd",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g2",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114542959539980"
+      "facebookPostId": "1302280479644878_122114546247539980"
     }
   ],
-  "nextDraftId": 35,
+  "nextDraftId": 36,
   "editingDraftId": null
 }
