@@ -13,18 +13,72 @@
       "name": "Manchester United",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png"
     },
-    "homeScore": 0,
+    "homeScore": 1,
     "awayScore": 0,
-    "goals": [],
-    "redCards": [],
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "364",
+        "player": "Szoboszlai",
+        "minute": "10'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
+    "redCards": [
+      "360|Yoro"
+    ],
     "halfTimeDone": false,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 1,
+    "nextGoalId": 2,
     "autopilot": true
   },
-  "drafts": [],
-  "nextDraftId": 33,
+  "drafts": [
+    {
+      "id": 33,
+      "kind": "redCard",
+      "createdAt": "2026-11-22T16:41:31.5562124+00:00",
+      "status": "posted",
+      "homeScore": 0,
+      "awayScore": 0,
+      "title": "THẺ ĐỎ",
+      "detail": "Yoro 8'",
+      "teamId": "360",
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "\uD83D\uDFE5 Yoro (Man Utd) nhận thẻ đỏ phút 8'! Liverpool 0-0 Man Utd",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": "1302280479644878_122114542887539980"
+    },
+    {
+      "id": 34,
+      "kind": "goal",
+      "createdAt": "2026-11-22T16:41:31.5562124+00:00",
+      "status": "queued",
+      "homeScore": 1,
+      "awayScore": 0,
+      "title": "VÀOOOOO",
+      "detail": "Szoboszlai 10'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Szoboszlai 10' mở tỉ số cho Liverpool! Liverpool 1-0 Man Utd",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g1",
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": null
+    }
+  ],
+  "nextDraftId": 35,
   "editingDraftId": null
 }
