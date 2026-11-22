@@ -13,7 +13,7 @@
       "name": "Manchester United",
       "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png"
     },
-    "homeScore": 2,
+    "homeScore": 3,
     "awayScore": 0,
     "goals": [
       {
@@ -31,6 +31,14 @@
         "minute": "13'",
         "type": "goal",
         "cancelled": false
+      },
+      {
+        "id": "g3",
+        "teamId": "364",
+        "player": "Ngumoha",
+        "minute": "66'",
+        "type": "goal",
+        "cancelled": false
       }
     ],
     "redCards": [
@@ -40,7 +48,7 @@
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
-    "nextGoalId": 3,
+    "nextGoalId": 4,
     "autopilot": true
   },
   "drafts": [
@@ -129,11 +137,32 @@
       "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
       "goalId": null,
       "varWarning": false,
+      "telegramMessageId": 125,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114557689539980"
+    },
+    {
+      "id": 37,
+      "kind": "goal",
+      "createdAt": "2026-11-22T17:58:45.1768718+00:00",
+      "status": "posted",
+      "homeScore": 3,
+      "awayScore": 0,
+      "title": "VÀOOOOO",
+      "detail": "Ngumoha 66'",
+      "teamId": null,
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "⚽ Ngumoha 66' ghi bàn cho Liverpool! Liverpool 3-0 Man Utd",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": "g3",
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114557689539980"
+      "facebookPostId": "1302280479644878_122114569779539980"
     }
   ],
-  "nextDraftId": 37,
+  "nextDraftId": 38,
   "editingDraftId": null
 }
