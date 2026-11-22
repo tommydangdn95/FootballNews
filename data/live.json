@@ -22,7 +22,7 @@
     "hadExtraTime": false,
     "fullTimeDone": false,
     "nextGoalId": 1,
-    "autopilot": false
+    "autopilot": true
   },
   "drafts": [],
   "nextDraftId": 33,
