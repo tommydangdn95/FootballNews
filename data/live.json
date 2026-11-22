@@ -55,7 +55,7 @@
     "hadExtraTime": false,
     "fullTimeDone": false,
     "nextGoalId": 5,
-    "autopilot": false
+    "autopilot": true
   },
   "drafts": [],
   "nextDraftId": 30,
