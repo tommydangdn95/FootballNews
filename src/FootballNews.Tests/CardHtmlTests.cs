@@ -305,9 +305,12 @@ public class CardHtmlTests
 
         var page = SinglePage(digest, CardLocale.Vietnamese);
 
-        Assert.Contains($"<p class=\"competition\">{WebUtility.HtmlEncode("NGOẠI HẠNG ANH · SERIE A")}</p>", page);
-        Assert.Contains($"<h2>{WebUtility.HtmlEncode("NGOẠI HẠNG ANH · LƯỢT TRẬN 11/38")}</h2>", page);
-        Assert.Contains($"<h2>{WebUtility.HtmlEncode("SERIE A · LƯỢT TRẬN 10/38")}</h2>", page);
+        Assert.Contains($"<p class=\"competition\">{WebUtility.HtmlEncode("TỔNG HỢP CÁC LƯỢT TRẬN")}</p>", page);
+        Assert.Contains("<p class=\"competition\">MATCHDAY ROUNDUP</p>", SinglePage(digest, CardLocale.English));
+        // Ảnh ghép có logo giải trước tiêu đề mục.
+        Assert.Contains($"<span>{WebUtility.HtmlEncode("NGOẠI HẠNG ANH · LƯỢT TRẬN 11/38")}</span></h2>", page);
+        Assert.Contains($"<span>{WebUtility.HtmlEncode("SERIE A · LƯỢT TRẬN 10/38")}</span></h2>", page);
+        Assert.Equal(2, page.Split("<h2><img class=\"league-logo\"").Length - 1);
     }
 
     [Fact]
@@ -418,6 +421,30 @@ public class CardHtmlTests
         var english = html.BuildPages(Upcoming(Night, Night), CardLocale.Vietnamese).Single();
         Assert.DoesNotContain("#0E1B3D", english);
         Assert.Contains("background: #000", english);
+    }
+
+    [Fact]
+    public void Page_mixing_competitions_uses_the_mixed_colours_not_the_first_competition()
+    {
+        var theme = Theme with
+        {
+            Competitions = new Dictionary<string, ThemeColors>
+            {
+                ["esp.1"] = new(Background: "#00001B"),
+                [CardTheme.MixedKey] = new(Background: "#14161C"),
+            },
+        };
+        var html = new CardHtml(TestData.Clubs, theme, "", "");
+        Match In(string id, string slug) => TestData.Match(id, Night) with { Competition = TestData.Competition(slug) with { Logo = $"https://logo/{slug}.png" } };
+
+        var mixed = html.BuildPages(new Digest(DigestKind.Results, [In("1", "esp.1"), In("2", "ger.1")], []), CardLocale.Vietnamese).Single();
+        Assert.Contains("background: #14161C", mixed);
+        Assert.Contains("<h2><img class=\"league-logo\" src=\"https://logo/esp.1.png\"", mixed);
+        Assert.DoesNotContain("#00001B", mixed);
+
+        var laLiga = html.BuildPages(new Digest(DigestKind.Results, [In("1", "esp.1"), In("2", "esp.1")], []), CardLocale.Vietnamese).Single();
+        Assert.Contains("background: #00001B", laLiga);
+        Assert.DoesNotContain("<h2><img", laLiga);
     }
 
     private static string FindConfigDirectory()

@@ -27,6 +27,9 @@ public sealed record CardTheme(
     string Muted,
     IReadOnlyDictionary<string, ThemeColors>? Competitions = null)
 {
+    /// <summary>Khoá trong <see cref="Competitions"/> cho ảnh ghép nhiều giải.</summary>
+    public const string MixedKey = "mixed";
+
     public static CardTheme Load(string path) =>
         JsonSerializer.Deserialize<CardTheme>(File.ReadAllText(path), JsonDefaults.Options)
         ?? throw new InvalidDataException($"Không đọc được {path}");

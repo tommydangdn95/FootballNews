@@ -2,6 +2,8 @@ namespace FootballNews.Core.Models;
 
 /// <param name="Zone">Vùng xếp hạng theo ESPN, vd <c>Champions League</c>, <c>Relegation</c>. Đội không thuộc vùng nào thì null.</param>
 /// <param name="Form">Phong độ do <see cref="TeamForm"/> tính, xếp cũ đến mới. Chỉ có ở bài hằng ngày.</param>
+/// <param name="JustPlayed">Đội có trận trong bài kết quả đi kèm, để tô nổi trên bảng.</param>
+/// <param name="RankChange">Số bậc lên (dương) hoặc xuống (âm) so với trước các trận trong bài kết quả. 0 hoặc null thì không vẽ.</param>
 public sealed record StandingRow(
     int Rank,
     Team Team,
@@ -13,7 +15,9 @@ public sealed record StandingRow(
     int GoalsAgainst,
     int Points,
     string? Zone,
-    string? Form = null)
+    string? Form = null,
+    bool JustPlayed = false,
+    int? RankChange = null)
 {
     public int GoalDifference => GoalsFor - GoalsAgainst;
 }
@@ -39,6 +43,41 @@ public sealed record Standings(Competition Competition, IReadOnlyList<StandingRo
 
     private static bool IsBottomZone(string zone) =>
         zone.Contains("relegat", StringComparison.OrdinalIgnoreCase) || zone.Contains("eliminated", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Thứ hạng thay đổi thế nào sau <paramref name="results"/>: id đội → số bậc lên (dương) hoặc xuống (âm).
+    /// ESPN có trường <c>rankChange</c> nhưng luôn bằng 0, nên tự dựng bảng trước các trận đó bằng cách trừ kết quả
+    /// của chúng ra rồi xếp lại theo điểm, hiệu số, bàn thắng. Đội bằng nhau cả ba thì giữ thứ tự hiện tại của ESPN,
+    /// vì luật phụ (đối đầu, fair-play...) mỗi giải một kiểu. Trận chưa xong hoặc thiếu tỉ số thì bỏ qua.
+    /// </summary>
+    public IReadOnlyDictionary<string, int> RankChanges(IEnumerable<Match> results)
+    {
+        var before = Rows.ToDictionary(r => r.Team.Id, r => (r.Rank, r.Points, r.GoalsFor, r.GoalsAgainst));
+        foreach (var m in results)
+        {
+            if (m.Status != MatchStatus.Finished || m.Home.Score is not { } home || m.Away.Score is not { } away)
+                continue;
+            Undo(m.Home.Team.Id, home, away);
+            Undo(m.Away.Team.Id, away, home);
+        }
+
+        var previous = before
+            .OrderByDescending(t => t.Value.Points)
+            .ThenByDescending(t => t.Value.GoalsFor - t.Value.GoalsAgainst)
+            .ThenByDescending(t => t.Value.GoalsFor)
+            .ThenBy(t => t.Value.Rank)
+            .Select((t, i) => (t.Key, Rank: i + 1))
+            .ToDictionary(t => t.Key, t => t.Rank);
+        return Rows.GroupBy(r => r.Team.Id).ToDictionary(g => g.Key, g => previous[g.Key] - g.First().Rank);
+
+        void Undo(string team, int scored, int conceded)
+        {
+            if (!before.TryGetValue(team, out var t))
+                return;
+            var points = scored > conceded ? 3 : scored == conceded ? 1 : 0;
+            before[team] = (t.Rank, t.Points - points, t.GoalsFor - scored, t.GoalsAgainst - conceded);
+        }
+    }
 
     /// <summary>Id đội → số trận đã đá, dùng cho <see cref="Matchday.Assign"/>.</summary>
     public IReadOnlyDictionary<string, int> GamesPlayed() => Rows

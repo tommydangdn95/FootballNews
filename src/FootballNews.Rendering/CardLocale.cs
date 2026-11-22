@@ -25,6 +25,7 @@ public sealed record CardLocale(
     string StandingsTitle,
     IReadOnlyList<string> StandingsColumns,
     Func<int, string> StandingsRound,
+    string MixedSubtitle,
     Func<string, string> Zone)
 {
     // Giờ châu Âu đổi theo mùa nên phải dùng múi giờ thật, không dùng độ lệch cố định.
@@ -71,6 +72,7 @@ public sealed record CardLocale(
         // Hạng, đội, trận, thắng, hoà, bại, hiệu số, điểm, phong độ.
         StandingsColumns: ["HẠNG", "ĐỘI", "TR", "T", "H", "B", "HS", "Đ", "PHONG ĐỘ"],
         StandingsRound: n => $"VÒNG {n}",
+        MixedSubtitle: "TỔNG HỢP CÁC LƯỢT TRẬN",
         Zone: zone => zone.ToLowerInvariant() switch
         {
             "champions league" => "Champions League",
@@ -121,6 +123,7 @@ public sealed record CardLocale(
         StandingsTitle: "STANDINGS",
         StandingsColumns: ["RANK", "TEAMS", "PLD", "WON", "DRA", "LOS", "GD", "PTS", "FORM"],
         StandingsRound: n => $"MATCHDAY {n}",
+        MixedSubtitle: "MATCHDAY ROUNDUP",
         Zone: zone => zone.ToLowerInvariant() switch
         {
             "relegated" => "Relegation",

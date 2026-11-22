@@ -116,9 +116,16 @@ internal sealed class DailyRunner(
                 continue;
             // Phong độ tính đến lúc chạy, cùng giải và cùng mùa với các trận vừa đá.
             var season = group.Select(m => m.Season).FirstOrDefault(s => s is not null);
+            var played = group.SelectMany(m => new[] { m.Home.Team.Id, m.Away.Team.Id }).ToHashSet();
+            var changes = table.RankChanges(group);
             var rows = new List<StandingRow>(table.Rows.Count);
             foreach (var row in table.Rows)
-                rows.Add(row with { Form = await FormAsync(table.Competition, row.Team, season, DateTimeOffset.UtcNow, ct) });
+                rows.Add(row with
+                {
+                    Form = await FormAsync(table.Competition, row.Team, season, DateTimeOffset.UtcNow, ct),
+                    JustPlayed = played.Contains(row.Team.Id),
+                    RankChange = changes.GetValueOrDefault(row.Team.Id),
+                });
             tables.Add(table with { Rows = rows, Round = group.Max(m => m.Round) });
         }
         Console.WriteLine($"Standings: {tables.Count} giải");

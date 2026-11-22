@@ -16,6 +16,7 @@
     "esp.1":            { "background": "#00001B", "surface": "#FF4B44", "surfaceEnd": "#FF9A76", "surfaceText": "#00001B", "surfaceMuted": "#4A1414", "accent": "#FF4B44", "muted": "#B8B8D1" },
     "ger.1":            { "background": "#2B2B30", "surface": "#FF2D45", "surfaceEnd": "#6E0016", "surfaceText": "#FFFFFF", "surfaceMuted": "#FFD6DA", "accent": "#FF5A66", "muted": "#D2C4C6" },
     "ita.1":            { "background": "#0E1B3D", "surface": "#3D8BFF", "surfaceEnd": "#7CC8FF", "surfaceText": "#0E1B3D", "surfaceMuted": "#13306B", "accent": "#7CC8FF", "muted": "#A9BCE0" },
-    "fra.1":            { "background": "#1C1C1E", "surface": "#FF4FAD", "surfaceEnd": "#6F86FF", "surfaceText": "#FFFFFF", "surfaceMuted": "#F6E9FF", "accent": "#FF4FAD", "muted": "#C9C9D1" }
+    "fra.1":            { "background": "#0F1A12", "surface": "#C8F02A", "surfaceEnd": "#FFE14D", "surfaceText": "#0F1A12", "surfaceMuted": "#3A4A14", "accent": "#C8F02A", "muted": "#C3CDB0" },
+    "mixed":            { "background": "#1C1C1E", "surface": "#FF4FAD", "surfaceEnd": "#6F86FF", "surfaceText": "#FFFFFF", "surfaceMuted": "#F6E9FF", "accent": "#FF4FAD", "muted": "#C9C9D1" }
   }
 }
