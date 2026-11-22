@@ -57,11 +57,13 @@
         "cancelled": false
       }
     ],
-    "redCards": [],
+    "redCards": [
+      "102|Navarro"
+    ],
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
+    "fullTimeDone": true,
     "nextGoalId": 6,
     "autopilot": true
   },
@@ -83,11 +85,61 @@
       "hashtags": "#Barcelona #Villarreal #LaLiga #MatchdayChallenge",
       "goalId": "g5",
       "varWarning": false,
+      "telegramMessageId": 112,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114502909539980"
+    },
+    {
+      "id": 31,
+      "kind": "redCard",
+      "createdAt": "2026-11-22T15:01:46.0874467+00:00",
+      "status": "posted",
+      "homeScore": 3,
+      "awayScore": 2,
+      "title": "THẺ ĐỎ",
+      "detail": "Navarro 90'+3'",
+      "teamId": "102",
+      "homeLines": null,
+      "awayLines": null,
+      "customLines": null,
+      "text": "\uD83D\uDFE5 Navarro (Villarreal) nhận thẻ đỏ phút 90'+3'! Barcelona 3-2 Villarreal",
+      "hashtags": "#Barcelona #Villarreal #LaLiga #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114502909539980"
+      "facebookPostId": "1302280479644878_122114511255539980"
+    },
+    {
+      "id": 32,
+      "kind": "fullTime",
+      "createdAt": "2026-11-22T15:01:46.0874467+00:00",
+      "status": "queued",
+      "homeScore": 3,
+      "awayScore": 2,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Martín 57'",
+        "López 61'",
+        "Navarro 67' (phản lưới)"
+      ],
+      "awayLines": [
+        "Buchanan 5'",
+        "Oluwaseyi 7'",
+        "Navarro 90'+3' \uD83D\uDFE5"
+      ],
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Barcelona 3-2 Villarreal\n⚽ Barcelona: Martín 57', López 61', Navarro 67' (phản lưới)\n⚽ Villarreal: Buchanan 5', Oluwaseyi 7'\n\uD83D\uDFE5 Thẻ đỏ: Navarro 90'+3' (Villarreal)",
+      "hashtags": "#Barcelona #Villarreal #LaLiga #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
+      "telegramMessageId": null,
+      "telegramIsPhoto": false,
+      "facebookPostId": null
     }
   ],
-  "nextDraftId": 31,
+  "nextDraftId": 33,
   "editingDraftId": null
 }
