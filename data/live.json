@@ -1,5 +1,62 @@
 {
-  "watch": null,
+  "watch": {
+    "matchId": "401882804",
+    "competition": "esp.1",
+    "kickoffUtc": "2026-11-22T13:00:00+00:00",
+    "home": {
+      "id": "83",
+      "name": "Barcelona",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/83.png"
+    },
+    "away": {
+      "id": "102",
+      "name": "Villarreal",
+      "logoUrl": "https://a.espncdn.com/i/teamlogos/soccer/500/102.png"
+    },
+    "homeScore": 2,
+    "awayScore": 2,
+    "goals": [
+      {
+        "id": "g1",
+        "teamId": "102",
+        "player": "Buchanan",
+        "minute": "5'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g2",
+        "teamId": "102",
+        "player": "Oluwaseyi",
+        "minute": "7'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g3",
+        "teamId": "83",
+        "player": "Martín",
+        "minute": "57'",
+        "type": "goal",
+        "cancelled": false
+      },
+      {
+        "id": "g4",
+        "teamId": "83",
+        "player": "López",
+        "minute": "61'",
+        "type": "goal",
+        "cancelled": false
+      }
+    ],
+    "redCards": [],
+    "halfTimeDone": true,
+    "endOfRegulationDone": false,
+    "hadExtraTime": false,
+    "fullTimeDone": false,
+    "nextGoalId": 5,
+    "autopilot": false
+  },
   "drafts": [],
   "nextDraftId": 30,
   "editingDraftId": null
