@@ -36,6 +36,50 @@ public class StandingsHtmlTests
     }
 
     [Fact]
+    public void Rank_changes_are_worked_out_by_taking_the_new_results_back_out()
+    {
+        StandingRow Row(int rank, string id, int points, int gf, int ga) => new(rank, new Team(id, id, null), 10, 0, 0, 0, gf, ga, points, null);
+        var table = new Standings(TestData.Competition("fra.1"), [Row(1, "A", 12, 10, 5), Row(2, "B", 11, 9, 6), Row(3, "C", 10, 8, 7), Row(4, "D", 9, 6, 6)]);
+        // A thắng D 2-0: trước trận A có 9 điểm, hiệu số +3, D có 9 điểm, hiệu số +2 → A thứ 3, D thứ 4.
+        var win = TestData.Match("1", DateTimeOffset.UnixEpoch, MatchStatus.Finished, "A", "A", "D", "D", 2, 0);
+
+        var changes = table.RankChanges([win]);
+
+        Assert.Equal(2, changes["A"]);
+        Assert.Equal(-1, changes["B"]);
+        Assert.Equal(-1, changes["C"]);
+        Assert.Equal(0, changes["D"]);
+        Assert.All(table.RankChanges([win with { Status = MatchStatus.Scheduled }]).Values, c => Assert.Equal(0, c));
+    }
+
+    [Fact]
+    public void Rank_change_draws_a_green_up_or_red_down_triangle()
+    {
+        var table = PremierLeague();
+        table = table with { Rows = table.Rows.Select(r => r with { RankChange = r.Rank switch { 1 => 2, 2 => -1, _ => 0 } }).ToList() };
+
+        var page = Assert.Single(Html.BuildPages(table, CardLocale.Vietnamese));
+
+        Assert.Contains("<span class=\"pos\">1<i class=\"move up\"></i></span>", page);
+        Assert.Contains("<span class=\"pos\">2<i class=\"move down\"></i></span>", page);
+        Assert.Contains("<span class=\"pos\">3</span>", page);
+    }
+
+    [Fact]
+    public void Teams_that_just_played_are_highlighted_without_a_legend_entry()
+    {
+        var table = PremierLeague();
+        table = table with { Rows = table.Rows.Select(r => r with { JustPlayed = r.Rank is 1 or 7 }).ToList() };
+
+        var vi = WebUtility.HtmlDecode(Assert.Single(Html.BuildPages(table, CardLocale.Vietnamese)));
+        Assert.Equal(2, vi.Split("<div class=\"row played\">").Length - 1);
+        Assert.DoesNotContain("Vừa thi đấu", vi);
+
+        var none = WebUtility.HtmlDecode(Assert.Single(Html.BuildPages(PremierLeague(), CardLocale.English)));
+        Assert.DoesNotContain("row played", none);
+    }
+
+    [Fact]
     public void Zones_get_a_colour_bar_and_a_translated_legend()
     {
         var vi = WebUtility.HtmlDecode(Html.BuildPages(PremierLeague(), CardLocale.Vietnamese)[0]);

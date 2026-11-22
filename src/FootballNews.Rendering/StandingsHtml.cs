@@ -114,14 +114,22 @@ public sealed class StandingsHtml(ClubCatalog clubs, CardTheme baseTheme, string
             : $"<i class=\"zone{(zoneStarts ? " start" : "")}{(zoneEnds ? " end" : "")}\" style=\"background: {ZoneColor(r.Zone)}\"></i>";
         var gd = r.GoalDifference > 0 ? $"+{r.GoalDifference}" : r.GoalDifference.ToString(CultureInfo.InvariantCulture);
         return $"""
-            <div class="row">
-              {bar}<span class="pos">{r.Rank}</span>
+            <div class="row{(r.JustPlayed ? " played" : "")}">
+              {bar}<span class="pos">{r.Rank}{Move(r.RankChange)}</span>
               <span class="club">{Logo(r.Team)}<span class="name">{E(clubs.DisplayName(r.Team))}</span></span>
               <span class="num">{r.Played}</span><span class="num">{r.Won}</span><span class="num">{r.Drawn}</span><span class="num">{r.Lost}</span>
               <span class="num">{gd}</span><span class="pts">{r.Points}</span>{Form(r.Form)}
             </div>
             """;
     }
+
+    // Tam giác xanh hướng lên khi đội lên hạng, đỏ hướng xuống khi tụt hạng; giữ nguyên thì không vẽ.
+    private static string Move(int? change) => change switch
+    {
+        > 0 => "<i class=\"move up\"></i>",
+        < 0 => "<i class=\"move down\"></i>",
+        _ => "",
+    };
 
     // Cùng kiểu ô phong độ với ảnh lịch đấu: trận gần nhất bên phải.
     private static string Form(string? form)
@@ -157,13 +165,20 @@ public sealed class StandingsHtml(ClubCatalog clubs, CardTheme baseTheme, string
         header p { font-size: 21px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-top: 6px; }
         .page-logo { position: absolute; right: 24px; top: 20px; height: 84px; }
         main { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #FFFFFF; color: {{theme.Background}}; border-radius: 28px; overflow: hidden; }
-        .row { display: grid; grid-template-columns: 80px 1fr 54px 54px 54px 54px 66px 62px 172px; align-items: center; padding: 0 16px 0 0; }
+        .row { display: grid; grid-template-columns: 96px 1fr 54px 54px 54px 54px 66px 62px 172px; align-items: center; padding: 0 16px 0 0; }
         .row.head { height: 58px; flex: none; font-size: 18px; font-weight: 700; letter-spacing: 1px;
                     background: linear-gradient(90deg, {{theme.Surface}}, {{theme.SurfaceEnd}}); color: {{theme.SurfaceText}}; }
         .rows { flex: 1; min-height: 0; display: flex; flex-direction: column; }
         .rows .row { position: relative; flex: 1; font-size: 24px; border-bottom: 1px solid color-mix(in srgb, {{theme.Background}} 9%, transparent); }
         .rows .row:last-child { border-bottom: none; }
-        .pos { text-align: center; font-weight: 700; }
+        /* Đội vừa đá: nền nhạt theo dải màu của giải, cùng màu với thanh tiêu đề bảng. */
+        .rows .row.played { background: linear-gradient(90deg, color-mix(in srgb, {{theme.Surface}} 55%, #FFFFFF), color-mix(in srgb, {{theme.SurfaceEnd}} 55%, #FFFFFF)); }
+        /* Ô phong độ cuối của đội vừa đá chính là trận hôm nay: viền đậm để nối với tỉ số trong bài kết quả. */
+        .rows .row.played .form b:last-child { box-shadow: 0 0 0 3px #FFFFFF, 0 0 0 5px {{theme.Background}}; }
+        .pos { text-align: center; font-weight: 700; position: relative; }
+        .move { position: absolute; right: 8px; top: 50%; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; }
+        .move.up { margin-top: -6px; border-bottom: 12px solid #1E9E5A; }
+        .move.down { margin-top: -6px; border-top: 12px solid #D2433D; }
         .zone { position: absolute; left: 0; top: 0; bottom: -1px; width: 9px; }
         .zone.end { bottom: 0; }
         .club { display: flex; align-items: center; gap: 16px; min-width: 0; }

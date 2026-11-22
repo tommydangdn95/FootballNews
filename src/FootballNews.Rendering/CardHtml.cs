@@ -41,15 +41,19 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme baseTheme, string bold
     {
         var isResults = kind == DigestKind.Results;
         var main = entries.Where(e => !e.IsUpdate).ToList();
-        // Mỗi giải một bộ màu; ảnh ghép lấy màu của giải đầu tiên, ảnh chỉ có trận cập nhật dùng màu mặc định.
-        var theme = baseTheme.For(main.Count > 0 ? main[0].Match.Competition.Slug : null);
+        // Mỗi giải một bộ màu; ảnh ghép nhiều giải dùng bộ màu riêng "mixed" để không bị nhận nhầm là của một giải,
+        // ảnh chỉ có trận cập nhật dùng màu mặc định.
+        var slugs = main.Select(e => e.Match.Competition.Slug).Distinct().ToList();
+        var theme = baseTheme.For(slugs.Count switch { 0 => null, 1 => slugs[0], _ => CardTheme.MixedKey });
         var sb = new StringBuilder();
         sb.Append($"<!DOCTYPE html><html lang=\"{locale.Code}\"><head><meta charset=\"utf-8\"><style>").Append(Css(theme)).Append("</style></head><body><div class=\"card\">");
         sb.Append($"<header><div class=\"heading\"><h1>{E(isResults ? locale.ResultsTitle : locale.UpcomingTitle)}</h1>");
 
-        // Tên giải nằm dưới tiêu đề; ảnh ghép (giải chỉ có 1 trận đi chung giải khác) ghi các giải nối nhau.
+        // Tên giải nằm dưới tiêu đề; ảnh ghép (giải chỉ có 1 trận đi chung giải khác) ghi "Tổng hợp các lượt trận",
+        // tên từng giải nằm ở tiêu đề mục kèm logo.
         var named = (main.Count > 0 ? main : [.. entries]).Select(e => e.Match.Competition).DistinctBy(c => c.Slug).ToList();
-        sb.Append($"<p class=\"competition\">{E(string.Join(" · ", named.Select(locale.CompetitionName)))}</p>");
+        var subtitle = named.Count > 1 ? locale.MixedSubtitle : string.Join(" · ", named.Select(locale.CompetitionName));
+        sb.Append($"<p class=\"competition\">{E(subtitle)}</p>");
         // Ảnh ghi ngày dưới từng trận; khoảng ngày nằm trong tin Telegram. Ảnh tiếng Anh ghi thêm múi giờ của lịch đấu.
         if (!isResults && locale.TimeZoneNote(entries.Select(e => e.Match.Competition).Distinct().ToList()) is { } note)
             sb.Append($"<p>{E(note)}</p>");
@@ -80,8 +84,12 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme baseTheme, string bold
                     : !mixed ? round
                     : round is null ? locale.CompetitionName(competition)
                     : $"{locale.CompetitionName(competition)} · {round}";
+                // Ảnh ghép có logo giải trước tiêu đề mục để nhận ra giải nhanh hơn chữ.
+                var logo = mixed && !string.IsNullOrEmpty(competition?.Logo)
+                    ? $"<img class=\"league-logo\" src=\"{E(competition.Logo)}\" alt=\"\" onerror=\"this.remove()\">"
+                    : "";
                 if (heading is not null)
-                    sb.Append($"<h2>{E(heading)}</h2>");
+                    sb.Append(logo.Length > 0 ? $"<h2>{logo}<span>{E(heading)}</span></h2>" : $"<h2>{E(heading)}</h2>");
                 if (showFormNote)
                     sb.Append($"<p class=\"note\">{E(locale.FormNote(competition))}</p>");
                 showFormNote = false;
@@ -203,7 +211,8 @@ public sealed class CardHtml(ClubCatalog clubs, CardTheme baseTheme, string bold
         header p { font-size: 28px; color: {{theme.Muted}}; margin-top: 2px; }
         header p.competition { font-size: 34px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-top: 4px; }
         section { margin-bottom: 28px; }
-        h2 { font-size: 26px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-bottom: 14px; }
+        h2 { display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 700; letter-spacing: 2px; color: {{theme.Accent}}; margin-bottom: 14px; }
+        h2 .league-logo { height: 44px; max-width: 64px; object-fit: contain; flex: none; }
         .note { font-size: 21px; color: {{theme.Muted}}; margin: -8px 0 14px; }
         article { background: linear-gradient(90deg, {{theme.Surface}}, {{theme.SurfaceEnd}}); color: {{theme.SurfaceText}}; border-radius: 56px; padding: 22px 36px; margin-bottom: 14px; }
         .line { display: grid; grid-template-columns: 1fr 170px 1fr; align-items: center; column-gap: 14px; }
