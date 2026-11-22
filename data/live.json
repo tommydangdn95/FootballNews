@@ -36,7 +36,7 @@
     "redCards": [
       "360|Yoro"
     ],
-    "halfTimeDone": false,
+    "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
     "fullTimeDone": false,
@@ -103,11 +103,37 @@
       "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g2",
       "varWarning": false,
+      "telegramMessageId": 124,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114546247539980"
+    },
+    {
+      "id": 36,
+      "kind": "halfTime",
+      "createdAt": "2026-11-22T17:20:05.2047876+00:00",
+      "status": "posted",
+      "homeScore": 2,
+      "awayScore": 0,
+      "title": "HẾT HIỆP 1",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Szoboszlai 10'",
+        "Wirtz 13'"
+      ],
+      "awayLines": [
+        "Yoro 8' \uD83D\uDFE5"
+      ],
+      "customLines": null,
+      "text": "⏸️ Hết hiệp 1: Liverpool 2-0 Man Utd\n⚽ Liverpool: Szoboszlai 10', Wirtz 13'\n\uD83D\uDFE5 Thẻ đỏ: Yoro 8' (Man Utd)",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114546247539980"
+      "facebookPostId": "1302280479644878_122114557689539980"
     }
   ],
-  "nextDraftId": 36,
+  "nextDraftId": 37,
   "editingDraftId": null
 }
