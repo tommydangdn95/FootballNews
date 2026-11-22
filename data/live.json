@@ -55,7 +55,7 @@
     "halfTimeDone": true,
     "endOfRegulationDone": false,
     "hadExtraTime": false,
-    "fullTimeDone": false,
+    "fullTimeDone": true,
     "nextGoalId": 5,
     "autopilot": true
   },
@@ -187,11 +187,39 @@
       "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
       "goalId": "g4",
       "varWarning": false,
+      "telegramMessageId": 127,
+      "telegramIsPhoto": true,
+      "facebookPostId": "1302280479644878_122114574693539980"
+    },
+    {
+      "id": 39,
+      "kind": "fullTime",
+      "createdAt": "2026-11-22T18:23:23.6032168+00:00",
+      "status": "posted",
+      "homeScore": 4,
+      "awayScore": 0,
+      "title": "KẾT THÚC",
+      "detail": null,
+      "teamId": null,
+      "homeLines": [
+        "Szoboszlai 10'",
+        "Wirtz 13'",
+        "Ngumoha 66'",
+        "Muñoz 82'"
+      ],
+      "awayLines": [
+        "Yoro 8' \uD83D\uDFE5"
+      ],
+      "customLines": null,
+      "text": "\uD83C\uDFC1 Kết thúc: Liverpool 4-0 Man Utd\n⚽ Liverpool: Szoboszlai 10', Wirtz 13', Ngumoha 66', Muñoz 82'\n\uD83D\uDFE5 Thẻ đỏ: Yoro 8' (Man Utd)",
+      "hashtags": "#Liverpool #MU #NgoaiHangAnh #MatchdayChallenge",
+      "goalId": null,
+      "varWarning": false,
       "telegramMessageId": null,
       "telegramIsPhoto": false,
-      "facebookPostId": "1302280479644878_122114574693539980"
+      "facebookPostId": "1302280479644878_122114577795539980"
     }
   ],
-  "nextDraftId": 39,
+  "nextDraftId": 40,
   "editingDraftId": null
 }
