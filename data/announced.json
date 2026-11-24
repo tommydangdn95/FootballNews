@@ -1097,6 +1097,174 @@
       "status": "scheduled",
       "competition": "esp.1",
       "announcedAt": "2026-11-23T00:03:29.9594473+00:00"
+    },
+    "401884720": {
+      "kickoffUtc": "2026-11-27T19:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884721": {
+      "kickoffUtc": "2026-11-28T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884722": {
+      "kickoffUtc": "2026-11-28T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884723": {
+      "kickoffUtc": "2026-11-28T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884719": {
+      "kickoffUtc": "2026-11-28T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884726": {
+      "kickoffUtc": "2026-11-28T17:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884724": {
+      "kickoffUtc": "2026-11-29T14:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884725": {
+      "kickoffUtc": "2026-11-29T16:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401884727": {
+      "kickoffUtc": "2026-11-29T18:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ger.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401875004": {
+      "kickoffUtc": "2026-11-27T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401875081": {
+      "kickoffUtc": "2026-11-28T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401874826": {
+      "kickoffUtc": "2026-11-28T17:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401874977": {
+      "kickoffUtc": "2026-11-28T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401875031": {
+      "kickoffUtc": "2026-11-29T11:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401874992": {
+      "kickoffUtc": "2026-11-29T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401874769": {
+      "kickoffUtc": "2026-11-29T17:00:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401874994": {
+      "kickoffUtc": "2026-11-29T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401875095": {
+      "kickoffUtc": "2026-11-30T17:30:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401875019": {
+      "kickoffUtc": "2026-11-30T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "ita.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876392": {
+      "kickoffUtc": "2026-11-27T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876394": {
+      "kickoffUtc": "2026-11-28T16:15:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876391": {
+      "kickoffUtc": "2026-11-28T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876390": {
+      "kickoffUtc": "2026-11-28T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876388": {
+      "kickoffUtc": "2026-11-28T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876387": {
+      "kickoffUtc": "2026-11-28T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876393": {
+      "kickoffUtc": "2026-11-29T14:00:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876386": {
+      "kickoffUtc": "2026-11-29T16:15:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
+    },
+    "401876389": {
+      "kickoffUtc": "2026-11-29T19:45:00+00:00",
+      "status": "scheduled",
+      "competition": "fra.1",
+      "announcedAt": "2026-11-24T00:01:54.4360095+00:00"
     }
   },
   "results": {
@@ -1528,6 +1696,15 @@
     },
     "401876400": {
       "announcedAt": "2026-11-23T00:02:25.8502624+00:00"
+    },
+    "401879237": {
+      "announcedAt": "2026-11-24T00:01:19.5047368+00:00"
+    },
+    "401882802": {
+      "announcedAt": "2026-11-24T00:01:19.5047368+00:00"
+    },
+    "401875009": {
+      "announcedAt": "2026-11-24T00:01:19.5047368+00:00"
     }
   }
 }
