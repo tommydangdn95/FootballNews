@@ -38,6 +38,9 @@ internal sealed class DailyRunner(
             if (digest.IsEmpty)
             {
                 await publisher.NotifyAsync(DigestText.Empty(kind, ignoreAnnounced), ct);
+                // Chạy force luôn gửi đủ bảng xếp hạng, kể cả khi không có kết quả mới.
+                if (kind == DigestKind.Results && ignoreAnnounced)
+                    await PublishStandingsAsync([], vietnamDate, ct);
                 continue;
             }
 
@@ -105,28 +108,29 @@ internal sealed class DailyRunner(
 
     /// <summary>
     /// Sau bài kết quả, gửi bảng xếp hạng của các giải có trận vừa đá (giải VĐQG, vòng phân hạng cúp châu Âu).
+    /// Chạy force thì gửi đủ mọi giải có bảng, kể cả giải không có trận trong bài (vd C1/C2/C3 giữa hai lượt),
+    /// và không tô đội vừa đá vì cả vòng đều vừa đá; mũi tên lên/xuống hạng vẫn tính theo vòng trong bài.
     /// Lỗi ở đây chỉ báo cho chủ trang: bài kết quả đã gửi xong.
     /// </summary>
     private async Task PublishStandingsAsync(IReadOnlyList<Match> results, DateOnly vietnamDate, CancellationToken ct)
     {
+        var bySlug = results.Where(m => Matchday.IsNumbered(m.Stage)).GroupBy(m => m.Competition.Slug).ToDictionary(g => g.Key, g => g.ToList());
+        var targets = ignoreAnnounced
+            ? competitions.OrderBy(c => c.Order).ToList()
+            : bySlug.Values.Select(g => g[0].Competition).OrderBy(c => c.Order).ToList();
         var tables = new List<Standings>();
-        foreach (var group in results.Where(m => Matchday.IsNumbered(m.Stage)).GroupBy(m => m.Competition.Slug).OrderBy(g => g.First().Competition.Order))
+        foreach (var competition in targets)
         {
-            if (await StandingsAsync(group.First().Competition, ct) is not { Rows.Count: > 0 } table)
+            if (await StandingsAsync(competition, ct) is not { Rows.Count: > 0 } table)
                 continue;
-            // Phong độ tính đến lúc chạy, cùng giải và cùng mùa với các trận vừa đá.
+            var group = bySlug.GetValueOrDefault(competition.Slug) ?? [];
+            var shown = table.AfterResults(group, highlightPlayed: !ignoreAnnounced);
+            // Phong độ tính đến lúc chạy, cùng giải và cùng mùa với các trận vừa đá (không có trận thì lấy mùa hiện tại của ESPN).
             var season = group.Select(m => m.Season).FirstOrDefault(s => s is not null);
-            var played = group.SelectMany(m => new[] { m.Home.Team.Id, m.Away.Team.Id }).ToHashSet();
-            var changes = table.RankChanges(group);
-            var rows = new List<StandingRow>(table.Rows.Count);
-            foreach (var row in table.Rows)
-                rows.Add(row with
-                {
-                    Form = await FormAsync(table.Competition, row.Team, season, DateTimeOffset.UtcNow, ct),
-                    JustPlayed = played.Contains(row.Team.Id),
-                    RankChange = changes.GetValueOrDefault(row.Team.Id),
-                });
-            tables.Add(table with { Rows = rows, Round = group.Max(m => m.Round) });
+            var rows = new List<StandingRow>(shown.Rows.Count);
+            foreach (var row in shown.Rows)
+                rows.Add(row with { Form = await FormAsync(competition, row.Team, season, DateTimeOffset.UtcNow, ct) });
+            tables.Add(shown with { Rows = rows });
         }
         Console.WriteLine($"Standings: {tables.Count} giải");
         if (tables.Count == 0)

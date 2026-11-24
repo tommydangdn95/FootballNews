@@ -53,6 +53,29 @@ public class StandingsHtmlTests
     }
 
     [Fact]
+    public void After_results_highlights_only_on_a_normal_run_and_falls_back_to_games_played_for_the_round()
+    {
+        StandingRow Row(int rank, string id, int points, int gf, int ga, int played = 10) => new(rank, new Team(id, id, null), played, 0, 0, 0, gf, ga, points, null);
+        var table = new Standings(TestData.Competition("fra.1"), [Row(1, "A", 12, 10, 5, 11), Row(2, "B", 11, 9, 6), Row(3, "C", 10, 8, 7), Row(4, "D", 9, 6, 6, 11)]);
+        var win = TestData.Match("1", DateTimeOffset.UnixEpoch, MatchStatus.Finished, "A", "A", "D", "D", 2, 0) with { Round = 11 };
+
+        var normal = table.AfterResults([win], highlightPlayed: true);
+        Assert.Equal(["A", "D"], normal.Rows.Where(r => r.JustPlayed).Select(r => r.Team.Id));
+        Assert.Equal(2, normal.Rows[0].RankChange);
+        Assert.Equal(11, normal.Round);
+
+        // Chạy force: cả vòng vừa đá nên không tô, mũi tên vẫn giữ.
+        var force = table.AfterResults([win], highlightPlayed: false);
+        Assert.DoesNotContain(force.Rows, r => r.JustPlayed);
+        Assert.Equal(2, force.Rows[0].RankChange);
+
+        // Giải không có trận trong bài (vd C1 giữa hai lượt khi chạy force): không mũi tên, vòng là số trận đã đá nhiều nhất.
+        var idle = table.AfterResults([], highlightPlayed: false);
+        Assert.All(idle.Rows, r => Assert.Equal(0, r.RankChange));
+        Assert.Equal(11, idle.Round);
+    }
+
+    [Fact]
     public void Rank_change_draws_a_green_up_or_red_down_triangle()
     {
         var table = PremierLeague();

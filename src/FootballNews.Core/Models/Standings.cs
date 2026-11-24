@@ -79,6 +79,25 @@ public sealed record Standings(Competition Competition, IReadOnlyList<StandingRo
         }
     }
 
+    /// <summary>
+    /// Bảng để vẽ sau bài kết quả: mũi tên lên/xuống hạng theo <paramref name="results"/> (các trận của giải này trong bài),
+    /// tô nổi đội vừa đá nếu <paramref name="highlightPlayed"/>. Vòng ghi trên ảnh là vòng lớn nhất trong bài; giải không có
+    /// trận nào trong bài (chạy force) thì lấy số trận đã đá nhiều nhất trên bảng, cùng quy tắc với <see cref="Matchday"/>.
+    /// </summary>
+    public Standings AfterResults(IReadOnlyList<Match> results, bool highlightPlayed)
+    {
+        var changes = RankChanges(results);
+        var played = highlightPlayed
+            ? results.SelectMany(m => new[] { m.Home.Team.Id, m.Away.Team.Id }).ToHashSet()
+            : [];
+        var round = results.Select(m => m.Round).Max() ?? (Rows.Count > 0 ? Rows.Max(r => r.Played) : null);
+        return this with
+        {
+            Rows = Rows.Select(r => r with { JustPlayed = played.Contains(r.Team.Id), RankChange = changes.GetValueOrDefault(r.Team.Id) }).ToList(),
+            Round = round,
+        };
+    }
+
     /// <summary>Id đội → số trận đã đá, dùng cho <see cref="Matchday.Assign"/>.</summary>
     public IReadOnlyDictionary<string, int> GamesPlayed() => Rows
         .GroupBy(r => r.Team.Id)
